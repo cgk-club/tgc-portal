@@ -45,7 +45,7 @@ export default function ItineraryNoteCard({
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => onUpdate({ custom_title: title })}
           placeholder="Note title (e.g. Transfer, Flight)"
-          className="w-full text-sm font-medium text-gray-900 bg-transparent border-none p-0 focus:outline-none placeholder:text-gray-400 italic"
+          className="w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-[4px] px-3 py-1.5 focus:border-green focus:outline-none focus:ring-1 focus:ring-green placeholder:text-gray-400 italic"
         />
         <textarea
           value={note}
@@ -53,7 +53,7 @@ export default function ItineraryNoteCard({
           onBlur={() => onUpdate({ custom_note: note })}
           placeholder="Details..."
           rows={2}
-          className="w-full text-sm text-gray-600 bg-transparent border-none p-0 mt-1 focus:outline-none placeholder:text-gray-400 resize-none italic"
+          className="w-full text-sm text-gray-600 bg-white border border-gray-200 rounded-[4px] px-3 py-1.5 mt-2 focus:border-green focus:outline-none focus:ring-1 focus:ring-green placeholder:text-gray-400 resize-none italic"
         />
 
         <div className="flex items-center gap-2 mt-2">

@@ -113,7 +113,7 @@ export default function ItineraryDay({ day, itineraryId, onUpdate }: ItineraryDa
         className="flex items-center gap-3 cursor-pointer select-none mb-3"
         onClick={() => setCollapsed(!collapsed)}
       >
-        <span className="text-gray-400 text-xs">{collapsed ? '&#9654;' : '&#9660;'}</span>
+        <span className="text-gray-400 text-xs">{collapsed ? '\u25B6' : '\u25BC'}</span>
         <h3 className="font-heading text-base font-semibold text-green">
           Day {day.day_number}
           {dateLabel && <span className="font-body font-normal text-sm text-gray-500 ml-2">{dateLabel}</span>}
