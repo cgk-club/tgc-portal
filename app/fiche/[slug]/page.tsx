@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { notFound } from 'next/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getOrgById } from '@/lib/airtable'
