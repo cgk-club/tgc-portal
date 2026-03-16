@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getSupabase } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { getOrgById } from '@/lib/airtable'
 import { Fiche, Highlight } from '@/types'
 import FicheHero from '@/components/fiche/FicheHero'
@@ -10,12 +10,14 @@ import FicheContact from '@/components/fiche/FicheContact'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ preview?: string }>
 }
 
-export default async function FichePage({ params }: PageProps) {
+export default async function FichePage({ params, searchParams }: PageProps) {
   const { slug } = await params
+  const { preview } = await searchParams
 
-  const { data: fiche } = await getSupabase()
+  const { data: fiche } = await getSupabaseAdmin()
     .from('fiches')
     .select('*')
     .eq('slug', slug)
@@ -27,7 +29,7 @@ export default async function FichePage({ params }: PageProps) {
 
   const ficheData = fiche as Fiche
 
-  if (ficheData.status !== 'live') {
+  if (ficheData.status !== 'live' && preview !== 'true') {
     notFound()
   }
 
