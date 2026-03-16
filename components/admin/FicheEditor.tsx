@@ -296,7 +296,7 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
         {/* Actions */}
         <div className="space-y-2">
           <a
-            href={`/fiche/${slug}`}
+            href={status === 'live' ? `/fiche/${slug}` : `/fiche/${slug}?preview=true`}
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full text-center rounded-[4px] border border-green text-green px-4 py-2 text-sm font-medium hover:bg-green-muted transition-colors"
