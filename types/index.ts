@@ -47,8 +47,10 @@ export interface Itinerary {
   summary: string | null
   status: 'draft' | 'shared' | 'archived'
   share_token: string | null
+  start_date: string | null
   created_at: string
   updated_at: string
+  days?: ItineraryDay[]
 }
 
 export interface ItineraryDay {
@@ -59,14 +61,20 @@ export interface ItineraryDay {
   title: string | null
   notes: string | null
   sort_order: number
+  items?: ItineraryItem[]
 }
+
+export type TimeOfDay = 'breakfast' | 'morning' | 'lunch' | 'afternoon' | 'evening' | 'dinner' | 'late_night'
 
 export interface ItineraryItem {
   id: string
   day_id: string
   fiche_id: string | null
+  fiche?: Fiche
   custom_title: string | null
   custom_note: string | null
-  time_of_day: 'morning' | 'afternoon' | 'evening' | null
+  time_of_day: TimeOfDay | null
+  exact_time: string | null
   sort_order: number
+  item_type: 'fiche' | 'note'
 }

@@ -77,3 +77,18 @@ CREATE POLICY "Service role full access itinerary_days" ON itinerary_days
 
 CREATE POLICY "Service role full access itinerary_items" ON itinerary_items
   FOR ALL USING (auth.role() = 'service_role');
+
+-- Public read access for shared itineraries (via share_token)
+CREATE POLICY "Public can read shared itineraries" ON itineraries
+  FOR SELECT USING (status = 'shared');
+
+CREATE POLICY "Public can read itinerary days" ON itinerary_days
+  FOR SELECT USING (true);
+
+CREATE POLICY "Public can read itinerary items" ON itinerary_items
+  FOR SELECT USING (true);
+
+-- Phase 2 schema additions (run these if tables already exist)
+-- ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS item_type TEXT DEFAULT 'fiche';
+-- ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS exact_time TIME;
+-- ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS start_date DATE;

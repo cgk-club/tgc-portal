@@ -1,13 +1,104 @@
-// Phase 2
-export default function ItineraryPage() {
+import { notFound } from 'next/navigation'
+import { getItineraryByToken } from '@/lib/itineraries'
+import { getOrgById } from '@/lib/airtable'
+import ClientItineraryCover from '@/components/client/ClientItineraryCover'
+import ClientDaySection from '@/components/client/ClientDaySection'
+import ClientItineraryPDF from './ClientPDF'
+
+interface PageProps {
+  params: Promise<{ shareToken: string }>
+}
+
+export default async function ItineraryPage({ params }: PageProps) {
+  const { shareToken } = await params
+  const itinerary = await getItineraryByToken(shareToken)
+
+  if (!itinerary) {
+    notFound()
+  }
+
+  // Archived
+  if (itinerary.status === 'archived') {
+    return (
+      <div className="min-h-screen bg-pearl flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <span className="font-heading text-sm font-semibold tracking-wider text-gold">
+            THE GATEKEEPERS CLUB
+          </span>
+          <p className="text-gray-500 font-body mt-4">
+            This itinerary is no longer available. Please contact us if you believe this is an error.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Draft
+  if (itinerary.status === 'draft') {
+    return (
+      <div className="min-h-screen bg-pearl flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <span className="font-heading text-sm font-semibold tracking-wider text-gold">
+            THE GATEKEEPERS CLUB
+          </span>
+          <p className="text-gray-500 font-body mt-4">
+            This itinerary is being prepared. Please check back soon.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Enrich fiche items with org data
+  if (itinerary.days) {
+    for (const day of itinerary.days) {
+      if (day.items) {
+        for (const item of day.items) {
+          if (item.fiche?.airtable_record_id) {
+            const org = await getOrgById(item.fiche.airtable_record_id)
+            if (org) {
+              ;(item.fiche as unknown as Record<string, unknown>).org = org
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const days = itinerary.days || []
+
   return (
-    <div className="min-h-screen bg-pearl flex items-center justify-center">
-      <div className="text-center">
+    <div className="min-h-screen bg-pearl">
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 md:px-12 py-4 border-b border-gray-100">
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">
           THE GATEKEEPERS CLUB
         </span>
-        <p className="text-gray-500 font-body mt-4">Itinerary view coming soon.</p>
+        <ClientItineraryPDF itinerary={itinerary} />
+      </header>
+
+      {/* Cover */}
+      <div className="max-w-3xl mx-auto px-6">
+        <ClientItineraryCover itinerary={itinerary} />
+
+        {/* Days */}
+        {days.map((day) => (
+          <ClientDaySection key={day.id} day={day} />
+        ))}
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-12 text-center mt-12">
+        <span className="font-heading text-sm font-semibold tracking-wider text-gold">
+          THE GATEKEEPERS CLUB
+        </span>
+        <p className="text-sm text-gray-400 font-body mt-2">
+          Curated travel, crafted personally
+        </p>
+        <p className="text-xs text-gray-300 font-body mt-4">
+          &copy; {new Date().getFullYear()} The Gatekeepers Club
+        </p>
+      </footer>
     </div>
   )
 }
