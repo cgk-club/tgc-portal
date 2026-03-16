@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ItineraryItem, TimeOfDay } from '@/types'
 
 const TIME_OPTIONS: { value: TimeOfDay | ''; label: string }[] = [
@@ -32,19 +33,24 @@ export default function ItineraryNoteCard({
   onDelete,
   onUpdate,
 }: ItineraryNoteCardProps) {
+  const [title, setTitle] = useState(item.custom_title || '')
+  const [note, setNote] = useState(item.custom_note || '')
+
   return (
     <div className="bg-pearl rounded-[8px] border-l-4 border-gold p-4 flex gap-4">
       <div className="flex-1 min-w-0">
         <input
           type="text"
-          value={item.custom_title || ''}
-          onChange={(e) => onUpdate({ custom_title: e.target.value })}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={() => onUpdate({ custom_title: title })}
           placeholder="Note title (e.g. Transfer, Flight)"
           className="w-full text-sm font-medium text-gray-900 bg-transparent border-none p-0 focus:outline-none placeholder:text-gray-400 italic"
         />
         <textarea
-          value={item.custom_note || ''}
-          onChange={(e) => onUpdate({ custom_note: e.target.value })}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          onBlur={() => onUpdate({ custom_note: note })}
           placeholder="Details..."
           rows={2}
           className="w-full text-sm text-gray-600 bg-transparent border-none p-0 mt-1 focus:outline-none placeholder:text-gray-400 resize-none italic"
