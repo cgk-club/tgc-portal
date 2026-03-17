@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { TEMPLATE_LABELS, FicheTemplate } from '@/lib/ficheTemplates'
+import { getOrgById } from '@/lib/airtable'
+import { TEMPLATE_LABELS, FicheTemplate, getTemplate } from '@/lib/ficheTemplates'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,7 @@ export default async function AdminDashboard() {
     { count: draftItineraries },
     { count: sharedItineraries },
     { count: totalClients },
-    { data: fichesByTemplate },
+    { data: allFiches },
   ] = await Promise.all([
     sb.from('fiches').select('*', { count: 'exact', head: true }),
     sb.from('fiches').select('*', { count: 'exact', head: true }).eq('status', 'live'),
@@ -25,14 +26,37 @@ export default async function AdminDashboard() {
     sb.from('itineraries').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
     sb.from('itineraries').select('*', { count: 'exact', head: true }).eq('status', 'shared'),
     sb.from('client_accounts').select('*', { count: 'exact', head: true }),
-    sb.from('fiches').select('template_type'),
+    sb.from('fiches').select('id, airtable_record_id, template_type'),
   ])
 
-  // Count fiches by template type
+  // For fiches still on 'default', look up Airtable category to compute real template
   const templateCounts: Record<string, number> = {}
-  for (const row of fichesByTemplate || []) {
-    const t = (row.template_type as string) || 'default'
-    templateCounts[t] = (templateCounts[t] || 0) + 1
+  const backfillUpdates: { id: string; template_type: string }[] = []
+
+  await Promise.all(
+    (allFiches || []).map(async (fiche) => {
+      let t = fiche.template_type as string
+      if (!t || t === 'default') {
+        // Look up the org to derive the template
+        const org = await getOrgById(fiche.airtable_record_id)
+        const derived = getTemplate(org?.categorySub)
+        t = derived
+        // Queue a backfill so we don't have to do this every time
+        if (derived !== 'default' && derived !== fiche.template_type) {
+          backfillUpdates.push({ id: fiche.id, template_type: derived })
+        }
+      }
+      templateCounts[t] = (templateCounts[t] || 0) + 1
+    })
+  )
+
+  // Backfill template_type in background (non-blocking)
+  if (backfillUpdates.length > 0) {
+    Promise.all(
+      backfillUpdates.map((u) =>
+        sb.from('fiches').update({ template_type: u.template_type }).eq('id', u.id)
+      )
+    ).catch(() => {})
   }
 
   // Sort by count descending
