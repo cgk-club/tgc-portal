@@ -50,9 +50,9 @@ export default function ClientFicheCard({ item }: ClientFicheCardProps) {
             {description.slice(0, 200)}{description.length > 200 ? '...' : ''}
           </p>
         )}
-        {slug && fiche?.status === 'live' && (
+        {slug && (
           <a
-            href={`/fiche/${slug}`}
+            href={fiche?.status === 'live' ? `/fiche/${slug}` : `/fiche/${slug}?preview=true`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-green hover:text-green-light font-medium font-body"
