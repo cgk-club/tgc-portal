@@ -9,6 +9,12 @@ import Textarea from '@/components/ui/Textarea'
 import ImageUploader from '@/components/admin/ImageUploader'
 import GalleryManager from '@/components/admin/GalleryManager'
 import OutreachModal from '@/components/admin/OutreachModal'
+import TemplateFieldSelector from '@/components/admin/template-fields/TemplateFieldSelector'
+import HospitalityFieldsEditor from '@/components/admin/template-fields/HospitalityFields'
+import RealEstateFieldsEditor from '@/components/admin/template-fields/RealEstateFields'
+import DiningFieldsEditor from '@/components/admin/template-fields/DiningFields'
+import MakerFieldsEditor from '@/components/admin/template-fields/MakerFields'
+import { FicheTemplate, getTemplate } from '@/lib/ficheTemplates'
 
 interface FicheEditorProps {
   fiche: FicheWithOrg
@@ -36,6 +42,14 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
   const [status, setStatus] = useState(initial.status)
   const [featured, setFeatured] = useState(initial.featured)
   const [slug, setSlug] = useState(initial.slug)
+  const [templateType, setTemplateType] = useState<FicheTemplate>(
+    (initial.template_type as FicheTemplate) || getTemplate(initial.org?.categorySub)
+  )
+  const [templateFields, setTemplateFields] = useState<Record<string, unknown>>(
+    (initial.template_fields && typeof initial.template_fields === 'object') ? initial.template_fields : {}
+  )
+  const [showPrice, setShowPrice] = useState(initial.show_price ?? false)
+  const [priceDisplay, setPriceDisplay] = useState(initial.price_display || '')
   const [showOutreach, setShowOutreach] = useState(false)
   const [lastContacted, setLastContacted] = useState<string | null>(null)
 
@@ -89,6 +103,10 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
         gallery_urls: galleryUrls,
         tags,
         tgc_note: tgcNote || null,
+        template_type: templateType,
+        template_fields: templateFields,
+        show_price: showPrice,
+        price_display: priceDisplay || null,
         status,
         featured,
         slug,
@@ -133,6 +151,55 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+
+        {/* Template Fields */}
+        <div className="bg-white rounded-[8px] border border-gray-200 p-4 space-y-4">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Template Fields
+          </h3>
+          <TemplateFieldSelector value={templateType} onChange={setTemplateType} />
+          {templateType === 'hospitality' && (
+            <HospitalityFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'real_estate' && (
+            <RealEstateFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'dining' && (
+            <DiningFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'maker' && (
+            <MakerFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          <div className="border-t border-gray-200 pt-3 space-y-3">
+            <Input
+              label="Price display"
+              placeholder="e.g. from €850 per night"
+              value={priceDisplay}
+              onChange={(e) => setPriceDisplay(e.target.value)}
+            />
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showPrice}
+                onChange={(e) => setShowPrice(e.target.checked)}
+                className="rounded border-gray-300 text-green focus:ring-green"
+              />
+              <span className="text-sm text-gray-700">Show price publicly</span>
+            </label>
+          </div>
+        </div>
 
         {/* Highlights */}
         <div>

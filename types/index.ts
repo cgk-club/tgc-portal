@@ -33,6 +33,10 @@ export interface Fiche {
   latitude: number | null
   longitude: number | null
   geocoded_at: string | null
+  template_type: string | null
+  template_fields: Record<string, unknown>
+  show_price: boolean
+  price_display: string | null
   status: 'draft' | 'live' | 'archived'
   featured: boolean
   created_at: string

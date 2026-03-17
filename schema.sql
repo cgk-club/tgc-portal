@@ -113,6 +113,12 @@ ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_status TEXT DEFAULT 'draf
 ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_notes TEXT;
 ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_token TEXT UNIQUE;
 
+-- Phase 4 schema additions (typed fiche templates)
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS template_type TEXT DEFAULT 'default';
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS template_fields JSONB DEFAULT '{}';
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS show_price BOOLEAN DEFAULT false;
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS price_display TEXT;
+
 -- Phase 3B schema additions (run these in Supabase SQL Editor)
 
 -- Client accounts

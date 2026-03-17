@@ -4,11 +4,12 @@ import { notFound } from 'next/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getOrgById } from '@/lib/airtable'
 import { Fiche, Highlight } from '@/types'
-import FicheHero from '@/components/fiche/FicheHero'
-import FicheHighlights from '@/components/fiche/FicheHighlights'
-import FicheGallery from '@/components/fiche/FicheGallery'
-import FicheTags from '@/components/fiche/FicheTags'
-import FicheContact from '@/components/fiche/FicheContact'
+import { getTemplate } from '@/lib/ficheTemplates'
+import DefaultFiche from '@/components/fiche/templates/DefaultFiche'
+import HospitalityFiche from '@/components/fiche/templates/HospitalityFiche'
+import RealEstateFiche from '@/components/fiche/templates/RealEstateFiche'
+import DiningFiche from '@/components/fiche/templates/DiningFiche'
+import ClientMakerFiche from './ClientMakerFiche'
 import ClientFicheMap from './ClientFicheMap'
 
 interface PageProps {
@@ -38,10 +39,19 @@ export default async function FichePage({ params, searchParams }: PageProps) {
 
   const org = await getOrgById(ficheData.airtable_record_id)
   const name = org?.name || 'Unnamed'
-  const category = org?.category || ''
-  const categorySub = org?.categorySub || ''
   const locationParts = [org?.city, org?.country].filter(Boolean)
   const location = locationParts.join(', ')
+
+  // Auto-detect template if not set
+  const templateType = ficheData.template_type || getTemplate(org?.categorySub)
+
+  // Silent migration: set template_type if not yet stored
+  if (!ficheData.template_type && templateType !== 'default') {
+    await getSupabaseAdmin()
+      .from('fiches')
+      .update({ template_type: templateType })
+      .eq('id', ficheData.id)
+  }
 
   // Auto-geocode if lat/lng not set
   let lat = ficheData.latitude
@@ -61,7 +71,6 @@ export default async function FichePage({ params, searchParams }: PageProps) {
         if (results.length > 0) {
           lat = parseFloat(results[0].lat)
           lng = parseFloat(results[0].lon)
-          // Cache in database
           await getSupabaseAdmin()
             .from('fiches')
             .update({ latitude: lat, longitude: lng, geocoded_at: new Date().toISOString() })
@@ -77,6 +86,25 @@ export default async function FichePage({ params, searchParams }: PageProps) {
   const galleryUrls: string[] = Array.isArray(ficheData.gallery_urls) ? ficheData.gallery_urls : []
   const tags: string[] = Array.isArray(ficheData.tags) ? ficheData.tags : []
 
+  const mapSlot = lat != null && lng != null ? (
+    <div className="py-8 px-4 sm:px-8 md:px-12 lg:px-16">
+      <div className="max-w-3xl mx-auto">
+        <ClientFicheMap lat={lat} lng={lng} name={name} />
+      </div>
+    </div>
+  ) : null
+
+  const commonProps = {
+    fiche: ficheData,
+    org,
+    name,
+    location,
+    highlights,
+    galleryUrls,
+    tags,
+    mapSlot,
+  }
+
   return (
     <div className="min-h-screen bg-pearl">
       {/* Header */}
@@ -86,40 +114,21 @@ export default async function FichePage({ params, searchParams }: PageProps) {
         </span>
       </header>
 
-      <FicheHero
-        name={name}
-        headline={ficheData.headline}
-        category={category}
-        categorySub={categorySub}
-        location={location}
-        heroImageUrl={ficheData.hero_image_url}
-      />
-
-      <FicheHighlights highlights={highlights} />
-
-      {lat != null && lng != null && (
-        <div className="py-8 px-4 sm:px-8 md:px-12 lg:px-16">
-          <div className="max-w-3xl mx-auto">
-            <ClientFicheMap lat={lat} lng={lng} name={name} />
-          </div>
-        </div>
+      {templateType === 'hospitality' && <HospitalityFiche {...commonProps} />}
+      {templateType === 'real_estate' && <RealEstateFiche {...commonProps} />}
+      {templateType === 'dining' && <DiningFiche {...commonProps} />}
+      {templateType === 'maker' && (
+        <ClientMakerFiche
+          fiche={ficheData}
+          org={org}
+          name={name}
+          location={location}
+          galleryUrls={galleryUrls}
+        />
       )}
-
-      {ficheData.description && (
-        <div className="py-10 px-8 md:px-12 lg:px-16">
-          <div className="max-w-3xl mx-auto">
-            <div className="prose prose-lg font-body text-gray-700 leading-relaxed whitespace-pre-line max-w-[65ch]">
-              {ficheData.description}
-            </div>
-          </div>
-        </div>
+      {(templateType === 'default' || !['hospitality', 'real_estate', 'dining', 'maker'].includes(templateType)) && (
+        <DefaultFiche {...commonProps} />
       )}
-
-      <FicheGallery images={galleryUrls} name={name} />
-
-      <FicheTags tags={tags} />
-
-      <FicheContact name={name} />
 
       {/* Footer */}
       <footer className="py-8 px-8 text-center border-t border-gray-200">

@@ -38,6 +38,10 @@ export async function PATCH(
     'gallery_urls',
     'tags',
     'tgc_note',
+    'template_type',
+    'template_fields',
+    'show_price',
+    'price_display',
     'status',
     'featured',
   ]

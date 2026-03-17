@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { searchOrgs, getOrgById } from '@/lib/airtable'
 import { slugify } from '@/lib/utils'
+import { getTemplate } from '@/lib/ficheTemplates'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -79,12 +80,17 @@ export async function POST(request: NextRequest) {
     slug = `${slug}-${Date.now()}`
   }
 
+  // Auto-detect template type from Airtable category
+  const org = await getOrgById(airtable_record_id)
+  const template_type = getTemplate(org?.categorySub)
+
   const { data: fiche, error } = await getSupabaseAdmin()
     .from('fiches')
     .insert({
       airtable_record_id,
       slug,
       status: 'draft',
+      template_type,
     })
     .select()
     .single()
