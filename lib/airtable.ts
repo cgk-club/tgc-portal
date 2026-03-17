@@ -20,6 +20,8 @@ function mapRecord(record: AirtableRecord): AirtableOrg {
     id: record.id,
     name: (f['Organization Name'] as string) || '',
     category: (f['Organization Type'] as string) || '',
+    categoryParent: (f['Category Parent'] as string) || undefined,
+    categorySub: (f['Category Sub'] as string) || undefined,
     country: (f['Country'] as string) || '',
     region: (f['Region'] as string) || '',
     city: (f['City'] as string) || '',

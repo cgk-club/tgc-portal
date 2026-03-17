@@ -161,6 +161,7 @@ export async function updateItinerary(
   const allowedFields = [
     'client_name', 'title', 'slug', 'cover_image_url', 'summary',
     'status', 'share_token', 'start_date',
+    'is_member', 'currency', 'quote_status', 'quote_notes', 'quote_token',
   ]
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const field of allowedFields) {
@@ -210,6 +211,7 @@ export async function updateItem(
   const allowedFields = [
     'fiche_id', 'custom_title', 'custom_note',
     'time_of_day', 'exact_time', 'sort_order', 'item_type',
+    'unit_price', 'quantity', 'price_note', 'is_zero_margin', 'is_included',
   ]
   const updates: Record<string, unknown> = {}
   for (const field of allowedFields) {
@@ -252,6 +254,46 @@ export async function generateShareToken(id: string): Promise<string> {
     .update({
       share_token: token,
       status: 'shared',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  return token
+}
+
+export async function getItineraryByQuoteToken(quoteToken: string): Promise<Itinerary | null> {
+  const { data, error } = await sb()
+    .from('itineraries')
+    .select(`
+      *,
+      days:itinerary_days(
+        *,
+        items:itinerary_items(
+          *,
+          fiche:fiches(*)
+        )
+      )
+    `)
+    .eq('quote_token', quoteToken)
+    .order('sort_order', { referencedTable: 'itinerary_days', ascending: true })
+    .order('sort_order', { referencedTable: 'itinerary_days.itinerary_items', ascending: true })
+    .single()
+
+  if (error) return null
+  return data
+}
+
+export async function generateQuoteToken(id: string): Promise<string> {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let token = ''
+  for (let i = 0; i < 12; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+
+  await sb()
+    .from('itineraries')
+    .update({
+      quote_token: token,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

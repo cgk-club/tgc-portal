@@ -92,3 +92,23 @@ CREATE POLICY "Public can read itinerary items" ON itinerary_items
 -- ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS item_type TEXT DEFAULT 'fiche';
 -- ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS exact_time TIME;
 -- ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS start_date DATE;
+
+-- Phase 3A schema additions (run these in Supabase SQL Editor)
+-- Geocoding for fiches
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS latitude DECIMAL(9,6);
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS longitude DECIMAL(9,6);
+ALTER TABLE fiches ADD COLUMN IF NOT EXISTS geocoded_at TIMESTAMPTZ;
+
+-- Quote fields on itinerary_items
+ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS unit_price DECIMAL(10,2);
+ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS quantity INTEGER DEFAULT 1;
+ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS price_note TEXT;
+ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS is_zero_margin BOOLEAN DEFAULT false;
+ALTER TABLE itinerary_items ADD COLUMN IF NOT EXISTS is_included BOOLEAN DEFAULT true;
+
+-- Quote fields on itineraries
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS is_member BOOLEAN DEFAULT false;
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'EUR';
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_status TEXT DEFAULT 'draft';
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_notes TEXT;
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_token TEXT UNIQUE;

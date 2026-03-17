@@ -17,7 +17,7 @@ export default function FicheGallery({ images, name }: FicheGalleryProps) {
       <div className="py-10 px-8 md:px-12 lg:px-16">
         <div className="max-w-5xl mx-auto">
           <h2 className="font-heading text-2xl font-semibold text-green mb-6">Gallery</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {images.map((url, i) => (
               <button
                 key={i}

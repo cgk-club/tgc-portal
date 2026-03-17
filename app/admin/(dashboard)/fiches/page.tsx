@@ -118,7 +118,7 @@ export default function FicheListPage() {
                     {fiche.org?.name || fiche.slug}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {fiche.org?.category || '-'}
+                    {fiche.org?.categorySub || fiche.org?.category || '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {[fiche.org?.city, fiche.org?.country].filter(Boolean).join(', ') || '-'}
@@ -187,7 +187,7 @@ export default function FicheListPage() {
                     >
                       <p className="text-sm font-medium text-gray-900">{org.name}</p>
                       <p className="text-xs text-gray-500">
-                        {org.category} {org.city && `/ ${org.city}`} {org.country && `/ ${org.country}`}
+                        {org.categorySub || org.category} {org.city && `/ ${org.city}`} {org.country && `/ ${org.country}`}
                       </p>
                     </button>
                   ))}

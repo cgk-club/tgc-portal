@@ -6,6 +6,8 @@ import { Itinerary } from '@/types'
 import ItineraryDay from '@/components/itinerary/ItineraryDay'
 import ShareButton from '@/components/itinerary/ShareButton'
 import PDFExport from '@/components/itinerary/PDFExport'
+import QuotePanel from '@/components/quote/QuotePanel'
+import ImageUploader from '@/components/admin/ImageUploader'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
@@ -17,11 +19,13 @@ export default function ItineraryBuilderPage() {
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState<'details' | 'quote'>('details')
 
   // Editable fields
   const [clientName, setClientName] = useState('')
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
+  const [coverImageUrl, setCoverImageUrl] = useState('')
   const [status, setStatus] = useState<'draft' | 'shared' | 'archived'>('draft')
 
   const fetchItinerary = useCallback(async () => {
@@ -32,6 +36,7 @@ export default function ItineraryBuilderPage() {
       setClientName(data.client_name)
       setTitle(data.title)
       setStartDate(data.start_date || '')
+      setCoverImageUrl(data.cover_image_url || '')
       setStatus(data.status)
     }
     setLoading(false)
@@ -50,6 +55,7 @@ export default function ItineraryBuilderPage() {
         client_name: clientName,
         title,
         start_date: startDate || null,
+        cover_image_url: coverImageUrl || null,
         status,
       }),
     })
@@ -85,7 +91,7 @@ export default function ItineraryBuilderPage() {
             onClick={() => router.push('/admin/itineraries')}
             className="text-sm text-gray-500 hover:text-green font-body"
           >
-            &larr; Back to Itineraries
+            {'\u2190'} Back to Itineraries
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -110,12 +116,12 @@ export default function ItineraryBuilderPage() {
         </div>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Panel: Days */}
-        <div className="flex-1 min-w-0" style={{ flex: '0 0 65%' }}>
+        <div className="flex-1 min-w-0 lg:max-w-[65%]">
           <div className="mb-4">
             <h2 className="font-heading text-xl font-semibold text-green">
-              {itinerary.client_name} &mdash; {itinerary.title}
+              {itinerary.client_name} {'\u2014'} {itinerary.title}
             </h2>
           </div>
 
@@ -136,56 +142,95 @@ export default function ItineraryBuilderPage() {
           </button>
         </div>
 
-        {/* Right Panel: Details */}
-        <div className="w-80 flex-shrink-0">
-          <div className="bg-white rounded-[8px] border border-gray-200 p-6 sticky top-8">
-            <h3 className="font-heading text-sm font-semibold text-green uppercase tracking-wider mb-4">
-              Itinerary Details
-            </h3>
+        {/* Right Panel: Tabs */}
+        <div className="w-full lg:w-80 flex-shrink-0">
+          <div className="bg-white rounded-[8px] border border-gray-200 sticky top-8">
+            {/* Tab headers */}
+            <div className="flex border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('details')}
+                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  activeTab === 'details'
+                    ? 'text-green border-b-2 border-green'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Details
+              </button>
+              <button
+                onClick={() => setActiveTab('quote')}
+                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  activeTab === 'quote'
+                    ? 'text-green border-b-2 border-green'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Quote
+              </button>
+            </div>
 
-            <div className="space-y-4">
-              <Input
-                label="Client name"
-                value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
-              />
-              <Input
-                label="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <Input
-                label="Start date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+            <div className="p-6">
+              {activeTab === 'details' ? (
+                <div className="space-y-4">
+                  <Input
+                    label="Client name"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                  />
+                  <Input
+                    label="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                  <ImageUploader
+                    label="Cover Image"
+                    currentUrl={coverImageUrl || null}
+                    onUpload={(url) => setCoverImageUrl(url)}
+                  />
+                  {coverImageUrl && (
+                    <button
+                      onClick={() => setCoverImageUrl('')}
+                      className="text-xs text-red-400 hover:text-red-600"
+                    >
+                      Remove cover image
+                    </button>
+                  )}
+                  <Input
+                    label="Start date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as typeof status)}
-                  className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="shared">Shared</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as typeof status)}
+                      className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="shared">Shared</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
 
-              <div className="text-sm text-gray-500">
-                <p>Days: {days.length}</p>
-                {itinerary.share_token && (
-                  <p className="mt-1 truncate">
-                    Share link: <span className="text-green text-xs">/itinerary/{itinerary.share_token}</span>
-                  </p>
-                )}
-              </div>
+                  <div className="text-sm text-gray-500">
+                    <p>Days: {days.length}</p>
+                    {itinerary.share_token && (
+                      <p className="mt-1 truncate">
+                        Share link: <span className="text-green text-xs">/itinerary/{itinerary.share_token}</span>
+                      </p>
+                    )}
+                  </div>
 
-              <Button onClick={saveChanges} disabled={saving} className="w-full">
-                {saving ? 'Saving...' : 'Save changes'}
-              </Button>
+                  <Button onClick={saveChanges} disabled={saving} className="w-full">
+                    {saving ? 'Saving...' : 'Save changes'}
+                  </Button>
+                </div>
+              ) : (
+                <QuotePanel itinerary={itinerary} onUpdate={fetchItinerary} />
+              )}
             </div>
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function ItineraryFicheCard({
           className="text-gray-400 hover:text-green disabled:opacity-30 text-sm p-1"
           title="Move up"
         >
-          &#9650;
+          {'\u25B2'}
         </button>
         <button
           onClick={onMoveDown}
@@ -80,7 +80,7 @@ export default function ItineraryFicheCard({
           className="text-gray-400 hover:text-green disabled:opacity-30 text-sm p-1"
           title="Move down"
         >
-          &#9660;
+          {'\u25BC'}
         </button>
         <button
           onClick={onDelete}

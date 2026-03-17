@@ -22,7 +22,7 @@ export default function FicheContact({ name }: FicheContactProps) {
           </p>
           <button
             onClick={() => setChatOpen(true)}
-            className="inline-flex items-center justify-center rounded-[4px] bg-green text-white px-8 py-3 font-body font-medium hover:bg-green-light transition-colors"
+            className="inline-flex items-center justify-center rounded-[4px] bg-green text-white px-8 py-3 font-body font-medium hover:bg-green-light transition-colors w-full sm:w-auto"
           >
             Enquire about this property
           </button>

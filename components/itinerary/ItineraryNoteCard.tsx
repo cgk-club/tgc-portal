@@ -81,14 +81,14 @@ export default function ItineraryNoteCard({
           disabled={isFirst}
           className="text-gray-400 hover:text-green disabled:opacity-30 text-sm p-1"
         >
-          &#9650;
+          {'\u25B2'}
         </button>
         <button
           onClick={onMoveDown}
           disabled={isLast}
           className="text-gray-400 hover:text-green disabled:opacity-30 text-sm p-1"
         >
-          &#9660;
+          {'\u25BC'}
         </button>
         <button onClick={onDelete} className="text-gray-400 hover:text-red-500 text-sm p-1">
           &times;

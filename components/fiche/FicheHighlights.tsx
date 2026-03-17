@@ -9,7 +9,7 @@ export default function FicheHighlights({ highlights }: FicheHighlightsProps) {
 
   return (
     <div className="bg-green-muted py-8 px-8 md:px-12 lg:px-16">
-      <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
         {highlights.map((h, i) => (
           <div key={i} className="text-center">
             <div className="text-2xl mb-1">{h.icon}</div>

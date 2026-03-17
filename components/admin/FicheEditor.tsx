@@ -179,10 +179,10 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
                 <dt className="text-gray-400">Name</dt>
                 <dd className="text-gray-900 font-medium">{org.name}</dd>
               </div>
-              {org.category && (
+              {(org.categorySub || org.category) && (
                 <div>
                   <dt className="text-gray-400">Category</dt>
-                  <dd className="text-gray-900">{org.category}</dd>
+                  <dd className="text-gray-900">{org.categorySub || org.category}</dd>
                 </div>
               )}
               {(org.city || org.country) && (

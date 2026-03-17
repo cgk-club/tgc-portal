@@ -20,9 +20,9 @@ export default function ClientDaySection({ day }: ClientDaySectionProps) {
   return (
     <section className="mb-12">
       <div className="border-b-2 border-green pb-2 mb-6">
-        <h3 className="font-heading text-lg font-semibold text-green">
+        <h3 className="font-heading text-base sm:text-lg font-semibold text-green">
           Day {day.day_number}
-          {day.title && ` \u2014 ${day.title}`}
+          {day.title && <span className="block sm:inline"> {'\u2014'} {day.title}</span>}
         </h3>
         {dateLabel && (
           <p className="text-sm text-gray-400 font-body mt-1">{dateLabel}</p>

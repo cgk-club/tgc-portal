@@ -9,6 +9,7 @@ import FicheHighlights from '@/components/fiche/FicheHighlights'
 import FicheGallery from '@/components/fiche/FicheGallery'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
+import ClientFicheMap from './ClientFicheMap'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -38,8 +39,39 @@ export default async function FichePage({ params, searchParams }: PageProps) {
   const org = await getOrgById(ficheData.airtable_record_id)
   const name = org?.name || 'Unnamed'
   const category = org?.category || ''
+  const categorySub = org?.categorySub || ''
   const locationParts = [org?.city, org?.country].filter(Boolean)
   const location = locationParts.join(', ')
+
+  // Auto-geocode if lat/lng not set
+  let lat = ficheData.latitude
+  let lng = ficheData.longitude
+  if (!lat && !lng && location) {
+    try {
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?${new URLSearchParams({
+          q: location,
+          format: 'json',
+          limit: '1',
+        })}`,
+        { headers: { 'User-Agent': 'TGCPortal/1.0 (hello@thegatekeepers.club)' } }
+      )
+      if (geoRes.ok) {
+        const results = await geoRes.json()
+        if (results.length > 0) {
+          lat = parseFloat(results[0].lat)
+          lng = parseFloat(results[0].lon)
+          // Cache in database
+          await getSupabaseAdmin()
+            .from('fiches')
+            .update({ latitude: lat, longitude: lng, geocoded_at: new Date().toISOString() })
+            .eq('id', ficheData.id)
+        }
+      }
+    } catch {
+      // Geocoding failed, continue without map
+    }
+  }
 
   const highlights: Highlight[] = Array.isArray(ficheData.highlights) ? ficheData.highlights : []
   const galleryUrls: string[] = Array.isArray(ficheData.gallery_urls) ? ficheData.gallery_urls : []
@@ -58,11 +90,20 @@ export default async function FichePage({ params, searchParams }: PageProps) {
         name={name}
         headline={ficheData.headline}
         category={category}
+        categorySub={categorySub}
         location={location}
         heroImageUrl={ficheData.hero_image_url}
       />
 
       <FicheHighlights highlights={highlights} />
+
+      {lat != null && lng != null && (
+        <div className="py-8 px-4 sm:px-8 md:px-12 lg:px-16">
+          <div className="max-w-3xl mx-auto">
+            <ClientFicheMap lat={lat} lng={lng} name={name} />
+          </div>
+        </div>
+      )}
 
       {ficheData.description && (
         <div className="py-10 px-8 md:px-12 lg:px-16">

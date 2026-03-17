@@ -35,7 +35,7 @@ export default function ClientFicheCard({ item }: ClientFicheCardProps) {
           <img src={heroUrl} alt={name} className="w-full h-full object-cover" />
         </div>
       )}
-      <div className="p-5 flex-1">
+      <div className="p-4 sm:p-5 flex-1">
         {timeLabel && (
           <span className="inline-block bg-gold-light text-gold text-xs font-medium px-2 py-0.5 rounded-full mb-2">
             {timeLabel}

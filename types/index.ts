@@ -2,6 +2,8 @@ export interface AirtableOrg {
   id: string
   name: string
   category: string
+  categoryParent?: string
+  categorySub?: string
   country: string
   region: string
   city: string
@@ -28,6 +30,9 @@ export interface Fiche {
   gallery_urls: string[]
   tags: string[]
   tgc_note: string | null
+  latitude: number | null
+  longitude: number | null
+  geocoded_at: string | null
   status: 'draft' | 'live' | 'archived'
   featured: boolean
   created_at: string
@@ -48,6 +53,11 @@ export interface Itinerary {
   status: 'draft' | 'shared' | 'archived'
   share_token: string | null
   start_date: string | null
+  is_member: boolean
+  currency: string
+  quote_status: 'draft' | 'sent' | 'accepted'
+  quote_notes: string | null
+  quote_token: string | null
   created_at: string
   updated_at: string
   days?: ItineraryDay[]
@@ -77,4 +87,20 @@ export interface ItineraryItem {
   exact_time: string | null
   sort_order: number
   item_type: 'fiche' | 'note'
+  unit_price: number | null
+  quantity: number
+  price_note: string | null
+  is_zero_margin: boolean
+  is_included: boolean
+}
+
+export interface QuoteCalculation {
+  commissionableTotal: number
+  zeroMarginTotal: number
+  feeRate: number
+  feeAmount: number
+  clientTotal: number
+  pointsEarned: number
+  pointsValue: number
+  requiresNegotiation: boolean
 }
