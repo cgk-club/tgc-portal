@@ -26,10 +26,10 @@ export default function ClientNoteCard({ item }: ClientNoteCardProps) {
         <span className="text-xs text-gold font-medium mb-1 block">{timeLabel}</span>
       )}
       {item.custom_title && (
-        <p className="text-sm font-medium text-gray-700 italic font-body">{item.custom_title}</p>
+        <p className="text-sm font-semibold text-gray-800 font-body">{item.custom_title}</p>
       )}
       {item.custom_note && (
-        <p className="text-sm text-gray-500 italic font-body mt-1">{item.custom_note}</p>
+        <p className="text-sm text-gray-600 font-body mt-1.5 leading-relaxed">{item.custom_note}</p>
       )}
     </div>
   )
