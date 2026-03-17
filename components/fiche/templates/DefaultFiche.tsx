@@ -14,7 +14,6 @@ interface Props {
   highlights: Highlight[]
   galleryUrls: string[]
   tags: string[]
-  mapSlot?: React.ReactNode
 }
 
 export default function DefaultFiche({
@@ -25,7 +24,6 @@ export default function DefaultFiche({
   highlights,
   galleryUrls,
   tags,
-  mapSlot,
 }: Props) {
   return (
     <>
@@ -39,8 +37,6 @@ export default function DefaultFiche({
       />
 
       <FicheHighlights highlights={highlights} />
-
-      {mapSlot}
 
       {fiche.description && (
         <div className="py-10 px-8 md:px-12 lg:px-16">

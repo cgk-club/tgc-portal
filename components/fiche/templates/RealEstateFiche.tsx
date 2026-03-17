@@ -14,7 +14,6 @@ interface Props {
   highlights: Highlight[]
   galleryUrls: string[]
   tags: string[]
-  mapSlot?: React.ReactNode
 }
 
 const CATERING_LABELS: Record<string, string> = {
@@ -37,7 +36,6 @@ export default function RealEstateFiche({
   highlights,
   galleryUrls,
   tags,
-  mapSlot,
 }: Props) {
   const tf = (fiche.template_fields || {}) as RealEstateFields
 
@@ -80,8 +78,6 @@ export default function RealEstateFiche({
           </div>
         </div>
       )}
-
-      {mapSlot}
 
       {fiche.description && (
         <div className="py-10 px-8 md:px-12 lg:px-16">

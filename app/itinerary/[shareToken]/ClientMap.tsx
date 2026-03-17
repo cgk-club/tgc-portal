@@ -15,8 +15,14 @@ export default function ClientMap({ stops }: { stops: MapStop[] }) {
   if (stops.length === 0) return null
 
   return (
-    <section className="mb-12">
-      <h2 className="font-heading text-lg font-semibold text-green mb-4">Your Journey</h2>
+    <section className="my-10">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="h-px flex-1 bg-gray-200" />
+        <h2 className="font-heading text-sm font-semibold tracking-widest text-gold uppercase">
+          Your Journey
+        </h2>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
       <ItineraryMap stops={stops} />
     </section>
   )

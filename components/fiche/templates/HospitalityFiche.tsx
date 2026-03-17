@@ -14,7 +14,6 @@ interface Props {
   highlights: Highlight[]
   galleryUrls: string[]
   tags: string[]
-  mapSlot?: React.ReactNode
 }
 
 export default function HospitalityFiche({
@@ -25,7 +24,6 @@ export default function HospitalityFiche({
   highlights,
   galleryUrls,
   tags,
-  mapSlot,
 }: Props) {
   const tf = (fiche.template_fields || {}) as HospitalityFields
 
@@ -66,8 +64,6 @@ export default function HospitalityFiche({
           </div>
         </div>
       )}
-
-      {mapSlot}
 
       {fiche.description && (
         <div className="py-10 px-8 md:px-12 lg:px-16">

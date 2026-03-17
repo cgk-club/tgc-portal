@@ -13,7 +13,6 @@ interface Props {
   highlights: Highlight[]
   galleryUrls: string[]
   tags: string[]
-  mapSlot?: React.ReactNode
 }
 
 const DRESS_LABELS: Record<string, string> = {
@@ -31,7 +30,6 @@ export default function DiningFiche({
   highlights,
   galleryUrls,
   tags,
-  mapSlot,
 }: Props) {
   const tf = (fiche.template_fields || {}) as DiningFields
 
@@ -71,8 +69,6 @@ export default function DiningFiche({
           </div>
         </div>
       )}
-
-      {mapSlot}
 
       {fiche.description && (
         <div className="py-10 px-8 md:px-12 lg:px-16">
