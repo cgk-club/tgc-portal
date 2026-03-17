@@ -101,12 +101,21 @@ export default function ItineraryBuilderPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              if (itinerary.share_token) {
-                window.open(`/itinerary/${itinerary.share_token}`, '_blank')
+            onClick={async () => {
+              let token = itinerary.share_token
+              if (!token) {
+                // Generate a share token for preview without changing status
+                const res = await fetch(`/api/admin/itineraries/${id}/preview-token`, { method: 'POST' })
+                if (res.ok) {
+                  const data = await res.json()
+                  token = data.token
+                  fetchItinerary()
+                }
+              }
+              if (token) {
+                window.open(`/itinerary/${token}?preview=true`, '_blank')
               }
             }}
-            disabled={!itinerary.share_token}
           >
             Preview
           </Button>

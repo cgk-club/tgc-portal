@@ -8,18 +8,22 @@ import ClientMap from './ClientMap'
 
 interface PageProps {
   params: Promise<{ shareToken: string }>
+  searchParams: Promise<{ preview?: string }>
 }
 
-export default async function ItineraryPage({ params }: PageProps) {
+export default async function ItineraryPage({ params, searchParams }: PageProps) {
   const { shareToken } = await params
+  const { preview } = await searchParams
   const itinerary = await getItineraryByToken(shareToken)
 
   if (!itinerary) {
     notFound()
   }
 
+  const isPreview = preview === 'true'
+
   // Archived
-  if (itinerary.status === 'archived') {
+  if (itinerary.status === 'archived' && !isPreview) {
     return (
       <div className="min-h-screen bg-pearl flex items-center justify-center">
         <div className="text-center max-w-md">
@@ -34,8 +38,8 @@ export default async function ItineraryPage({ params }: PageProps) {
     )
   }
 
-  // Draft
-  if (itinerary.status === 'draft') {
+  // Draft - block public access but allow preview
+  if (itinerary.status === 'draft' && !isPreview) {
     return (
       <div className="min-h-screen bg-pearl flex items-center justify-center">
         <div className="text-center max-w-md">
@@ -85,6 +89,12 @@ export default async function ItineraryPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-pearl">
+      {/* Preview banner */}
+      {isPreview && (
+        <div className="bg-gold text-white text-center text-xs font-body py-1.5 tracking-wide">
+          PREVIEW MODE — This is how the client will see this itinerary
+        </div>
+      )}
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 border-b border-gray-100">
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">

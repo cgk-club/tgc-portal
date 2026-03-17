@@ -73,6 +73,7 @@ export default function ItineraryDay({ day, itineraryId, onUpdate }: ItineraryDa
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
+    onUpdate()
   }
 
   async function deleteItem(itemId: string) {
