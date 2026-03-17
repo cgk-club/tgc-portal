@@ -9,6 +9,7 @@ function sb() {
 
 export async function createItinerary(data: {
   client_name: string
+  client_email?: string
   title: string
   slug: string
   start_date?: string
@@ -17,6 +18,7 @@ export async function createItinerary(data: {
     .from('itineraries')
     .insert({
       client_name: data.client_name,
+      client_email: data.client_email || null,
       title: data.title,
       slug: data.slug,
       start_date: data.start_date || null,
@@ -159,7 +161,8 @@ export async function updateItinerary(
   data: Partial<Itinerary>
 ): Promise<Itinerary> {
   const allowedFields = [
-    'client_name', 'title', 'slug', 'cover_image_url', 'summary',
+    'client_name', 'client_email', 'client_account_id',
+    'title', 'slug', 'cover_image_url', 'summary',
     'status', 'share_token', 'start_date',
     'is_member', 'currency', 'quote_status', 'quote_notes', 'quote_token',
   ]

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { client_name, title, start_date, num_days = 3 } = body
+  const { client_name, client_email, title, start_date, num_days = 3 } = body
 
   if (!client_name || !title) {
     return NextResponse.json({ error: 'Client name and title are required' }, { status: 400 })
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
 
     const itinerary = await createItinerary({
       client_name,
+      client_email,
       title,
       slug,
       start_date,

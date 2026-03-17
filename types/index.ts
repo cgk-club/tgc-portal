@@ -47,6 +47,8 @@ export interface Itinerary {
   id: string
   slug: string
   client_name: string
+  client_email: string | null
+  client_account_id: string | null
   title: string
   cover_image_url: string | null
   summary: string | null

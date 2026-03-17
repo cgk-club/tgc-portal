@@ -11,6 +11,7 @@ interface NewItineraryModalProps {
 
 export default function NewItineraryModal({ onClose, onCreated }: NewItineraryModalProps) {
   const [clientName, setClientName] = useState('')
+  const [clientEmail, setClientEmail] = useState('')
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
   const [numDays, setNumDays] = useState(3)
@@ -29,6 +30,7 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         client_name: clientName,
+        client_email: clientEmail || undefined,
         title,
         start_date: startDate || undefined,
         num_days: numDays,
@@ -64,6 +66,13 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             required
+          />
+          <Input
+            label="Client email (optional)"
+            type="email"
+            placeholder="client@example.com"
+            value={clientEmail}
+            onChange={(e) => setClientEmail(e.target.value)}
           />
           <Input
             label="Itinerary title"

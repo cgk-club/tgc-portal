@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FicheWithOrg, Highlight } from '@/types'
 import Button from '@/components/ui/Button'
@@ -8,6 +8,7 @@ import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import ImageUploader from '@/components/admin/ImageUploader'
 import GalleryManager from '@/components/admin/GalleryManager'
+import OutreachModal from '@/components/admin/OutreachModal'
 
 interface FicheEditorProps {
   fiche: FicheWithOrg
@@ -35,6 +36,17 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
   const [status, setStatus] = useState(initial.status)
   const [featured, setFeatured] = useState(initial.featured)
   const [slug, setSlug] = useState(initial.slug)
+  const [showOutreach, setShowOutreach] = useState(false)
+  const [lastContacted, setLastContacted] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch(`/api/admin/outreach/${initial.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (data.length > 0) setLastContacted(data[0].sent_at)
+      })
+      .catch(() => {})
+  }, [initial.id])
 
   function addHighlight() {
     setHighlights([...highlights, { icon: '', label: '', value: '' }])
@@ -260,6 +272,26 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           onChange={(e) => setTgcNote(e.target.value)}
         />
 
+        {/* Supplier Outreach */}
+        <div className="bg-white rounded-[8px] border border-gray-200 p-4">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+            Supplier Outreach
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full mb-2"
+            onClick={() => setShowOutreach(true)}
+          >
+            Draft outreach email
+          </Button>
+          <p className="text-xs text-gray-400 font-body">
+            Last contacted: {lastContacted
+              ? new Date(lastContacted).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+              : 'Never'}
+          </p>
+        </div>
+
         {/* Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -326,6 +358,18 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           </Button>
         </div>
       </div>
+
+      {showOutreach && org && (
+        <OutreachModal
+          ficheId={initial.id}
+          airtableRecordId={initial.airtable_record_id}
+          supplierName={org.name}
+          supplierEmail={org.email}
+          ficheSlug={slug}
+          onClose={() => setShowOutreach(false)}
+          onSent={() => setLastContacted(new Date().toISOString())}
+        />
+      )}
     </div>
   )
 }

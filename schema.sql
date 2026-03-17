@@ -112,3 +112,54 @@ ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'EUR';
 ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_status TEXT DEFAULT 'draft';
 ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_notes TEXT;
 ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS quote_token TEXT UNIQUE;
+
+-- Phase 3B schema additions (run these in Supabase SQL Editor)
+
+-- Client accounts
+CREATE TABLE IF NOT EXISTS client_accounts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  last_login TIMESTAMPTZ
+);
+
+-- Magic link tokens
+CREATE TABLE IF NOT EXISTS magic_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES client_accounts(id) ON DELETE CASCADE,
+  token TEXT UNIQUE NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Link itineraries to client accounts
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS client_email TEXT;
+ALTER TABLE itineraries ADD COLUMN IF NOT EXISTS client_account_id UUID REFERENCES client_accounts(id);
+
+-- Outreach log
+CREATE TABLE IF NOT EXISTS outreach_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  fiche_id UUID REFERENCES fiches(id),
+  airtable_record_id TEXT,
+  supplier_name TEXT,
+  supplier_email TEXT,
+  subject TEXT,
+  sent_at TIMESTAMPTZ DEFAULT now(),
+  sent_by TEXT DEFAULT 'jeeves@thegatekeepers.club'
+);
+
+-- RLS for new tables
+ALTER TABLE client_accounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE magic_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE outreach_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role full access client_accounts" ON client_accounts
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access magic_tokens" ON magic_tokens
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access outreach_log" ON outreach_log
+  FOR ALL USING (auth.role() = 'service_role');

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySession, COOKIE_NAME } from '@/lib/auth'
+import { verifyClientSession, CLIENT_COOKIE_NAME } from '@/lib/client-auth'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Admin auth
   if (pathname === '/admin/login') {
     return NextResponse.next()
   }
@@ -31,9 +33,21 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Client portal auth (protect /client but not /client/login or /client/auth)
+  if (pathname === '/client') {
+    const token = request.cookies.get(CLIENT_COOKIE_NAME)?.value
+    if (!token) {
+      return NextResponse.redirect(new URL('/client/login', request.url))
+    }
+    const session = await verifyClientSession(token)
+    if (!session) {
+      return NextResponse.redirect(new URL('/client/login', request.url))
+    }
+  }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/client'],
 }
