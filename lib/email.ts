@@ -33,6 +33,23 @@ export async function sendMagicLink(to: string, name: string, token: string) {
   })
 }
 
+function bodyToHtml(body: string): string {
+  const blocks = body.split('\n\n')
+  return blocks.map(block => {
+    const lines = block.split('\n')
+    const isBulletList = lines.every(l => l.startsWith('- ') || l.trim() === '')
+    if (isBulletList && lines.some(l => l.startsWith('- '))) {
+      const items = lines
+        .filter(l => l.startsWith('- '))
+        .map(l => `<li style="margin-bottom: 6px;">${l.slice(2)}</li>`)
+        .join('')
+      return `<ul style="color: #333; font-size: 15px; line-height: 1.7; padding-left: 20px; margin: 16px 0;">${items}</ul>`
+    }
+    const escaped = block.replace(/\n/g, '<br />')
+    return `<p style="color: #333; font-size: 15px; line-height: 1.7;">${escaped}</p>`
+  }).join('')
+}
+
 export async function sendOutreachEmail(to: string, subject: string, body: string) {
   await getResend().emails.send({
     from: `Christian de Jabrun <${FROM_EMAIL}>`,
@@ -41,10 +58,10 @@ export async function sendOutreachEmail(to: string, subject: string, body: strin
     text: body,
     html: `<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
       <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase; margin-bottom: 30px;">THE GATEKEEPERS CLUB</p>
-      ${body.split('\n\n').map(p => `<p style="color: #333; font-size: 15px; line-height: 1.7;">${p}</p>`).join('')}
+      ${bodyToHtml(body)}
       <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
       <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase;">The Gatekeepers Club</p>
-      <p style="color: #999; font-size: 12px;">hello@thegatekeepers.club</p>
+      <p style="color: #999; font-size: 12px;">jeeves@thegatekeepers.club</p>
       <p style="color: #999; font-size: 12px;">thegatekeepers.club</p>
     </div>`,
   })

@@ -475,6 +475,10 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           supplierName={org.name}
           supplierEmail={org.email}
           ficheSlug={slug}
+          templateType={(templateType || 'default') as FicheTemplate}
+          templateFields={templateFields}
+          heroImageUrl={heroImageUrl || null}
+          galleryUrls={galleryUrls}
           onClose={() => setShowOutreach(false)}
           onSent={() => setLastContacted(new Date().toISOString())}
         />

@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Button from '@/components/ui/Button'
+import { FicheTemplate } from '@/lib/ficheTemplates'
+import { generateOutreachBody, detectGaps } from '@/lib/outreachGaps'
 
 interface OutreachModalProps {
   ficheId: string
@@ -9,6 +11,10 @@ interface OutreachModalProps {
   supplierName: string
   supplierEmail: string | undefined
   ficheSlug: string
+  templateType: FicheTemplate
+  templateFields: Record<string, unknown> | null
+  heroImageUrl: string | null
+  galleryUrls: string[] | null
   onClose: () => void
   onSent: () => void
 }
@@ -19,29 +25,19 @@ export default function OutreachModal({
   supplierName,
   supplierEmail,
   ficheSlug,
+  templateType,
+  templateFields,
+  heroImageUrl,
+  galleryUrls,
   onClose,
   onSent,
 }: OutreachModalProps) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || ''
-  const ficheLink = `${appUrl}/fiche/${ficheSlug}`
+  const gaps = detectGaps(templateType, templateFields, heroImageUrl, galleryUrls)
 
   const [to, setTo] = useState(supplierEmail || '')
   const [subject, setSubject] = useState(`The Gatekeepers Club -- ${supplierName}`)
   const [body, setBody] = useState(
-`${supplierName} team,
-
-I'm reaching out from The Gatekeepers Club, a concierge and advisory service based in the South of France. We work with discerning clients -- primarily entrepreneurs and families travelling into Europe and Africa -- and we focus on connecting them with independent, quality-led providers rather than mass-market options.
-
-${supplierName} caught our attention, and we've featured it in our supplier network. You can see how we've presented your property here:
-
-${ficheLink}
-
-We'd welcome the opportunity to discuss how we might work together. No obligation -- simply an introduction.
-
-Christian de Jabrun
-The Gatekeepers Club
-hello@thegatekeepers.club
-thegatekeepers.club`
+    generateOutreachBody(supplierName, templateType, templateFields, heroImageUrl, galleryUrls)
   )
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
@@ -86,6 +82,16 @@ thegatekeepers.club`
               &times;
             </button>
           </div>
+          {gaps.length > 0 && (
+            <p className="text-xs text-amber-600 mt-2">
+              {gaps.length} missing field{gaps.length !== 1 ? 's' : ''} detected. Asking supplier to fill gaps.
+            </p>
+          )}
+          {gaps.length === 0 && (
+            <p className="text-xs text-emerald-600 mt-2">
+              All template fields populated. Sending introduction only.
+            </p>
+          )}
         </div>
 
         <div className="p-6 space-y-4">
@@ -117,14 +123,9 @@ thegatekeepers.club`
             <textarea
               value={body}
               onChange={e => setBody(e.target.value)}
-              rows={14}
+              rows={18}
               className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body leading-relaxed"
             />
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-gray-500 font-body">
-            <span className="text-green">Fiche link included:</span>
-            <span className="truncate">{ficheLink}</span>
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
