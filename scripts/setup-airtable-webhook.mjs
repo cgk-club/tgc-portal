@@ -19,9 +19,8 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { homedir } from 'os'
 
-// Load env
+// Load env — always load all vars from .env.local (don't skip if some are already set)
 function loadEnv() {
-  if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) return
   try {
     const envPath = resolve(process.cwd(), '.env.local')
     const content = readFileSync(envPath, 'utf8')
@@ -41,9 +40,8 @@ loadEnv()
 const API_KEY = process.env.AIRTABLE_API_KEY
 const BASE_ID = process.env.AIRTABLE_BASE_ID || 'app23Nd0wKEbMGW7p'
 const TABLE_ID = process.argv[2]
-const NOTIFICATION_URL = process.env.NEXT_PUBLIC_APP_URL
-  ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/airtable`
-  : 'https://portal.thegatekeepers.club/api/webhooks/airtable'
+// Always use production URL — webhooks must point to the deployed app
+const NOTIFICATION_URL = 'https://portal.thegatekeepers.club/api/webhooks/airtable'
 
 if (!API_KEY) {
   console.error('Error: AIRTABLE_API_KEY not set')
@@ -88,9 +86,21 @@ const res = await fetch(`https://api.airtable.com/v0/bases/${BASE_ID}/webhooks`,
 })
 
 if (!res.ok) {
-  console.error(`Error: ${res.status} ${res.statusText}`)
   const text = await res.text()
+  console.error(`Error: ${res.status} ${res.statusText}`)
   console.error(text)
+
+  if (res.status === 403) {
+    console.error()
+    console.error('Your Airtable personal access token needs the webhook:manage scope.')
+    console.error('Regenerate your token with this scope enabled at:')
+    console.error()
+    console.error('  https://airtable.com/create/tokens')
+    console.error()
+    console.error('Required scopes: data.records:read, schema.bases:read, webhook:manage')
+    console.error('Then update AIRTABLE_API_KEY in .env.local and Railway.')
+  }
+
   process.exit(1)
 }
 
