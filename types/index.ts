@@ -100,6 +100,19 @@ export interface ItineraryItem {
   is_included: boolean
 }
 
+export interface WebhookLog {
+  id: string
+  received_at: string
+  source: string
+  payload: Record<string, unknown>
+  records_processed: number
+  records_created: number
+  records_updated: number
+  records_skipped: number
+  error: string | null
+  duration_ms: number
+}
+
 export interface QuoteCalculation {
   commissionableTotal: number
   zeroMarginTotal: number

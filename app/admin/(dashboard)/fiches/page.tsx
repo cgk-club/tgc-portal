@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -11,10 +11,22 @@ interface FicheWithOrg extends Fiche {
   org?: AirtableOrg
 }
 
+function getEnrichmentScore(f: Fiche): number {
+  let score = 0
+  if (f.hero_image_url) score += 30
+  if (f.description) score += 25
+  if (f.headline) score += 15
+  if (f.highlights && f.highlights.length >= 3) score += 15
+  if (f.gallery_urls && f.gallery_urls.length >= 3) score += 10
+  if (f.tags && f.tags.length >= 3) score += 5
+  return score
+}
+
 export default function FicheListPage() {
   const [fiches, setFiches] = useState<FicheWithOrg[]>([])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [sortBy, setSortBy] = useState<'recent' | 'enrichment'>('recent')
   const [loading, setLoading] = useState(true)
   const [showNewModal, setShowNewModal] = useState(false)
   const [airtableResults, setAirtableResults] = useState<AirtableOrg[]>([])
@@ -38,6 +50,13 @@ export default function FicheListPage() {
   useEffect(() => {
     fetchFiches()
   }, [fetchFiches])
+
+  const sortedFiches = useMemo(() => {
+    if (sortBy === 'enrichment') {
+      return [...fiches].sort((a, b) => getEnrichmentScore(a) - getEnrichmentScore(b))
+    }
+    return fiches
+  }, [fiches, sortBy])
 
   async function searchAirtable() {
     if (!airtableSearch.trim()) return
@@ -91,6 +110,14 @@ export default function FicheListPage() {
           <option value="live">Live</option>
           <option value="archived">Archived</option>
         </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as 'recent' | 'enrichment')}
+          className="rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+        >
+          <option value="recent">Most recent</option>
+          <option value="enrichment">Needs attention</option>
+        </select>
       </div>
 
       {loading ? (
@@ -108,34 +135,49 @@ export default function FicheListPage() {
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Enrichment</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody>
-              {fiches.map((fiche) => (
-                <tr key={fiche.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    {fiche.org?.name || fiche.slug}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {fiche.org?.categorySub || fiche.org?.category || '-'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {[fiche.org?.city, fiche.org?.country].filter(Boolean).join(', ') || '-'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <FicheStatusBadge status={fiche.status} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/fiches/${fiche.id}`}
-                      className="text-sm text-green hover:text-green-light font-medium"
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {sortedFiches.map((fiche) => {
+                const score = getEnrichmentScore(fiche)
+                return (
+                  <tr key={fiche.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                      {fiche.org?.name || fiche.slug}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {fiche.org?.categorySub || fiche.org?.category || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {[fiche.org?.city, fiche.org?.country].filter(Boolean).join(', ') || '-'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <FicheStatusBadge status={fiche.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${score === 100 ? 'bg-green' : score >= 50 ? 'bg-gold' : 'bg-gray-300'}`}
+                            style={{ width: `${score}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400 w-8">{score}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/admin/fiches/${fiche.id}`}
+                        className="text-sm text-green hover:text-green-light font-medium"
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

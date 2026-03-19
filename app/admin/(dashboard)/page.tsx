@@ -18,6 +18,7 @@ export default async function AdminDashboard() {
     { count: sharedItineraries },
     { count: totalClients },
     { data: allFiches },
+    { data: draftFichesForInbox },
   ] = await Promise.all([
     sb.from('fiches').select('*', { count: 'exact', head: true }),
     sb.from('fiches').select('*', { count: 'exact', head: true }).eq('status', 'live'),
@@ -27,6 +28,11 @@ export default async function AdminDashboard() {
     sb.from('itineraries').select('*', { count: 'exact', head: true }).eq('status', 'shared'),
     sb.from('client_accounts').select('*', { count: 'exact', head: true }),
     sb.from('fiches').select('id, airtable_record_id, template_type'),
+    sb.from('fiches')
+      .select('id, airtable_record_id, slug, hero_image_url, headline, description, highlights, gallery_urls, tags')
+      .eq('status', 'draft')
+      .order('created_at', { ascending: false })
+      .limit(5),
   ])
 
   // For fiches still on 'default', look up Airtable category to compute real template
@@ -61,6 +67,27 @@ export default async function AdminDashboard() {
 
   // Sort by count descending
   const sortedTemplates = Object.entries(templateCounts).sort((a, b) => b[1] - a[1])
+
+  // Enrichment score for inbox fiches
+  function getEnrichmentScore(f: { hero_image_url?: string | null; description?: string | null; headline?: string | null; highlights?: unknown[]; gallery_urls?: unknown[]; tags?: unknown[] }): number {
+    let score = 0
+    if (f.hero_image_url) score += 30
+    if (f.description) score += 25
+    if (f.headline) score += 15
+    if (f.highlights && f.highlights.length >= 3) score += 15
+    if (f.gallery_urls && f.gallery_urls.length >= 3) score += 10
+    if (f.tags && f.tags.length >= 3) score += 5
+    return score
+  }
+
+  // Enrich inbox fiches with org names
+  const inboxFiches = await Promise.all(
+    (draftFichesForInbox || []).map(async (f) => {
+      const org = await getOrgById(f.airtable_record_id)
+      const score = getEnrichmentScore(f)
+      return { ...f, orgName: org?.name || f.slug, orgCity: org?.city || '', score }
+    })
+  )
 
   return (
     <div className="p-8">
@@ -120,6 +147,53 @@ export default async function AdminDashboard() {
           })}
         </div>
       </div>
+
+      {/* Fiche Inbox */}
+      {inboxFiches.length > 0 && (
+        <div className="bg-white rounded-[8px] border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-500 font-body uppercase tracking-wider">
+              Fiche Inbox
+            </h2>
+            <span className="text-xs text-gold font-medium font-body bg-gold-light px-2 py-0.5 rounded-full">
+              {draftFiches || 0} drafts
+            </span>
+          </div>
+          <div className="space-y-3">
+            {inboxFiches.map((f) => (
+              <Link
+                key={f.id}
+                href={`/admin/fiches/${f.id}`}
+                className="flex items-center justify-between p-3 rounded-[4px] border border-gray-100 hover:border-green hover:bg-green-muted transition-colors group"
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-green">{f.orgName}</p>
+                  {f.orgCity && (
+                    <p className="text-xs text-gray-400">{f.orgCity}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-green"
+                      style={{ width: `${f.score}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 w-8 text-right">{f.score}%</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {(draftFiches || 0) > 5 && (
+            <Link
+              href="/admin/fiches?status=draft"
+              className="block text-center text-sm text-green hover:text-green-light font-medium font-body mt-4"
+            >
+              View all drafts
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Quick links */}
       <div className="flex flex-wrap gap-4">

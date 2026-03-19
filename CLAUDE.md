@@ -62,6 +62,7 @@ ADMIN_SESSION_SECRET
 NEXT_PUBLIC_APP_URL=https://portal.thegatekeepers.club
 RESEND_API_KEY
 FROM_EMAIL=jeeves@thegatekeepers.club
+AIRTABLE_WEBHOOK_SECRET  (set after running setup-airtable-webhook.mjs)
 ```
 
 ---
@@ -96,6 +97,7 @@ itinerary_items         — fiche or note items within a day
 client_accounts         — client portal accounts
 magic_tokens            — magic link auth tokens
 outreach_log            — supplier outreach email log
+webhook_log             — Airtable webhook audit log
 ```
 
 **Key columns added across phases (always use IF NOT EXISTS):**
@@ -216,16 +218,20 @@ git push
 - **Phase 3A:** Maps + quote builder + mobile optimisation + cover images + quick wins
 - **Phase 3B:** Client portal (magic link) + supplier outreach emails
 - **Phase 4:** Typed fiche templates (hospitality/villa/dining/maker/default)
+- **Phase 5:** Airtable webhook automation — auto-creates draft fiches from new orgs
 
 ---
 
 ## Current State (update this section after each session)
 
-*Last updated: 17 March 2026*
+*Last updated: 19 March 2026*
 
 - Portal live at portal.thegatekeepers.club
 - 1 live fiche: Airelles Versailles Le Grand Controle (hospitality template)
 - Phase 4 templates deployed — fiche editor shows template-specific fields
+- Phase 5 webhook endpoint built — needs webhook_log table + Airtable webhook registration
+- Airtable Organizations table ID: `tblRiQuIfeQ34aN5L`
+- Admin dashboard: Fiche Inbox card + enrichment scores on fiche list
 - Client portal operational — magic link auth via jeeves@thegatekeepers.club
 - Resend domain verified for thegatekeepers.club
 

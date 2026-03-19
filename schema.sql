@@ -169,3 +169,24 @@ CREATE POLICY "Service role full access magic_tokens" ON magic_tokens
 
 CREATE POLICY "Service role full access outreach_log" ON outreach_log
   FOR ALL USING (auth.role() = 'service_role');
+
+-- Phase 5 schema additions (Airtable webhook automation)
+
+-- Webhook log for auditing
+CREATE TABLE IF NOT EXISTS webhook_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  received_at TIMESTAMPTZ DEFAULT now(),
+  source TEXT DEFAULT 'airtable',
+  payload JSONB,
+  records_processed INTEGER DEFAULT 0,
+  records_created INTEGER DEFAULT 0,
+  records_updated INTEGER DEFAULT 0,
+  records_skipped INTEGER DEFAULT 0,
+  error TEXT,
+  duration_ms INTEGER
+);
+
+ALTER TABLE webhook_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role full access webhook_log" ON webhook_log
+  FOR ALL USING (auth.role() = 'service_role');
