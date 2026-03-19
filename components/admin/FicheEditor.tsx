@@ -14,6 +14,12 @@ import HospitalityFieldsEditor from '@/components/admin/template-fields/Hospital
 import RealEstateFieldsEditor from '@/components/admin/template-fields/RealEstateFields'
 import DiningFieldsEditor from '@/components/admin/template-fields/DiningFields'
 import MakerFieldsEditor from '@/components/admin/template-fields/MakerFields'
+import ExperienceFieldsEditor from '@/components/admin/template-fields/ExperienceFields'
+import TransportFieldsEditor from '@/components/admin/template-fields/TransportFields'
+import WineEstateFieldsEditor from '@/components/admin/template-fields/WineEstateFields'
+import WellnessFieldsEditor from '@/components/admin/template-fields/WellnessFields'
+import EventsSportFieldsEditor from '@/components/admin/template-fields/EventsSportFields'
+import ArtsCultureFieldsEditor from '@/components/admin/template-fields/ArtsCultureFields'
 import { FicheTemplate, getTemplate } from '@/lib/ficheTemplates'
 
 interface FicheEditorProps {
@@ -178,6 +184,42 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           )}
           {templateType === 'maker' && (
             <MakerFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'experience' && (
+            <ExperienceFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'transport' && (
+            <TransportFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'wine_estate' && (
+            <WineEstateFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'wellness' && (
+            <WellnessFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'events_sport' && (
+            <EventsSportFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'arts_culture' && (
+            <ArtsCultureFieldsEditor
               fields={templateFields as Record<string, unknown>}
               onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
             />

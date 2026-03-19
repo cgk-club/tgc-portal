@@ -7,7 +7,10 @@ interface TemplateFieldSelectorProps {
   onChange: (template: FicheTemplate) => void
 }
 
-const TEMPLATE_OPTIONS: FicheTemplate[] = ['default', 'hospitality', 'real_estate', 'dining', 'maker']
+const TEMPLATE_OPTIONS: FicheTemplate[] = [
+  'default', 'hospitality', 'real_estate', 'dining', 'maker',
+  'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture',
+]
 
 export default function TemplateFieldSelector({ value, onChange }: TemplateFieldSelectorProps) {
   return (

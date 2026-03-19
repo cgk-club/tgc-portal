@@ -126,7 +126,7 @@ app/
   api/geocode/                # Nominatim geocoding proxy
 
 components/
-  fiche/templates/            # HospitalityFiche, VillaFiche, DiningFiche, MakerFiche, DefaultFiche
+  fiche/templates/            # 11 templates: Hospitality, RealEstate, Dining, Maker, Experience, Transport, WineEstate, Wellness, EventsSport, ArtsCulture, Default
   admin/template-fields/      # Per-template admin field components
   itinerary/                  # Builder components
   client/                     # Client-facing itinerary components
@@ -148,15 +148,21 @@ lib/
 ## Fiche Template System
 
 Templates are auto-detected from Airtable `Category Sub` on fiche creation.
-Mapping lives in `lib/ficheTemplates.ts`.
+Mapping lives in `lib/ficheTemplates.ts`. Updated 19 March 2026 after taxonomy cleanup.
 
-| Template | Maps to |
+| Template | Category Sub values |
 |---|---|
-| `hospitality` | Boutique Hotels, Luxury Hotels, Lodges, Palaces |
-| `villa` | Villas, Estates, Chateaux, Private Residences |
-| `dining` | Restaurants, Chefs, Private Dining |
-| `maker` | Artisans, Designers, Craftspeople |
-| `default` | Everything else |
+| `hospitality` | Boutique Hotels, Luxury Hotels, Palace Hotels, Safari Lodges & Camps, Resort Hotels, Boutique Guesthouses, Bed & Breakfast, Vineyards Distilleries & Breweries |
+| `real_estate` | Villas & Private Estates, Châteaux & Manor Houses, Apartments & City Residences, Land & Development, Property Management, Estate Agents |
+| `dining` | Independent Restaurants, Fine Dining, Casual Dining, Private Chefs, Cafés & Patisseries, Beach Clubs & Pool Bars, Private Dining Experiences |
+| `maker` | Traditional Crafts, Contemporary Design, Jewellery & Accessories, Fashion & Tailoring, Ceramics & Pottery, Glasswork, Textile & Weaving, Furniture & Cabinetry, Perfumery & Beauty, Food & Artisan Produce |
+| `experience` | Cultural Tours & Guided Experiences, Adventure & Outdoor, Culinary Experiences & Classes, Photography Experiences, Music & Arts Experiences, Private Access & VIP Experiences, Safari & Wildlife |
+| `transport` | Private Aviation, Commercial Aviation, Helicopter Services, Yacht Charters, Boat & River Cruises, Luxury Transfers, Car Rental, Luxury Car Rental, Rail & Train Travel, Chauffeur Services |
+| `wine_estate` | Wine Estates & Domaines |
+| `wellness` | Wellness & Spa Retreats, Wellness & Spa |
+| `events_sport` | Event Venues, Event Production, Wedding Services, Golf, Equestrian, Water Sports, Skiing, Tennis |
+| `arts_culture` | Galleries & Art Dealers, Museums & Cultural Institutions, Performing Arts, Auction Houses |
+| `default` | Everything else (professional services, provisioning, etc.) |
 
 Template-specific data stored in `template_fields` JSONB column.
 Manual override available in admin fiche editor.
@@ -219,6 +225,7 @@ git push
 - **Phase 3B:** Client portal (magic link) + supplier outreach emails
 - **Phase 4:** Typed fiche templates (hospitality/villa/dining/maker/default)
 - **Phase 5:** Airtable webhook automation — auto-creates draft fiches from new orgs
+- **Phase 6:** Six new fiche templates (experience, transport, wine estate, wellness, events/sport, arts/culture)
 
 ---
 
@@ -227,10 +234,12 @@ git push
 *Last updated: 19 March 2026*
 
 - Portal live at portal.thegatekeepers.club
-- 1 live fiche: Airelles Versailles Le Grand Controle (hospitality template)
-- Phase 4 templates deployed — fiche editor shows template-specific fields
-- Phase 5 webhook endpoint built — needs webhook_log table + Airtable webhook registration
+- 55 fiches total (14 live, 41 draft)
+- Phase 6 deployed: 11 total fiche templates (hospitality, real_estate, dining, maker, experience, transport, wine_estate, wellness, events_sport, arts_culture, default)
+- Transport template has air/sea vs ground sub-layouts; Events & Sport has venue vs sport sub-layouts
+- Phase 5 webhook endpoint live
 - Airtable Organizations table ID: `tblRiQuIfeQ34aN5L`
+- ficheTemplates.ts updated with all Category Sub mappings
 - Admin dashboard: Fiche Inbox card + enrichment scores on fiche list
 - Client portal operational — magic link auth via jeeves@thegatekeepers.club
 - Resend domain verified for thegatekeepers.club

@@ -76,11 +76,12 @@ async function ensureUniqueSlug(baseSlug: string, existingId?: string): Promise<
 }
 
 function buildTemplateFields(org: AirtableOrg, template: FicheTemplate): Record<string, unknown> {
+  const location = org.city ? `${org.city}, ${org.country}` : org.country || ''
   switch (template) {
     case 'maker':
-      return {
-        based_in: org.city ? `${org.city}, ${org.country}` : org.country || '',
-      }
+      return { based_in: location }
+    case 'transport':
+      return { base_location: location }
     default:
       return {}
   }

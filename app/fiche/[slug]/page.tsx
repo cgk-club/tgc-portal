@@ -9,6 +9,12 @@ import DefaultFiche from '@/components/fiche/templates/DefaultFiche'
 import HospitalityFiche from '@/components/fiche/templates/HospitalityFiche'
 import RealEstateFiche from '@/components/fiche/templates/RealEstateFiche'
 import DiningFiche from '@/components/fiche/templates/DiningFiche'
+import ExperienceFiche from '@/components/fiche/templates/ExperienceFiche'
+import TransportFiche from '@/components/fiche/templates/TransportFiche'
+import WineEstateFiche from '@/components/fiche/templates/WineEstateFiche'
+import WellnessFiche from '@/components/fiche/templates/WellnessFiche'
+import EventsSportFiche from '@/components/fiche/templates/EventsSportFiche'
+import ArtsCultureFiche from '@/components/fiche/templates/ArtsCultureFiche'
 import ClientMakerFiche from './ClientMakerFiche'
 
 interface PageProps {
@@ -87,7 +93,13 @@ export default async function FichePage({ params, searchParams }: PageProps) {
           galleryUrls={galleryUrls}
         />
       )}
-      {(templateType === 'default' || !['hospitality', 'real_estate', 'dining', 'maker'].includes(templateType)) && (
+      {templateType === 'experience' && <ExperienceFiche {...commonProps} />}
+      {templateType === 'transport' && <TransportFiche {...commonProps} />}
+      {templateType === 'wine_estate' && <WineEstateFiche {...commonProps} />}
+      {templateType === 'wellness' && <WellnessFiche {...commonProps} />}
+      {templateType === 'events_sport' && <EventsSportFiche {...commonProps} />}
+      {templateType === 'arts_culture' && <ArtsCultureFiche {...commonProps} />}
+      {(templateType === 'default' || !['hospitality', 'real_estate', 'dining', 'maker', 'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture'].includes(templateType)) && (
         <DefaultFiche {...commonProps} />
       )}
 
