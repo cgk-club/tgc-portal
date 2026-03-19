@@ -81,12 +81,34 @@ export default function WineEstateFieldsEditor({ fields, onChange }: Props) {
         </label>
       </div>
       {fields.accommodation && (
-        <Input
-          label="Accommodation details"
-          placeholder="e.g. 4-room gite, sleeps 8"
-          value={fields.accommodation_details ?? ''}
-          onChange={(e) => update('accommodation_details', e.target.value || undefined)}
-        />
+        <>
+          <Input
+            label="Accommodation details"
+            placeholder="e.g. 4-room gite, sleeps 8"
+            value={fields.accommodation_details ?? ''}
+            onChange={(e) => update('accommodation_details', e.target.value || undefined)}
+          />
+          <div className="grid grid-cols-3 gap-3">
+            <Input
+              label="Rooms / suites"
+              type="number"
+              value={fields.room_count ?? ''}
+              onChange={(e) => update('room_count', e.target.value ? parseInt(e.target.value) : undefined)}
+            />
+            <Input
+              label="Check-in"
+              type="time"
+              value={fields.checkin_time ?? ''}
+              onChange={(e) => update('checkin_time', e.target.value || undefined)}
+            />
+            <Input
+              label="Check-out"
+              type="time"
+              value={fields.checkout_time ?? ''}
+              onChange={(e) => update('checkout_time', e.target.value || undefined)}
+            />
+          </div>
+        </>
       )}
       <Input
         label="Cellar visits"

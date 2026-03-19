@@ -223,6 +223,9 @@ export interface WineEstateFields {
   established?: number
   accommodation?: boolean
   accommodation_details?: string
+  room_count?: number
+  checkin_time?: string
+  checkout_time?: string
   cellar_visits?: string
   tasting_format?: string
   restaurant_bistro?: boolean

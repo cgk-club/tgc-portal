@@ -147,6 +147,20 @@ export default function WineEstateFiche({
                       <dd className="text-gray-900 font-medium text-right">{tf.accommodation_details}</dd>
                     </div>
                   )}
+                  {tf.accommodation && tf.room_count && (
+                    <div className="flex justify-between">
+                      <dt className="text-gray-400">Rooms</dt>
+                      <dd className="text-gray-900 font-medium">{tf.room_count}</dd>
+                    </div>
+                  )}
+                  {tf.accommodation && (tf.checkin_time || tf.checkout_time) && (
+                    <div className="flex justify-between">
+                      <dt className="text-gray-400">Check-in / out</dt>
+                      <dd className="text-gray-900 font-medium">
+                        {[tf.checkin_time, tf.checkout_time].filter(Boolean).join(' / ')}
+                      </dd>
+                    </div>
+                  )}
                   {tf.shipping && (
                     <div className="flex justify-between">
                       <dt className="text-gray-400">Shipping</dt>
