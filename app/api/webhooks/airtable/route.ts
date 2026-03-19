@@ -40,12 +40,14 @@ interface PayloadsResponse {
 }
 
 function verifySignature(body: string, signature: string | null): boolean {
-  const secret = process.env.AIRTABLE_WEBHOOK_SECRET
-  if (!secret || !signature) return false
+  const secretBase64 = process.env.AIRTABLE_WEBHOOK_SECRET
+  if (!secretBase64 || !signature) return false
 
-  const hmac = crypto.createHmac('sha256', secret)
-  hmac.update(body, 'utf8')
-  const expected = hmac.digest('base64')
+  // The secret from Airtable is base64-encoded — decode it for HMAC key
+  const secretBytes = Buffer.from(secretBase64, 'base64')
+  const hmac = crypto.createHmac('sha256', secretBytes)
+  hmac.update(body, 'ascii')
+  const expected = 'hmac-sha256=' + hmac.digest('hex')
 
   try {
     return crypto.timingSafeEqual(
