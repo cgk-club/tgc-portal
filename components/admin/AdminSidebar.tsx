@@ -9,6 +9,7 @@ const navItems = [
   { label: 'Fiches', href: '/admin/fiches' },
   { label: 'Itineraries', href: '/admin/itineraries' },
   { label: 'Clients', href: '/admin/clients' },
+  { label: 'Rates', href: '/admin/rates' },
 ]
 
 export default function AdminSidebar() {

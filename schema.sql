@@ -190,3 +190,34 @@ ALTER TABLE webhook_log ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Service role full access webhook_log" ON webhook_log
   FOR ALL USING (auth.role() = 'service_role');
+
+-- Phase 7 schema additions (Supplier pricing register)
+
+CREATE TABLE IF NOT EXISTS supplier_rates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  supplier_name TEXT NOT NULL,
+  service TEXT NOT NULL,
+  rate DECIMAL(12,2) NOT NULL,
+  currency TEXT DEFAULT 'EUR',
+  unit TEXT DEFAULT 'per night',
+  rate_type TEXT DEFAULT 'net',
+  vat_rate DECIMAL(5,2),
+  commission_pct DECIMAL(5,2),
+  valid_from DATE,
+  valid_to DATE,
+  variant TEXT,
+  client_project TEXT,
+  source_contact TEXT,
+  source_date DATE,
+  source_note TEXT,
+  cancellation_terms TEXT,
+  status TEXT DEFAULT 'quoted',
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE supplier_rates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role full access supplier_rates" ON supplier_rates
+  FOR ALL USING (auth.role() = 'service_role');

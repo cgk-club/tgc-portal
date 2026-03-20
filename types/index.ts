@@ -113,6 +113,34 @@ export interface WebhookLog {
   duration_ms: number
 }
 
+export type RateUnit = 'per night' | 'per trip' | 'per person' | 'per day' | 'flat' | 'per hour' | 'other'
+export type RateType = 'net' | 'gross' | 'inc_vat'
+export type RateStatus = 'quoted' | 'confirmed' | 'expired' | 'booked' | 'cancelled'
+
+export interface SupplierRate {
+  id: string
+  supplier_name: string
+  service: string
+  rate: number
+  currency: string
+  unit: RateUnit
+  rate_type: RateType
+  vat_rate: number | null
+  commission_pct: number | null
+  valid_from: string | null
+  valid_to: string | null
+  variant: string | null
+  client_project: string | null
+  source_contact: string | null
+  source_date: string | null
+  source_note: string | null
+  cancellation_terms: string | null
+  status: RateStatus
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface QuoteCalculation {
   commissionableTotal: number
   zeroMarginTotal: number
