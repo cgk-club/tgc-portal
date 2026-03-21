@@ -11,6 +11,7 @@ const navItems = [
   { label: 'Clients', href: '/admin/clients' },
   { label: 'Rates', href: '/admin/rates' },
   { label: 'Events', href: '/admin/events' },
+  { label: 'Requests', href: '/admin/requests' },
 ]
 
 export default function AdminSidebar() {

@@ -10,6 +10,7 @@ interface ClientAccount {
   email: string
   created_at: string
   last_login: string | null
+  points_balance: number
 }
 
 export default function ClientsPage() {
@@ -74,6 +75,7 @@ export default function ClientsPage() {
               <tr className="border-b border-gray-200">
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Last login</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
@@ -87,6 +89,7 @@ export default function ClientsPage() {
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">{c.name || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{c.email}</td>
+                  <td className="px-4 py-3 text-sm text-right font-medium text-gold">{(c.points_balance || 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {c.last_login
                       ? new Date(c.last_login).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
