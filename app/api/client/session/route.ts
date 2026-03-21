@@ -11,13 +11,20 @@ export async function GET(request: NextRequest) {
 
   const { data: client } = await getSupabaseAdmin()
     .from('client_accounts')
-    .select('id, name, email, points_balance')
+    .select('id, name, email, points_balance, password_hash')
     .eq('id', session.clientId)
     .single()
 
   if (!client) return NextResponse.json({ authenticated: false }, { status: 401 })
 
-  return NextResponse.json({ authenticated: true, client })
+  // Don't expose the actual hash to the client, just whether one is set
+  return NextResponse.json({
+    authenticated: true,
+    client: {
+      ...client,
+      password_hash: client.password_hash ? true : null,
+    },
+  })
 }
 
 export async function DELETE() {

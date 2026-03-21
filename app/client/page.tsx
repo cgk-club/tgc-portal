@@ -11,6 +11,7 @@ interface ClientInfo {
   name: string
   email: string
   points_balance: number
+  password_hash: string | null
 }
 
 export default function ClientDashboardPage() {
@@ -18,6 +19,10 @@ export default function ClientDashboardPage() {
   const [client, setClient] = useState<ClientInfo | null>(null)
   const [itineraries, setItineraries] = useState<(Itinerary & { days?: { id: string }[] })[]>([])
   const [loading, setLoading] = useState(true)
+  const [showPasswordBanner, setShowPasswordBanner] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [settingPassword, setSettingPassword] = useState(false)
+  const [passwordSet, setPasswordSet] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -28,6 +33,7 @@ export default function ClientDashboardPage() {
       }
       const { client: c } = await sessionRes.json()
       setClient(c)
+      if (!c.password_hash) setShowPasswordBanner(true)
 
       const itinRes = await fetch('/api/client/itineraries')
       if (itinRes.ok) {
@@ -73,6 +79,61 @@ export default function ClientDashboardPage() {
             Start a Conversation
           </Link>
         </div>
+
+        {/* Set Password Banner */}
+        {showPasswordBanner && !passwordSet && (
+          <div className="bg-gold/5 border border-gold/20 rounded-lg p-5 mb-8">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green font-heading mb-1">Set a password for easy access</p>
+                <p className="text-xs text-gray-500 font-body mb-3">So you can log in anytime without needing a magic link.</p>
+                {!settingPassword ? (
+                  <button
+                    onClick={() => setSettingPassword(true)}
+                    className="text-xs text-green border border-green/20 px-3 py-1.5 rounded hover:bg-green/5 transition-colors font-body"
+                  >
+                    Set password
+                  </button>
+                ) : (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    if (newPassword.length < 8) return
+                    const res = await fetch('/api/client/set-password', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ password: newPassword }),
+                    })
+                    if (res.ok) {
+                      setPasswordSet(true)
+                      setShowPasswordBanner(false)
+                    }
+                  }} className="flex gap-2 items-end">
+                    <div>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Min 8 characters"
+                        minLength={8}
+                        className="px-3 py-1.5 border border-green/20 rounded text-sm font-body w-48 focus:outline-none focus:ring-1 focus:ring-green/30"
+                      />
+                    </div>
+                    <button type="submit" disabled={newPassword.length < 8} className="px-3 py-1.5 bg-green text-white text-xs rounded font-body hover:bg-green-light disabled:opacity-50">
+                      Save
+                    </button>
+                  </form>
+                )}
+              </div>
+              <button onClick={() => setShowPasswordBanner(false)} className="text-gray-400 hover:text-gray-600 text-sm">&#10005;</button>
+            </div>
+          </div>
+        )}
+
+        {passwordSet && (
+          <div className="bg-green/5 border border-green/20 rounded-lg p-4 mb-8 text-center">
+            <p className="text-sm text-green font-body">Password set. You can now log in with your email and password anytime.</p>
+          </div>
+        )}
 
         {/* Quick Links Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
