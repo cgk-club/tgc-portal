@@ -10,7 +10,7 @@ interface ClientNavProps {
 const NAV_ITEMS = [
   { label: "Home", href: "/client", key: "home" },
   { label: "Our Collection", href: "/client/collection", key: "collection" },
-  { label: "My Journeys", href: "/client", key: "journeys" },
+  { label: "My Journeys", href: "/client#journeys", key: "journeys" },
   { label: "Events", href: "/client/events", key: "events" },
   { label: "Points", href: "/client/points", key: "points" },
 ];

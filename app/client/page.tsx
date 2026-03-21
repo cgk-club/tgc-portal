@@ -61,7 +61,7 @@ export default function ClientDashboardPage() {
         <div className="text-center mb-12">
           <p className="text-sm text-gray-400 font-body mb-1">Welcome back,</p>
           <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-green mb-4">
-            {client?.name || client?.email}
+            {firstName}
           </h1>
           <p className="text-sm text-gray-500 font-body mb-6 max-w-md mx-auto">
             Your concierge is here whenever you need us.
