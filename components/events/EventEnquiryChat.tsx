@@ -13,9 +13,9 @@ export default function EventEnquiryChat({ eventName, enquiryType }: EventEnquir
 
   const greeting = eventName
     ? enquiryType === "logistics"
-      ? `Good day. I understand you are attending ${eventName} and may need support with logistics, accommodation, or dining around the event. Let me help you put a programme together. What do you need most?`
-      : `Good day. I see you are interested in ${eventName}. I am here to help you plan the full experience. To start, could you tell me what kind of access or involvement you are looking for?`
-    : `Good day. Welcome to The Gatekeepers Club events desk. I am here to help you plan an event experience from start to finish. Which event are you looking at?`;
+      ? `Hi. I understand you are attending ${eventName} and may need support with logistics, accommodation, or dining around the event. Let me help you put a programme together. What do you need most?`
+      : `Hi. I see you are interested in ${eventName}. I am here to help you plan the full experience. To start, could you tell me what kind of access or involvement you are looking for?`
+    : `Hi. Welcome to The Gatekeepers Club events desk. I am here to help you plan an event experience from start to finish. Which event are you looking at?`;
 
   async function handleComplete(data: Record<string, unknown>) {
     try {
