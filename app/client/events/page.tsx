@@ -5,21 +5,42 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ClientChatModule from "@/components/client/ClientChatModule";
 import ClientNav from "@/components/client/ClientNav";
-import { getUpcomingEvents, type TGCEvent } from "@/lib/events-data";
+
+interface TGCEvent {
+  id: string;
+  title: string;
+  category: string;
+  date_display: string;
+  location: string | null;
+  price: string;
+  description: string | null;
+  featured: boolean;
+}
 
 export default function ClientEventsPage() {
   const router = useRouter();
   const [clientName, setClientName] = useState<string>("");
+  const [events, setEvents] = useState<TGCEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBespokeChat, setShowBespokeChat] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/client/session");
-      if (!res.ok) { router.push("/client/login"); return; }
-      const { client } = await res.json();
+      const sessionRes = await fetch("/api/client/session");
+      if (!sessionRes.ok) { router.push("/client/login"); return; }
+      const { client } = await sessionRes.json();
       setClientName(client.name || "");
+
+      const eventsRes = await fetch("/api/events/list");
+      if (eventsRes.ok) {
+        const data = await eventsRes.json();
+        // Filter to upcoming events (date_start in the future or no date_start)
+        const now = new Date().toISOString().split("T")[0];
+        const upcoming = data.filter((ev: { date_end?: string | null }) => !ev.date_end || ev.date_end >= now);
+        setEvents(upcoming);
+      }
+
       setLoading(false);
     }
     load();
@@ -36,8 +57,7 @@ export default function ClientEventsPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-pearl"><p className="text-gray-400 font-body">Loading...</p></div>;
 
   const firstName = clientName.split(" ")[0];
-  const allEvents: TGCEvent[] = getUpcomingEvents();
-  const displayedEvents = showAll ? allEvents : allEvents.slice(0, 3);
+  const displayedEvents = showAll ? events : events.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-pearl">
@@ -61,29 +81,27 @@ export default function ClientEventsPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-heading text-sm font-semibold text-gray-800 mb-1">{ev.title}</h3>
-                  <p className="text-xs text-gray-500 font-body">{ev.date}</p>
+                  <p className="text-xs text-gray-500 font-body">{ev.date_display}</p>
                   <p className="text-xs text-gray-400 font-body mb-2">{ev.location}</p>
                   <p className="text-xs text-gray-400 font-body mb-3 line-clamp-2">{ev.description}</p>
-                  <div className="flex gap-2">
-                    <a
-                      href={`/events/enquiry?event=${encodeURIComponent(ev.title)}&type=enquiry`}
-                      className="inline-block text-xs text-green border border-green/20 px-3 py-1.5 rounded hover:bg-green/5 transition-colors font-body"
-                    >
-                      I am interested
-                    </a>
-                  </div>
+                  <a
+                    href={`/events/enquiry?event=${encodeURIComponent(ev.title)}&type=enquiry`}
+                    className="inline-block text-xs text-green border border-green/20 px-3 py-1.5 rounded hover:bg-green/5 transition-colors font-body"
+                  >
+                    I am interested
+                  </a>
                 </div>
               </div>
             ))}
           </div>
 
-          {!showAll && allEvents.length > 3 && (
+          {!showAll && events.length > 3 && (
             <div className="text-center mt-6">
               <button
                 onClick={() => setShowAll(true)}
                 className="text-sm text-green border border-green/20 px-5 py-2 rounded hover:bg-green/5 transition-colors font-body"
               >
-                See all {allEvents.length} events
+                See all {events.length} events
               </button>
             </div>
           )}
