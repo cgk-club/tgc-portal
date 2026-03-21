@@ -248,11 +248,11 @@ export default function ClientDashboardPage() {
                         </p>
                       </div>
                       <span className={`text-[10px] px-2 py-0.5 rounded font-body ${
-                        it.status === 'confirmed' ? 'bg-green/10 text-green' :
-                        it.status === 'sent' ? 'bg-gold/15 text-gold' :
-                        'bg-gray-100 text-gray-400'
+                        it.status === 'shared' ? 'bg-green/10 text-green' :
+                        it.status === 'archived' ? 'bg-gray-200 text-gray-500' :
+                        'bg-gold/15 text-gold'
                       }`}>
-                        {it.status === 'confirmed' ? 'Confirmed' : it.status === 'sent' ? 'Proposed' : 'Draft'}
+                        {it.status === 'shared' ? 'Active' : it.status === 'archived' ? 'Past' : 'Planning'}
                       </span>
                     </div>
                   </div>
