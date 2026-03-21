@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Client portal auth (protect /client and subpaths, but not /client/login or /client/auth)
-  if (pathname === '/client' || pathname.startsWith('/client/collection')) {
+  if (pathname === '/client' || pathname.startsWith('/client/collection') || pathname.startsWith('/client/conversation') || pathname.startsWith('/client/events') || pathname.startsWith('/client/points')) {
     const token = request.cookies.get(CLIENT_COOKIE_NAME)?.value
     if (!token) {
       return NextResponse.redirect(new URL('/client/login', request.url))
@@ -49,5 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*', '/client', '/client/collection/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/client', '/client/collection/:path*', '/client/conversation/:path*', '/client/events/:path*', '/client/points/:path*'],
 }

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const { data: client } = await getSupabaseAdmin()
     .from('client_accounts')
-    .select('id, name, email')
+    .select('id, name, email, points_balance')
     .eq('id', session.clientId)
     .single()
 
