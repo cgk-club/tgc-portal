@@ -4,6 +4,7 @@ import { WineEstateFields } from '@/lib/ficheTemplates'
 import FicheHero from '@/components/fiche/FicheHero'
 import FicheGallery from '@/components/fiche/FicheGallery'
 import FicheTags from '@/components/fiche/FicheTags'
+import FicheContact from '@/components/fiche/FicheContact'
 
 interface Props {
   fiche: Fiche
@@ -184,22 +185,7 @@ export default function WineEstateFiche({
 
       <FicheTags tags={tags} />
 
-      <div className="py-12 px-8 md:px-12 lg:px-16 bg-green-muted">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="font-heading text-2xl font-semibold text-green mb-3">
-            Interested in {name}?
-          </h2>
-          <p className="text-gray-600 font-body mb-6">
-            Get in touch and we will arrange your visit.
-          </p>
-          <a
-            href={`mailto:hello@thegatekeepers.club?subject=${mailtoSubject}`}
-            className="inline-flex items-center justify-center rounded-[4px] bg-green text-white px-8 py-3 font-body font-medium hover:bg-green-light transition-colors w-full sm:w-auto"
-          >
-            Plan your visit
-          </a>
-        </div>
-      </div>
+      <FicheContact name={name} />
     </>
   )
 }
