@@ -72,18 +72,29 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
 
   const days = itinerary.days || []
 
-  // Collect map stops from geocoded fiche items
-  const mapStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
+  // Collect map stops from geocoded fiche items, deduplicated by location
+  // Group nearby fiches (within ~0.05 degrees / ~5km) into a single stop using the day title
+  const rawStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
   for (const day of days) {
     for (const item of day.items || []) {
       if (item.item_type === 'fiche' && item.fiche?.latitude && item.fiche?.longitude) {
-        mapStops.push({
+        rawStops.push({
           lat: item.fiche.latitude,
           lng: item.fiche.longitude,
-          name: item.custom_title || item.fiche.headline || 'Untitled',
+          name: day.title || item.custom_title || item.fiche.headline || 'Untitled',
           dayNumber: day.day_number,
         })
       }
+    }
+  }
+  // Deduplicate: keep one stop per location cluster per day group
+  const mapStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
+  for (const stop of rawStops) {
+    const isDuplicate = mapStops.some(
+      existing => Math.abs(existing.lat - stop.lat) < 0.05 && Math.abs(existing.lng - stop.lng) < 0.05
+    )
+    if (!isDuplicate) {
+      mapStops.push(stop)
     }
   }
 
