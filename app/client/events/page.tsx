@@ -14,6 +14,9 @@ interface TGCEvent {
   location: string | null;
   price: string;
   description: string | null;
+  highlights: string | null;
+  itinerary: string | null;
+  includes: string | null;
   image_url: string | null;
   featured: boolean;
 }
@@ -25,6 +28,7 @@ export default function ClientEventsPage() {
   const [loading, setLoading] = useState(true);
   const [showBespokeChat, setShowBespokeChat] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<TGCEvent | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -71,7 +75,11 @@ export default function ClientEventsPage() {
           <p className="text-sm text-gray-500 font-body mb-6">Events we can arrange access and hospitality for.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {displayedEvents.map((ev) => (
-              <div key={ev.id} className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+              <button
+                key={ev.id}
+                onClick={() => setSelectedEvent(ev)}
+                className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow text-left"
+              >
                 <div className="h-36 bg-green-muted flex items-center justify-center relative overflow-hidden">
                   {ev.image_url ? (
                     <img src={ev.image_url} alt={ev.title} className="w-full h-full object-cover" />
@@ -85,18 +93,14 @@ export default function ClientEventsPage() {
                   )}
                 </div>
                 <div className="p-4">
+                  <p className="text-[10px] text-green/50 font-body uppercase tracking-wide mb-1">{ev.category}</p>
                   <h3 className="font-heading text-sm font-semibold text-gray-800 mb-1">{ev.title}</h3>
                   <p className="text-xs text-gray-500 font-body">{ev.date_display}</p>
                   <p className="text-xs text-gray-400 font-body mb-2">{ev.location}</p>
-                  <p className="text-xs text-gray-400 font-body mb-3 line-clamp-2">{ev.description}</p>
-                  <a
-                    href={`/events/enquiry?event=${encodeURIComponent(ev.title)}&type=enquiry`}
-                    className="inline-block text-xs text-green border border-green/20 px-3 py-1.5 rounded hover:bg-green/5 transition-colors font-body"
-                  >
-                    I am interested
-                  </a>
+                  <p className="text-xs text-gray-400 font-body line-clamp-2">{ev.description}</p>
+                  <span className="inline-block mt-3 text-xs text-green font-body">View details &#8594;</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -159,6 +163,107 @@ export default function ClientEventsPage() {
           )}
         </div>
       </div>
+
+      {/* Event Detail Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedEvent(null)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div
+            className="relative bg-pearl rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Hero */}
+            {selectedEvent.image_url && (
+              <div className="h-56 sm:h-64 overflow-hidden rounded-t-lg">
+                <img src={selectedEvent.image_url} alt={selectedEvent.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedEvent(null)}
+              className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors shadow"
+            >
+              &#10005;
+            </button>
+
+            <div className="p-6 sm:p-8">
+              {/* Category + Date */}
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[10px] tracking-[1.5px] text-green/60 uppercase font-body">{selectedEvent.category}</span>
+                {selectedEvent.featured && (
+                  <span className="text-[9px] tracking-[1px] text-gold bg-gold/10 px-2 py-0.5 rounded uppercase font-body">Featured</span>
+                )}
+              </div>
+
+              <h2 className="font-heading text-xl sm:text-2xl font-semibold text-green mb-1">{selectedEvent.title}</h2>
+              <p className="text-sm text-gray-500 font-body mb-1">{selectedEvent.date_display}</p>
+              <p className="text-sm text-gray-400 font-body mb-4">{selectedEvent.location}</p>
+
+              {selectedEvent.price && (
+                <p className="text-sm text-gold font-body font-medium mb-4">{selectedEvent.price}</p>
+              )}
+
+              {/* Description */}
+              <p className="text-sm text-gray-600 font-body leading-relaxed mb-6">{selectedEvent.description}</p>
+
+              {/* Highlights */}
+              {selectedEvent.highlights && selectedEvent.highlights.trim() && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">Highlights</h3>
+                  <ul className="space-y-1.5">
+                    {selectedEvent.highlights.split("\n").filter(Boolean).map((line, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600 font-body">
+                        <span className="text-gold mt-0.5">&#8226;</span>
+                        {line.replace(/^[-•]\s*/, "")}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Itinerary */}
+              {selectedEvent.itinerary && selectedEvent.itinerary.trim() && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">Itinerary</h3>
+                  <p className="text-sm text-gray-600 font-body leading-relaxed whitespace-pre-line">{selectedEvent.itinerary}</p>
+                </div>
+              )}
+
+              {/* What is Included */}
+              {selectedEvent.includes && selectedEvent.includes.trim() && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">What is Included</h3>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    {selectedEvent.includes.split("\n").filter(Boolean).map((line, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600 font-body">
+                        <span className="text-green mt-0.5">&#10003;</span>
+                        {line.replace(/^[-•]\s*/, "")}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-green/10">
+                <a
+                  href={`/events/enquiry?event=${encodeURIComponent(selectedEvent.title)}&type=enquiry`}
+                  className="flex-1 text-center px-5 py-3 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body"
+                >
+                  Enquire About This Event
+                </a>
+                <a
+                  href={`/events/enquiry?event=${encodeURIComponent(selectedEvent.title)}&type=logistics`}
+                  className="flex-1 text-center px-5 py-3 border border-green/20 text-green text-sm font-medium rounded-md hover:bg-green/5 transition-colors font-body"
+                >
+                  Get Event Logistics Support
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
