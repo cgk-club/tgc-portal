@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+
+import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
-import { cookies } from "next/headers";
 import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(CLIENT_COOKIE_NAME)?.value;
+    const token = request.cookies.get(CLIENT_COOKIE_NAME)?.value;
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const session = await verifyClientSession(token);

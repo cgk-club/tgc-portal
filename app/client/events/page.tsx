@@ -14,6 +14,7 @@ interface TGCEvent {
   location: string | null;
   price: string;
   description: string | null;
+  image_url: string | null;
   featured: boolean;
 }
 
@@ -71,8 +72,12 @@ export default function ClientEventsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {displayedEvents.map((ev) => (
               <div key={ev.id} className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-36 bg-green-muted flex items-center justify-center relative">
-                  <span className="text-green/20 text-xs font-body">{ev.category}</span>
+                <div className="h-36 bg-green-muted flex items-center justify-center relative overflow-hidden">
+                  {ev.image_url ? (
+                    <img src={ev.image_url} alt={ev.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-green/20 text-xs font-body">{ev.category}</span>
+                  )}
                   {ev.featured && (
                     <span className="absolute top-2 right-2 bg-gold/90 text-white text-[9px] tracking-[1px] uppercase px-2 py-0.5 rounded-sm font-body">
                       Featured

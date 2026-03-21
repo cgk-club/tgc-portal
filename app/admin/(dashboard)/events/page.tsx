@@ -223,7 +223,7 @@ export default function AdminEventsPage() {
               <textarea value={form.itinerary || ""} onChange={(e) => setForm({ ...form, itinerary: e.target.value })} rows={2} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-gray-500 font-body mb-1">What's Included</label>
+              <label className="block text-xs text-gray-500 font-body mb-1">What is Included</label>
               <textarea value={form.includes || ""} onChange={(e) => setForm({ ...form, includes: e.target.value })} rows={2} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
             </div>
             <div>
