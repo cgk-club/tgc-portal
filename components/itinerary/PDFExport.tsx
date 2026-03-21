@@ -101,52 +101,57 @@ function ItineraryPDF({ itinerary }: { itinerary: Itinerary }) {
         <Text style={styles.tagline}>Curated travel, crafted personally</Text>
       </Page>
 
-      {/* Day Pages */}
-      <Page size="A4" style={styles.page}>
-        {days.map((day: ItineraryDay) => (
-          <View key={day.id}>
-            <View style={styles.dayHeader}>
-              <Text style={styles.dayHeaderText}>
-                Day {day.day_number}{day.title ? ` \u2014 ${day.title}` : ''}
-              </Text>
-              {day.date && (
-                <Text style={styles.dayDate}>{formatDayDate(day.date)}</Text>
-              )}
-            </View>
-
-            {(day.items || []).map((item: ItineraryItem) =>
-              item.item_type === 'note' ? (
-                <View key={item.id} style={styles.noteItem}>
-                  {formatTimeLabel(item) && (
-                    <Text style={styles.ficheTime}>{formatTimeLabel(item)}</Text>
-                  )}
-                  {item.custom_title && (
-                    <Text style={styles.noteTitle}>{item.custom_title}</Text>
-                  )}
-                  {item.custom_note && (
-                    <Text style={styles.noteText}>{item.custom_note}</Text>
-                  )}
-                </View>
-              ) : (
-                <View key={item.id} style={styles.ficheItem}>
-                  {formatTimeLabel(item) && (
-                    <Text style={styles.ficheTime}>{formatTimeLabel(item)}</Text>
-                  )}
-                  <Text style={styles.ficheName}>
-                    {item.custom_title || item.fiche?.headline || 'Untitled'}
-                  </Text>
-                  {item.fiche?.description && (
-                    <Text style={styles.ficheDesc}>
-                      {item.fiche.description.slice(0, 200)}
-                      {item.fiche.description.length > 200 ? '...' : ''}
-                    </Text>
-                  )}
-                </View>
-              )
+      {/* Day Pages - one page per day */}
+      {days.map((day: ItineraryDay) => (
+        <Page key={day.id} size="A4" style={styles.page} wrap>
+          <View style={styles.dayHeader}>
+            <Text style={styles.dayHeaderText}>
+              Day {day.day_number}{day.title ? ` \u2014 ${day.title}` : ''}
+            </Text>
+            {day.date && (
+              <Text style={styles.dayDate}>{formatDayDate(day.date)}</Text>
             )}
           </View>
-        ))}
-      </Page>
+
+          {day.notes && (
+            <View style={{ marginBottom: 12 }}>
+              <Text style={{ fontSize: 10, color: '#777777', fontStyle: 'italic', lineHeight: 1.5 }}>
+                {day.notes}
+              </Text>
+            </View>
+          )}
+
+          {(day.items || []).map((item: ItineraryItem) =>
+            item.item_type === 'note' ? (
+              <View key={item.id} style={styles.noteItem} wrap={false}>
+                {formatTimeLabel(item) && (
+                  <Text style={styles.ficheTime}>{formatTimeLabel(item)}</Text>
+                )}
+                {item.custom_title && (
+                  <Text style={styles.noteTitle}>{item.custom_title}</Text>
+                )}
+                {item.custom_note && (
+                  <Text style={styles.noteText}>{item.custom_note}</Text>
+                )}
+              </View>
+            ) : (
+              <View key={item.id} style={styles.ficheItem} wrap={false}>
+                {formatTimeLabel(item) && (
+                  <Text style={styles.ficheTime}>{formatTimeLabel(item)}</Text>
+                )}
+                <Text style={styles.ficheName}>
+                  {item.custom_title || item.fiche?.headline || 'Untitled'}
+                </Text>
+                {item.custom_note && (
+                  <Text style={{ fontSize: 9, color: '#555555', lineHeight: 1.5, marginTop: 4 }}>
+                    {item.custom_note}
+                  </Text>
+                )}
+              </View>
+            )
+          )}
+        </Page>
+      ))}
 
       {/* Contact Footer Page */}
       <Page size="A4" style={[styles.page, styles.footer]}>
