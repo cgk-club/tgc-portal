@@ -50,6 +50,40 @@ function bodyToHtml(body: string): string {
   }).join('')
 }
 
+export async function sendEventEnquiryNotification(data: Record<string, unknown>) {
+  const lines = [
+    `Event: ${data.event_name || 'Not specified'}`,
+    `Access type: ${data.access_type || 'Not specified'}`,
+    `Group size: ${data.group_size || 'Not specified'}`,
+    `Accommodation: ${data.accommodation_needs || 'None mentioned'}`,
+    `Transfers: ${data.transfers_logistics || 'None mentioned'}`,
+    `Dining: ${data.dining_preferences || 'None mentioned'}`,
+    `Budget: ${data.budget_range || 'Not specified'}`,
+    `Special requests: ${data.special_requests || 'None'}`,
+    '',
+    `Name: ${data.name}`,
+    `Email: ${data.email}`,
+    `Phone: ${data.phone || 'Not provided'}`,
+    `Prefers: ${data.communication_pref || 'email'}`,
+  ]
+
+  const textBody = lines.join('\n')
+  const htmlBody = lines.map(l => l ? `<p style="color: #333; font-size: 14px; line-height: 1.6; margin: 4px 0;">${l}</p>` : '<br />').join('')
+
+  await getResend().emails.send({
+    from: `TGC Events <${FROM_EMAIL}>`,
+    to: 'christian@thegatekeepers.club',
+    subject: `Event Enquiry: ${data.event_name || 'New enquiry'} - ${data.name}`,
+    text: textBody,
+    html: `<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase; margin-bottom: 30px;">NEW EVENT ENQUIRY</p>
+      ${htmlBody}
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+      <p style="color: #999; font-size: 12px;">Submitted via portal.thegatekeepers.club/events/enquiry</p>
+    </div>`,
+  })
+}
+
 export async function sendOutreachEmail(to: string, subject: string, body: string) {
   await getResend().emails.send({
     from: `Christian de Jabrun <${FROM_EMAIL}>`,
