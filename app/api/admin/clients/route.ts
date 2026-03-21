@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { sendMagicLink } from '@/lib/email'
-import { randomBytes } from 'crypto'
 
 export async function GET() {
   const { data, error } = await getSupabaseAdmin()
@@ -29,20 +27,6 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  // Auto-send magic link on creation
-  const token = randomBytes(32).toString('hex')
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-
-  await getSupabaseAdmin().from('magic_tokens').insert({
-    client_id: data.id,
-    token,
-    expires_at: expiresAt,
-  })
-
-  sendMagicLink(data.email, data.name || 'there', token).catch((err) =>
-    console.error('Failed to send magic link on creation:', err)
-  )
 
   return NextResponse.json(data, { status: 201 })
 }
