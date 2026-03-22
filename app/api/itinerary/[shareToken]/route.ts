@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getItineraryByToken } from '@/lib/itineraries'
 import { getOrgById } from '@/lib/airtable'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ shareToken: string }> }

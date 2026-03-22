@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { Itinerary, ItineraryDay, ItineraryItem } from '@/types'
 
@@ -87,6 +88,7 @@ export async function createItem(
 // --- Read ---
 
 export async function getItinerary(id: string): Promise<Itinerary | null> {
+  noStore()
   const { data, error } = await sb()
     .from('itineraries')
     .select(`
@@ -109,6 +111,7 @@ export async function getItinerary(id: string): Promise<Itinerary | null> {
 }
 
 export async function getItineraryByToken(shareToken: string): Promise<Itinerary | null> {
+  noStore()
   const { data, error } = await sb()
     .from('itineraries')
     .select(`
