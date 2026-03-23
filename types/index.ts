@@ -153,6 +153,8 @@ export interface BankDetails {
   account_holder: string
 }
 
+export type CommissionType = 'percentage' | 'fixed'
+
 export interface PaymentItem {
   id: string
   itinerary_id: string
@@ -160,6 +162,9 @@ export interface PaymentItem {
   supplier_name: string
   amount: number
   currency: string
+  commission_type?: CommissionType
+  commission_value?: number
+  client_amount?: number
   payment_method: PaymentMethod
   payment_status: PaymentStatus
   cc_payment_url?: string

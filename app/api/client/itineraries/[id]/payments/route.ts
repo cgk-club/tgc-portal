@@ -33,7 +33,7 @@ export async function GET(
     // Fetch payment items (exclude internal notes)
     const { data: payments, error } = await supabase
       .from("payment_items")
-      .select("id, itinerary_id, service_name, supplier_name, amount, currency, payment_method, payment_status, cc_payment_url, bank_details, deposit_deadline, client_notes, sort_order, created_at, updated_at")
+      .select("id, itinerary_id, service_name, supplier_name, amount, currency, client_amount, payment_method, payment_status, cc_payment_url, bank_details, deposit_deadline, client_notes, sort_order, created_at, updated_at")
       .eq("itinerary_id", id)
       .neq("payment_status", "cancelled")
       .order("sort_order", { ascending: true });

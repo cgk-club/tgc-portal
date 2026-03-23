@@ -56,7 +56,7 @@ function PaymentCard({ item }: { item: PaymentItem }) {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="font-body text-sm font-semibold text-green">
-            {item.currency} {Number(item.amount).toLocaleString("en", { minimumFractionDigits: 0 })}
+            {item.currency} {(Number(item.client_amount) || Number(item.amount)).toLocaleString("en", { minimumFractionDigits: 0 })}
           </span>
           <span className={`text-[10px] font-body font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[item.payment_status]}`}>
             {item.payment_status === "confirmed" && <span className="mr-1">&#10003;</span>}
@@ -160,9 +160,10 @@ export default function PaymentsPage() {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-pearl"><p className="text-gray-400 font-body">Loading...</p></div>;
 
-  const totalAmount = payments.reduce((sum, p) => p.payment_status !== "cancelled" ? sum + Number(p.amount) : sum, 0);
-  const paidAmount = payments.reduce((sum, p) => ["fully_paid", "confirmed"].includes(p.payment_status) ? sum + Number(p.amount) : sum, 0);
-  const depositAmount = payments.reduce((sum, p) => p.payment_status === "deposit_paid" ? sum + Number(p.amount) : sum, 0);
+  const getClientAmount = (p: PaymentItem) => Number(p.client_amount) || Number(p.amount);
+  const totalAmount = payments.reduce((sum, p) => p.payment_status !== "cancelled" ? sum + getClientAmount(p) : sum, 0);
+  const paidAmount = payments.reduce((sum, p) => ["fully_paid", "confirmed"].includes(p.payment_status) ? sum + getClientAmount(p) : sum, 0);
+  const depositAmount = payments.reduce((sum, p) => p.payment_status === "deposit_paid" ? sum + getClientAmount(p) : sum, 0);
   const remainingAmount = totalAmount - paidAmount;
   const progressPct = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0;
 

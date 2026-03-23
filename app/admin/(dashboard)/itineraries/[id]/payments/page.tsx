@@ -63,6 +63,13 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  function calcClientAmount(amount: number, commType?: string, commValue?: number): number | null {
+    if (!commType || !commValue) return null;
+    if (commType === "percentage") return Math.round((amount / (1 - commValue / 100)) * 100) / 100;
+    if (commType === "fixed") return amount + commValue;
+    return null;
+  }
+
   async function handleFieldUpdate(paymentId: string, fields: Record<string, unknown>) {
     await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}`, {
       method: "PUT",
@@ -145,7 +152,8 @@ export default function AdminPaymentsPage() {
   }
 
   const total = payments.reduce((s, p) => p.payment_status !== "cancelled" ? s + Number(p.amount) : s, 0);
-  const paid = payments.reduce((s, p) => ["fully_paid", "confirmed"].includes(p.payment_status) ? s + Number(p.amount) : s, 0);
+  const clientTotal = payments.reduce((s, p) => p.payment_status !== "cancelled" ? s + (Number(p.client_amount) || Number(p.amount)) : s, 0);
+  const paid = payments.reduce((s, p) => ["fully_paid", "confirmed"].includes(p.payment_status) ? s + (Number(p.client_amount) || Number(p.amount)) : s, 0);
 
   if (loading) return <div className="p-6 text-gray-400 text-sm">Loading payments...</div>;
 
@@ -155,7 +163,7 @@ export default function AdminPaymentsPage() {
         <div>
           <h1 className="font-heading text-lg font-semibold text-green">Payment Tracker</h1>
           <p className="text-xs font-body text-gray-500 mt-1">
-            Total: EUR {total.toLocaleString()} | Paid: EUR {paid.toLocaleString()} | Remaining: EUR {(total - paid).toLocaleString()}
+            Net: EUR {total.toLocaleString()} | Client total: EUR {clientTotal.toLocaleString()} | Paid: EUR {paid.toLocaleString()} | Remaining: EUR {(clientTotal - paid).toLocaleString()}
           </p>
         </div>
         <div className="flex gap-2">
@@ -216,7 +224,9 @@ export default function AdminPaymentsPage() {
               <tr className="border-b bg-gray-50">
                 <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Service</th>
                 <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Supplier</th>
-                <th className="text-right px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Amount</th>
+                <th className="text-right px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Net Amount</th>
+                <th className="text-right px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Commission</th>
+                <th className="text-right px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Client Pays</th>
                 <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Method</th>
                 <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Status</th>
                 <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium font-body">Deadline</th>
@@ -255,6 +265,41 @@ export default function AdminPaymentsPage() {
                         className="w-24 bg-transparent border-0 p-0 text-sm font-body font-medium text-right focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1"
                       />
                     </div>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <select
+                        value={p.commission_type || ""}
+                        onChange={(e) => {
+                          const ct = e.target.value || null;
+                          const cv = p.commission_value || null;
+                          const ca = ct && cv ? calcClientAmount(Number(p.amount), ct, Number(cv)) : null;
+                          handleFieldUpdate(p.id, { commission_type: ct, client_amount: ca });
+                        }}
+                        className="w-12 bg-transparent border-0 p-0 text-[11px] font-body text-gray-400 cursor-pointer focus:outline-none focus:ring-0"
+                      >
+                        <option value="">---</option>
+                        <option value="percentage">%</option>
+                        <option value="fixed">+EUR</option>
+                      </select>
+                      {p.commission_type && (
+                        <input
+                          type="number"
+                          step="0.01"
+                          defaultValue={p.commission_value || ""}
+                          placeholder={p.commission_type === "percentage" ? "10" : "500"}
+                          onBlur={(e) => {
+                            const cv = parseFloat(e.target.value) || 0;
+                            const ca = calcClientAmount(Number(p.amount), p.commission_type!, cv);
+                            handleFieldUpdate(p.id, { commission_value: cv, client_amount: ca });
+                          }}
+                          className="w-14 bg-transparent border-0 p-0 text-[11px] font-body text-gray-600 text-right focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1"
+                        />
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right font-body text-sm font-medium text-green">
+                    {(Number(p.client_amount) || Number(p.amount)).toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
                     <select
