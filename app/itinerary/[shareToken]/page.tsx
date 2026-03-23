@@ -7,6 +7,7 @@ import ClientItineraryCover from '@/components/client/ClientItineraryCover'
 import ClientDaySection from '@/components/client/ClientDaySection'
 import ClientItineraryPDF from './ClientPDF'
 import ClientMap from './ClientMap'
+import ClientChoices from './ClientChoices'
 
 interface PageProps {
   params: Promise<{ shareToken: string }>
@@ -142,10 +143,16 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
         {/* Map */}
         {mapStops.length > 0 && <ClientMap stops={mapStops} />}
 
-        {/* Days */}
+        {/* Days with choice cards inserted after relevant days */}
         {days.map((day) => (
-          <ClientDaySection key={day.id} day={day} />
+          <div key={day.id}>
+            <ClientDaySection day={day} />
+            <ClientChoices itineraryId={itinerary.id} afterDay={day.day_number} />
+          </div>
         ))}
+
+        {/* Choice groups with no specific position (shown at end) */}
+        <ClientChoices itineraryId={itinerary.id} />
       </div>
 
       {/* Footer */}

@@ -249,3 +249,42 @@ ALTER TABLE payment_items ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Service role full access payment_items" ON payment_items
   FOR ALL USING (auth.role() = 'service_role');
+
+-- Phase 9 schema additions (Choice Cards)
+
+CREATE TABLE IF NOT EXISTS choice_groups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  itinerary_id UUID REFERENCES itineraries(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  position_after_day INTEGER,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'decided', 'expired')),
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS choice_options (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  group_id UUID REFERENCES choice_groups(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  description TEXT,
+  price_estimate NUMERIC,
+  currency TEXT DEFAULT 'EUR',
+  image_url TEXT,
+  details JSONB DEFAULT '[]',
+  is_selected BOOLEAN DEFAULT false,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE choice_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE choice_options ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role full access choice_groups" ON choice_groups
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access choice_options" ON choice_options
+  FOR ALL USING (auth.role() = 'service_role');

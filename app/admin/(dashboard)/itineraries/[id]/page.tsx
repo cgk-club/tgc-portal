@@ -10,6 +10,7 @@ import QuotePanel from '@/components/quote/QuotePanel'
 import ImageUploader from '@/components/admin/ImageUploader'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import ChoiceGroupEditor from '@/components/admin/ChoiceGroupEditor'
 
 export default function ItineraryBuilderPage() {
   const params = useParams()
@@ -19,7 +20,7 @@ export default function ItineraryBuilderPage() {
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState<'details' | 'quote' | 'payments'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'quote' | 'payments' | 'choices'>('details')
 
   // Editable fields
   const [clientName, setClientName] = useState('')
@@ -189,6 +190,16 @@ export default function ItineraryBuilderPage() {
               >
                 Payments
               </button>
+              <button
+                onClick={() => setActiveTab('choices')}
+                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  activeTab === 'choices'
+                    ? 'text-green border-b-2 border-green'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Choices
+              </button>
             </div>
 
             <div className="p-6">
@@ -259,7 +270,7 @@ export default function ItineraryBuilderPage() {
                 </div>
               ) : activeTab === 'quote' ? (
                 <QuotePanel itinerary={itinerary} onUpdate={fetchItinerary} />
-              ) : (
+              ) : activeTab === 'payments' ? (
                 <div className="text-center py-4">
                   <a
                     href={`/admin/itineraries/${id}/payments`}
@@ -271,6 +282,8 @@ export default function ItineraryBuilderPage() {
                   </a>
                   <p className="text-xs text-gray-400 mt-2 font-body">Opens in a full-width view for easier management.</p>
                 </div>
+              ) : (
+                <ChoiceGroupEditor itineraryId={id} />
               )}
             </div>
           </div>

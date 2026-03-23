@@ -177,6 +177,43 @@ export interface PaymentItem {
   updated_at: string
 }
 
+// Choice Cards types
+export type ChoiceStatus = 'open' | 'decided' | 'expired'
+
+export interface ChoiceDetail {
+  label: string
+  value: string
+}
+
+export interface ChoiceOption {
+  id: string
+  group_id: string
+  title: string
+  subtitle?: string
+  description?: string
+  price_estimate?: number
+  currency: string
+  image_url?: string
+  details: ChoiceDetail[]
+  is_selected: boolean
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ChoiceGroup {
+  id: string
+  itinerary_id: string
+  title: string
+  description?: string
+  position_after_day?: number
+  status: ChoiceStatus
+  sort_order: number
+  options?: ChoiceOption[]
+  created_at: string
+  updated_at: string
+}
+
 export interface QuoteCalculation {
   commissionableTotal: number
   zeroMarginTotal: number
