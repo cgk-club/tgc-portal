@@ -63,13 +63,17 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleStatusChange(paymentId: string, newStatus: PaymentStatus) {
+  async function handleFieldUpdate(paymentId: string, fields: Record<string, unknown>) {
     await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ payment_status: newStatus }),
+      body: JSON.stringify(fields),
     });
     load();
+  }
+
+  async function handleStatusChange(paymentId: string, newStatus: PaymentStatus) {
+    handleFieldUpdate(paymentId, { payment_status: newStatus });
   }
 
   async function handleDelete(paymentId: string) {
@@ -222,11 +226,44 @@ export default function AdminPaymentsPage() {
             <tbody>
               {payments.map((p) => (
                 <tr key={p.id} className="border-b border-gray-50 last:border-0">
-                  <td className="px-4 py-3 font-body text-gray-900">{p.service_name}</td>
-                  <td className="px-4 py-3 font-body text-gray-500">{p.supplier_name}</td>
-                  <td className="px-4 py-3 font-body text-right font-medium">{p.currency} {Number(p.amount).toLocaleString()}</td>
+                  <td className="px-4 py-3 font-body text-gray-900">
+                    <input
+                      defaultValue={p.service_name}
+                      onBlur={(e) => { if (e.target.value !== p.service_name) handleFieldUpdate(p.id, { service_name: e.target.value }); }}
+                      className="w-full bg-transparent border-0 p-0 text-sm font-body text-gray-900 focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1 -mx-1"
+                    />
+                  </td>
+                  <td className="px-4 py-3 font-body text-gray-500">
+                    <input
+                      defaultValue={p.supplier_name}
+                      onBlur={(e) => { if (e.target.value !== p.supplier_name) handleFieldUpdate(p.id, { supplier_name: e.target.value }); }}
+                      className="w-full bg-transparent border-0 p-0 text-sm font-body text-gray-500 focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1 -mx-1"
+                    />
+                  </td>
+                  <td className="px-4 py-3 font-body text-right font-medium">
+                    <div className="flex items-center justify-end gap-1">
+                      <input
+                        defaultValue={p.currency}
+                        onBlur={(e) => { if (e.target.value !== p.currency) handleFieldUpdate(p.id, { currency: e.target.value }); }}
+                        className="w-10 bg-transparent border-0 p-0 text-sm font-body text-gray-500 text-right focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        defaultValue={Number(p.amount)}
+                        onBlur={(e) => { const val = parseFloat(e.target.value); if (!isNaN(val) && val !== Number(p.amount)) handleFieldUpdate(p.id, { amount: val }); }}
+                        className="w-24 bg-transparent border-0 p-0 text-sm font-body font-medium text-right focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded px-1"
+                      />
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs font-body text-gray-600">{METHOD_OPTIONS.find(m => m.value === p.payment_method)?.label}</span>
+                    <select
+                      value={p.payment_method}
+                      onChange={(e) => handleFieldUpdate(p.id, { payment_method: e.target.value })}
+                      className="text-xs font-body text-gray-600 bg-transparent border-0 p-0 cursor-pointer focus:outline-none focus:ring-0"
+                    >
+                      {METHOD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
                   </td>
                   <td className="px-4 py-3">
                     <select
