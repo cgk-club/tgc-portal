@@ -141,6 +141,37 @@ export interface SupplierRate {
   updated_at: string
 }
 
+// Payment Tracker types
+export type PaymentMethod = 'bank_transfer' | 'cc_link' | 'included' | 'client_direct'
+export type PaymentStatus = 'pending' | 'deposit_paid' | 'fully_paid' | 'confirmed' | 'cancelled'
+
+export interface BankDetails {
+  bank_name?: string
+  iban: string
+  bic: string
+  reference?: string
+  account_holder: string
+}
+
+export interface PaymentItem {
+  id: string
+  itinerary_id: string
+  service_name: string
+  supplier_name: string
+  amount: number
+  currency: string
+  payment_method: PaymentMethod
+  payment_status: PaymentStatus
+  cc_payment_url?: string
+  bank_details?: BankDetails
+  deposit_deadline?: string
+  notes?: string
+  client_notes?: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
 export interface QuoteCalculation {
   commissionableTotal: number
   zeroMarginTotal: number

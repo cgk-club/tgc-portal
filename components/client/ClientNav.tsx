@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Our Collection", href: "/client/collection", key: "collection" },
   { label: "My Journeys", href: "/client#journeys", key: "journeys" },
   { label: "Events", href: "/client/events", key: "events" },
+  { label: "Payments", href: "/client/payments", key: "payments" },
   { label: "Points", href: "/client/points", key: "points" },
 ];
 
