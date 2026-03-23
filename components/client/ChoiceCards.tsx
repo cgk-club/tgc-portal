@@ -6,6 +6,7 @@ import type { ChoiceGroup, ChoiceOption } from "@/types";
 interface ChoiceCardsProps {
   group: ChoiceGroup;
   itineraryId: string;
+  shareToken?: string;
   onSelect?: () => void;
 }
 
@@ -121,7 +122,7 @@ function OptionCard({
   );
 }
 
-export default function ChoiceCards({ group, itineraryId, onSelect }: ChoiceCardsProps) {
+export default function ChoiceCards({ group, itineraryId, shareToken, onSelect }: ChoiceCardsProps) {
   const [expandedOption, setExpandedOption] = useState<string | null>(null);
   const [selecting, setSelecting] = useState(false);
   const options = group.options || [];
@@ -129,7 +130,11 @@ export default function ChoiceCards({ group, itineraryId, onSelect }: ChoiceCard
 
   async function handleSelect(optionId: string) {
     setSelecting(true);
-    await fetch(`/api/client/itineraries/${itineraryId}/choices`, {
+    // Use public endpoint if shareToken available, otherwise client auth endpoint
+    const url = shareToken
+      ? `/api/itinerary/${shareToken}/choices`
+      : `/api/client/itineraries/${itineraryId}/choices`;
+    await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ groupId: group.id, optionId }),

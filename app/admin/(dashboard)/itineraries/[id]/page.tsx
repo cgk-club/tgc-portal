@@ -10,7 +10,7 @@ import QuotePanel from '@/components/quote/QuotePanel'
 import ImageUploader from '@/components/admin/ImageUploader'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import ChoiceGroupEditor from '@/components/admin/ChoiceGroupEditor'
+// ChoiceGroupEditor loaded on full-width page at /admin/itineraries/[id]/choices
 
 export default function ItineraryBuilderPage() {
   const params = useParams()
@@ -283,7 +283,17 @@ export default function ItineraryBuilderPage() {
                   <p className="text-xs text-gray-400 mt-2 font-body">Opens in a full-width view for easier management.</p>
                 </div>
               ) : (
-                <ChoiceGroupEditor itineraryId={id} />
+                <div className="text-center py-4">
+                  <a
+                    href={`/admin/itineraries/${id}/choices`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-green text-white text-xs font-body font-medium px-4 py-2 rounded hover:bg-green/90 transition-colors"
+                  >
+                    Open Choice Editor
+                  </a>
+                  <p className="text-xs text-gray-400 mt-2 font-body">Opens in a full-width view for easier editing.</p>
+                </div>
               )}
             </div>
           </div>

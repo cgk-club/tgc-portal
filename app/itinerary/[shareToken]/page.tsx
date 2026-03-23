@@ -147,12 +147,12 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
         {days.map((day) => (
           <div key={day.id}>
             <ClientDaySection day={day} />
-            <ClientChoices itineraryId={itinerary.id} afterDay={day.day_number} />
+            <ClientChoices shareToken={shareToken} itineraryId={itinerary.id} afterDay={day.day_number} />
           </div>
         ))}
 
         {/* Choice groups with no specific position (shown at end) */}
-        <ClientChoices itineraryId={itinerary.id} />
+        <ClientChoices shareToken={shareToken} itineraryId={itinerary.id} />
       </div>
 
       {/* Footer */}
