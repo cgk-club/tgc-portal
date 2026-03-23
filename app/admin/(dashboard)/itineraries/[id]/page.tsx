@@ -19,7 +19,7 @@ export default function ItineraryBuilderPage() {
   const [itinerary, setItinerary] = useState<Itinerary | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState<'details' | 'quote'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'quote' | 'payments'>('details')
 
   // Editable fields
   const [clientName, setClientName] = useState('')
@@ -179,6 +179,16 @@ export default function ItineraryBuilderPage() {
               >
                 Quote
               </button>
+              <button
+                onClick={() => setActiveTab('payments')}
+                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  activeTab === 'payments'
+                    ? 'text-green border-b-2 border-green'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Payments
+              </button>
             </div>
 
             <div className="p-6">
@@ -247,8 +257,20 @@ export default function ItineraryBuilderPage() {
                     {saving ? 'Saving...' : 'Save changes'}
                   </Button>
                 </div>
-              ) : (
+              ) : activeTab === 'quote' ? (
                 <QuotePanel itinerary={itinerary} onUpdate={fetchItinerary} />
+              ) : (
+                <div className="text-center py-4">
+                  <a
+                    href={`/admin/itineraries/${id}/payments`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-green text-white text-xs font-body font-medium px-4 py-2 rounded hover:bg-green/90 transition-colors"
+                  >
+                    Open Payment Tracker
+                  </a>
+                  <p className="text-xs text-gray-400 mt-2 font-body">Opens in a full-width view for easier management.</p>
+                </div>
               )}
             </div>
           </div>

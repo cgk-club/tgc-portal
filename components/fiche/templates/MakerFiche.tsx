@@ -48,6 +48,102 @@ export default function MakerFiche({
 
   return (
     <>
+      {/* Hero */}
+      {fiche.hero_image_url && (
+        <div className="relative w-full h-[60vh] min-h-[400px]">
+          <img
+            src={fiche.hero_image_url}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 lg:p-16">
+            {discipline && (
+              <Badge className="mb-3 bg-white/20 text-white border-0 backdrop-blur-sm">
+                {discipline}
+              </Badge>
+            )}
+            <h1 className="font-heading text-3xl md:text-4xl font-semibold text-white mb-2">{name}</h1>
+            {basedIn && <p className="text-white/80 font-body text-sm">{basedIn}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Headline */}
+      {fiche.headline && (
+        <div className="py-10 px-8 md:px-12 lg:px-16">
+          <div className="max-w-3xl mx-auto">
+            <p className="font-heading text-xl text-green font-medium leading-relaxed">{fiche.headline}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Intro paragraph */}
+      {intro && (
+        <div className="px-8 md:px-12 lg:px-16 pb-8">
+          <div className="max-w-3xl mx-auto">
+            <p className="font-body text-lg text-gray-700 leading-relaxed">{intro}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Documentary image grid */}
+      {firstImage && (
+        <div className="px-8 md:px-12 lg:px-16 pb-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="md:col-span-2">
+                <img
+                  src={firstImage}
+                  alt={`${name} 1`}
+                  className="w-full h-[400px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setLightboxIndex(0)}
+                />
+              </div>
+              <div className="flex flex-col gap-3">
+                {gridImages.map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt={`${name} ${i + 2}`}
+                    className="w-full h-[126px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setLightboxIndex(i + 1)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Body text */}
+      {bodyParagraphs.length > 0 && (
+        <div className="py-8 px-8 md:px-12 lg:px-16">
+          <div className="max-w-3xl mx-auto prose prose-lg font-body text-gray-700 leading-relaxed">
+            {bodyParagraphs.map((p, i) => (
+              <p key={i} className="mb-4">{p}</p>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Remaining images */}
+      {remainingImages.length > 0 && (
+        <div className="px-8 md:px-12 lg:px-16 pb-10">
+          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3">
+            {remainingImages.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt={`${name} ${i + 5}`}
+                className="w-full h-[200px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setLightboxIndex(i + 4)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       <FicheContact name={name} />
 
       {/* Lightbox */}
