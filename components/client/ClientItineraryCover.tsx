@@ -18,9 +18,10 @@ export default function ClientItineraryCover({ itinerary }: ClientItineraryCover
   let dateRange = ''
   if (itinerary.start_date && days.length > 0) {
     const start = new Date(itinerary.start_date + 'T00:00:00')
-    const end = new Date(start)
-    end.setDate(end.getDate() + days.length - 1)
     const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    // Use last day's actual date if available, otherwise calculate from day count
+    const lastDay = [...days].sort((a, b) => (a.date || '').localeCompare(b.date || '')).pop()
+    const end = lastDay?.date ? new Date(lastDay.date + 'T00:00:00') : new Date(start.getTime() + (days.length - 1) * 86400000)
     dateRange = `${fmt(start)} \u2013 ${fmt(end)}`
   }
 
@@ -31,13 +32,19 @@ export default function ClientItineraryCover({ itinerary }: ClientItineraryCover
         {itinerary.client_name}
       </h1>
       <p className="font-heading text-lg text-gold mb-4">{itinerary.title}</p>
-      {dateRange && (
-        <p className="text-sm text-gray-400 font-body mb-2">{dateRange}</p>
+      {itinerary.summary ? (
+        <p className="text-sm text-gray-400 font-body mb-2">{itinerary.summary}</p>
+      ) : (
+        <>
+          {dateRange && (
+            <p className="text-sm text-gray-400 font-body mb-2">{dateRange}</p>
+          )}
+          <p className="text-sm text-gray-400 font-body">
+            {days.length} days
+            {destinations.size > 0 && ` \u00B7 ${destinations.size} destinations`}
+          </p>
+        </>
       )}
-      <p className="text-sm text-gray-400 font-body">
-        {days.length} days
-        {destinations.size > 0 && ` \u00B7 ${destinations.size} destinations`}
-      </p>
     </section>
   )
 }
