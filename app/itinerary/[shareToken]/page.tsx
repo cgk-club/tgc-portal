@@ -8,6 +8,8 @@ import ClientDaySection from '@/components/client/ClientDaySection'
 import ClientItineraryPDF from './ClientPDF'
 import ClientMap from './ClientMap'
 import ClientChoices from './ClientChoices'
+import { getSupabaseAdmin } from '@/lib/supabase'
+import { ChoiceGroup } from '@/types'
 
 interface PageProps {
   params: Promise<{ shareToken: string }>
@@ -74,6 +76,28 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
   }
 
   const days = itinerary.days || []
+
+  // Fetch choice groups server-side (single query, no client-side waterfalls)
+  const supabase = getSupabaseAdmin()
+  const { data: choiceGroups } = await supabase
+    .from('choice_groups')
+    .select('*')
+    .eq('itinerary_id', itinerary.id)
+    .order('sort_order', { ascending: true })
+
+  const groupIds = (choiceGroups || []).map((g: { id: string }) => g.id)
+  const { data: choiceOptions } = groupIds.length > 0
+    ? await supabase
+        .from('choice_options')
+        .select('*')
+        .in('group_id', groupIds)
+        .order('sort_order', { ascending: true })
+    : { data: [] }
+
+  const allChoiceGroups: ChoiceGroup[] = (choiceGroups || []).map((g: ChoiceGroup) => ({
+    ...g,
+    options: (choiceOptions || []).filter((o: { group_id: string }) => o.group_id === g.id),
+  }))
 
   // Collect map stops from geocoded fiche items, deduplicated by location
   // Group nearby fiches (within ~0.05 degrees / ~5km) into a single stop using the day title
@@ -144,15 +168,30 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
         {mapStops.length > 0 && <ClientMap stops={mapStops} />}
 
         {/* Days with choice cards inserted after relevant days */}
-        {days.map((day) => (
-          <div key={day.id}>
-            <ClientDaySection day={day} />
-            <ClientChoices shareToken={shareToken} itineraryId={itinerary.id} afterDay={day.day_number} />
-          </div>
-        ))}
+        {days.map((day) => {
+          const dayChoices = allChoiceGroups.filter(g => g.position_after_day === day.day_number)
+          return (
+            <div key={day.id}>
+              <ClientDaySection day={day} />
+              {dayChoices.length > 0 && (
+                <ClientChoices
+                  shareToken={shareToken}
+                  itineraryId={itinerary.id}
+                  prefetchedGroups={dayChoices}
+                />
+              )}
+            </div>
+          )
+        })}
 
         {/* Choice groups with no specific position (shown at end) */}
-        <ClientChoices shareToken={shareToken} itineraryId={itinerary.id} />
+        {allChoiceGroups.filter(g => !g.position_after_day).length > 0 && (
+          <ClientChoices
+            shareToken={shareToken}
+            itineraryId={itinerary.id}
+            prefetchedGroups={allChoiceGroups.filter(g => !g.position_after_day)}
+          />
+        )}
       </div>
 
       {/* Footer */}

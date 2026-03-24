@@ -1,31 +1,27 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import ChoiceCards from "@/components/client/ChoiceCards";
 import type { ChoiceGroup } from "@/types";
 
 interface Props {
   shareToken: string;
   itineraryId: string;
-  afterDay?: number;
+  prefetchedGroups: ChoiceGroup[];
 }
 
-export default function ClientChoices({ shareToken, itineraryId, afterDay }: Props) {
-  const [groups, setGroups] = useState<ChoiceGroup[]>([]);
+export default function ClientChoices({ shareToken, itineraryId, prefetchedGroups }: Props) {
+  const [groups, setGroups] = useState<ChoiceGroup[]>(prefetchedGroups);
 
-  const load = useCallback(async () => {
+  const reload = useCallback(async () => {
     const res = await fetch(`/api/itinerary/${shareToken}/choices`);
     if (res.ok) {
       const all: ChoiceGroup[] = await res.json();
-      if (afterDay !== undefined) {
-        setGroups(all.filter(g => g.position_after_day === afterDay));
-      } else {
-        setGroups(all.filter(g => !g.position_after_day));
-      }
+      // Only keep the groups that were in our prefetched set
+      const ids = prefetchedGroups.map(g => g.id);
+      setGroups(all.filter(g => ids.includes(g.id)));
     }
-  }, [shareToken, afterDay]);
-
-  useEffect(() => { load(); }, [load]);
+  }, [shareToken, prefetchedGroups]);
 
   if (groups.length === 0) return null;
 
@@ -37,7 +33,7 @@ export default function ClientChoices({ shareToken, itineraryId, afterDay }: Pro
           group={group}
           itineraryId={itineraryId}
           shareToken={shareToken}
-          onSelect={load}
+          onSelect={reload}
         />
       ))}
     </>
