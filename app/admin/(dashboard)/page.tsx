@@ -7,6 +7,7 @@ import CalendarView, { CalendarEvent } from '@/components/admin/dashboard/Calend
 import FicheInbox, { FicheInboxItem } from '@/components/admin/dashboard/FicheInbox'
 import RecentActivity, { ClientLogin, ChoiceSelection, RequestItem } from '@/components/admin/dashboard/RecentActivity'
 import QuickActions from '@/components/admin/dashboard/QuickActions'
+import TaskBoard from '@/components/admin/dashboard/TaskBoard'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,7 @@ export default async function AdminDashboard() {
     { data: clientAccounts },
     { data: clientRequests },
     { data: eventEnquiries },
+    { data: dashboardTasks },
   ] = await Promise.all([
     sb.from('itineraries')
       .select('id, client_name, title, status, start_date, currency, created_at, updated_at')
@@ -48,6 +50,12 @@ export default async function AdminDashboard() {
       .select('id, name, event_name, created_at')
       .order('created_at', { ascending: false })
       .limit(5),
+    sb.from('dashboard_tasks')
+      .select('*')
+      .order('completed', { ascending: true })
+      .order('priority', { ascending: false })
+      .order('due_date', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false }),
   ])
 
   const itineraries = (activeItineraries || []) as Array<{
@@ -307,6 +315,8 @@ export default async function AdminDashboard() {
     const tagsMissing = !f.tags || (f.tags as unknown[]).length < 3
     const isComplete = !heroMissing && !headlineMissing && !descriptionMissing && !highlightsMissing && !galleryMissing && !tagsMissing
 
+    const missingCount = [heroMissing, headlineMissing, descriptionMissing, highlightsMissing, galleryMissing, tagsMissing].filter(Boolean).length
+
     return {
       id: f.id,
       slug: f.slug,
@@ -318,8 +328,12 @@ export default async function AdminDashboard() {
       galleryMissing,
       tagsMissing,
       isComplete,
+      missingCount,
     }
   })
+
+  // Sort: most complete first (fewest missing fields)
+  ficheInbox.sort((a, b) => a.missingCount - b.missingCount)
 
   // ── Recent activity ───────────────────────────────────────────
 
@@ -378,10 +392,22 @@ export default async function AdminDashboard() {
       {/* Active pipeline */}
       <ActivePipeline pipeline={pipeline} />
 
-      {/* Revenue + Calendar */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      {/* Revenue */}
+      <div className="mb-6">
         <RevenueSnapshot revenue={revenue} />
+      </div>
+
+      {/* Calendar + Tasks */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CalendarView events={calendarEvents} />
+        <TaskBoard
+          initialTasks={dashboardTasks || []}
+          itineraries={itineraries.map((it) => ({
+            id: it.id,
+            clientName: it.client_name,
+            title: it.title,
+          }))}
+        />
       </div>
 
       {/* Fiche Inbox + Recent Activity */}

@@ -21,7 +21,7 @@ export default function RevenueSnapshot({ revenue }: { revenue: RevenueData }) {
       <h2 className="text-sm font-medium text-gray-500 font-body uppercase tracking-wider mb-3">
         Revenue
       </h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {cards.map((c) => (
           <div key={c.label} className="bg-white rounded-[8px] border border-gray-200 p-4">
             <p className="text-xs text-gray-500 font-body">{c.label}</p>

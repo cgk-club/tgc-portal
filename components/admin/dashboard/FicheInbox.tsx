@@ -14,6 +14,7 @@ export interface FicheInboxItem {
   galleryMissing: boolean
   tagsMissing: boolean
   isComplete: boolean
+  missingCount: number
 }
 
 interface Props {
