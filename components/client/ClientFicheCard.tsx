@@ -16,7 +16,7 @@ interface ClientFicheCardProps {
 
 export default function ClientFicheCard({ item }: ClientFicheCardProps) {
   const fiche = item.fiche as (Fiche & { org?: AirtableOrg }) | undefined
-  const name = item.custom_title || fiche?.headline || 'Untitled'
+  const name = item.custom_title || fiche?.org?.name || fiche?.headline || 'Untitled'
   const heroUrl = fiche?.hero_image_url
   const description = fiche?.description
   const slug = fiche?.slug

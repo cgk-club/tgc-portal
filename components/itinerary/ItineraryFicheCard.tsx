@@ -33,7 +33,7 @@ export default function ItineraryFicheCard({
   onUpdate,
 }: ItineraryFicheCardProps) {
   const heroUrl = item.fiche?.hero_image_url
-  const name = item.fiche?.headline || item.custom_title || 'Untitled'
+  const name = item.custom_title || item.fiche?.headline || 'Untitled'
 
   return (
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex gap-4">
