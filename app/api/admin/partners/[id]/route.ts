@@ -19,12 +19,41 @@ export async function GET(
     return NextResponse.json({ error: 'Partner not found' }, { status: 404 })
   }
 
-  // Get linked fiches (via org_ids or partner_account_id)
-  const { data: fiches } = await sb
+  // Get linked fiches (via partner_account_id OR airtable_record_id in org_ids)
+  const orgIds = partner.org_ids || []
+  let allFiches: { id: string; slug: string; headline: string | null; airtable_record_id: string; status: string }[] = []
+
+  // Query by partner_account_id
+  const { data: fichesByAccount } = await sb
     .from('fiches')
-    .select('id, slug, name, status')
+    .select('id, slug, headline, airtable_record_id, status')
     .eq('partner_account_id', id)
-    .order('name')
+
+  if (fichesByAccount) allFiches = [...fichesByAccount]
+
+  // Query by org_ids (airtable_record_id match)
+  if (orgIds.length > 0) {
+    const { data: fichesByOrg } = await sb
+      .from('fiches')
+      .select('id, slug, headline, airtable_record_id, status')
+      .in('airtable_record_id', orgIds)
+
+    if (fichesByOrg) {
+      const existingIds = new Set(allFiches.map(f => f.id))
+      for (const f of fichesByOrg) {
+        if (!existingIds.has(f.id)) allFiches.push(f)
+      }
+    }
+  }
+
+  // Map to expected shape
+  const fiches = allFiches.map(f => ({
+    id: f.id,
+    slug: f.slug,
+    name: f.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+    headline: f.headline,
+    status: f.status,
+  }))
 
   // Get active offers
   const { data: offers } = await sb
