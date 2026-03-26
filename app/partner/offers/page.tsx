@@ -287,7 +287,8 @@ export default function PartnerOffersPage() {
                 className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body bg-white"
               >
                 <option value="all">All clients</option>
-                <option value="members">Members only</option>
+                <option value="partners">Partners only</option>
+                <option value="clients_and_partners">Clients and Partners</option>
               </select>
             </div>
 
@@ -382,8 +383,10 @@ export default function PartnerOffersPage() {
                         </span>
                       )}
                       <span>
-                        {offer.tier === "members"
-                          ? "Members only"
+                        {offer.tier === "partners"
+                          ? "Partners only"
+                          : offer.tier === "clients_and_partners"
+                          ? "Clients & Partners"
                           : "All clients"}
                       </span>
                     </div>
