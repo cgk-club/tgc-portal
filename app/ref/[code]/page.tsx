@@ -164,7 +164,7 @@ export default function ReferralLandingPage() {
           THE GATEKEEPERS CLUB
         </span>
         <p className="text-sm text-gray-400 font-body mt-2">
-          hello@thegatekeepers.club
+          christian@thegatekeepers.club
         </p>
         <p className="text-xs text-gray-300 font-body mt-1">
           thegatekeepers.club

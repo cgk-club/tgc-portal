@@ -9,7 +9,7 @@ function getResend(): Resend {
   return _resend
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'hello@thegatekeepers.club'
+const FROM_EMAIL = process.env.FROM_EMAIL || 'jeeves@thegatekeepers.club'
 
 export async function sendMagicLink(to: string, name: string, token: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'

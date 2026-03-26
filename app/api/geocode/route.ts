@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       })}`,
       {
         headers: {
-          'User-Agent': 'TGCPortal/1.0 (hello@thegatekeepers.club)',
+          'User-Agent': 'TGCPortal/1.0 (christian@thegatekeepers.club)',
         },
       }
     )

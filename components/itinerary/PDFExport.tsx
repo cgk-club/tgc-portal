@@ -157,7 +157,7 @@ function ItineraryPDF({ itinerary }: { itinerary: Itinerary }) {
       <Page size="A4" style={[styles.page, styles.footer]}>
         <Text style={styles.footerBrand}>THE GATEKEEPERS CLUB</Text>
         <Text style={styles.footerText}>To discuss any element of your journey:</Text>
-        <Text style={styles.footerEmail}>hello@thegatekeepers.club</Text>
+        <Text style={styles.footerEmail}>christian@thegatekeepers.club</Text>
         <Text style={styles.footerUrl}>thegatekeepers.club</Text>
       </Page>
     </Document>

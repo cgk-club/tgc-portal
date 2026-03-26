@@ -220,7 +220,7 @@ export default function PartnerToolkitPage() {
               'Use "Recommended by The Gatekeepers Club" as the preferred phrasing.',
               "The badge should appear on a light or neutral background.",
               "Do not alter the badge colours or proportions.",
-              "For questions about co-marketing, contact hello@thegatekeepers.club.",
+              "For questions about co-marketing, contact christian@thegatekeepers.club.",
             ].map((item, i) => (
               <li
                 key={i}

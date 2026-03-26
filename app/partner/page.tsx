@@ -383,7 +383,7 @@ export default function PartnerDashboardPage() {
           THE GATEKEEPERS CLUB
         </span>
         <p className="text-sm text-gray-400 font-body mt-2">
-          hello@thegatekeepers.club
+          christian@thegatekeepers.club
         </p>
       </footer>
     </div>

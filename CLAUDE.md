@@ -43,7 +43,7 @@ Headings:       Poppins
 Body:           Lato
 Border radius:  8px cards, 4px inputs
 NEVER:          Black backgrounds, em dashes, "exceptional/outstanding/world-class"
-Contact:        hello@thegatekeepers.club
+Contact:        christian@thegatekeepers.club
 ```
 
 ---

@@ -164,7 +164,7 @@ function QuotePDFDocument({ itinerary, calc }: { itinerary: Itinerary; calc: Quo
 
         <View style={styles.footer}>
           <Text style={styles.footerBrand}>THE GATEKEEPERS CLUB</Text>
-          <Text style={styles.footerText}>hello@thegatekeepers.club</Text>
+          <Text style={styles.footerText}>christian@thegatekeepers.club</Text>
           <Text style={styles.footerText}>thegatekeepers.club</Text>
         </View>
       </Page>

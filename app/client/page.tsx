@@ -286,7 +286,7 @@ export default function ClientDashboardPage() {
 
       <footer className="border-t border-green/10 py-8 text-center">
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">THE GATEKEEPERS CLUB</span>
-        <p className="text-sm text-gray-400 font-body mt-2">hello@thegatekeepers.club</p>
+        <p className="text-sm text-gray-400 font-body mt-2">christian@thegatekeepers.club</p>
         <p className="text-xs text-gray-300 font-body mt-1">thegatekeepers.club</p>
       </footer>
     </div>
