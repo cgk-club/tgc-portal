@@ -305,6 +305,27 @@ export default function ClientMarketplacePage() {
                     </span>
                   )}
 
+                  {/* Share button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      const url = `${window.location.origin}/client/marketplace/${listing.slug}`
+                      if (navigator.share) {
+                        navigator.share({ title: listing.title, text: listing.editorial_hook || listing.title, url })
+                      } else {
+                        navigator.clipboard.writeText(url)
+                        alert('Link copied')
+                      }
+                    }}
+                    className="absolute top-2 right-12 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
+                    aria-label="Share listing"
+                  >
+                    <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                    </svg>
+                  </button>
+
                   {/* Wishlist heart */}
                   <button
                     onClick={(e) => toggleWishlist(e, listing.id)}
