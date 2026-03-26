@@ -4,12 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
 
+interface HighlightItem {
+  icon?: string;
+  label: string;
+  value: string;
+}
+
 interface Fiche {
   id: string;
   slug: string;
   headline: string;
   description: string;
-  highlights: string | null;
+  highlights: HighlightItem[] | null;
   hero_image_url: string | null;
   gallery_urls: string[] | null;
   price_display: string | null;
@@ -78,14 +84,14 @@ export default function PartnerFichePage() {
   function populateFields(fiche: Fiche) {
     setHeadline(fiche.headline || "");
     setDescription(fiche.description || "");
-    setHighlights(
-      fiche.highlights
-        ? fiche.highlights
-            .split("\n")
-            .filter(Boolean)
-            .map((h) => h.replace(/^[-•]\s*/, ""))
-        : []
-    );
+    // highlights is JSONB array of {icon, label, value} objects
+    if (fiche.highlights && Array.isArray(fiche.highlights)) {
+      setHighlights(fiche.highlights.map((h) =>
+        typeof h === 'string' ? h : `${h.label}: ${h.value}`
+      ));
+    } else {
+      setHighlights([]);
+    }
     setGalleryUrls(fiche.gallery_urls || []);
     setPriceDisplay(fiche.price_display || "");
     setTemplateFields(fiche.template_fields || {});
@@ -165,7 +171,7 @@ export default function PartnerFichePage() {
     let score = 0;
     if (fiche.headline) score += 15;
     if (fiche.description && fiche.description.length > 50) score += 20;
-    if (fiche.highlights) score += 15;
+    if (fiche.highlights && Array.isArray(fiche.highlights) && fiche.highlights.length > 0) score += 15;
     if (fiche.hero_image_url) score += 20;
     if (fiche.gallery_urls && fiche.gallery_urls.length > 0) score += 15;
     if (fiche.price_display) score += 10;
