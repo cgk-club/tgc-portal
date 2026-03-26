@@ -134,12 +134,75 @@ Collect the following:
 In the JSON output, include these in category_fields:
 materials, customisable, lead_time, available_quantity`;
 
+const MARINA_PROMPT = `${BASE_PROMPT}
+
+CATEGORY: THE MARINA (Boats, Yachts, Sailing Vessels)
+
+Collect the following, in conversational order:
+1. Vessel type (sailboat, motorboat, catamaran, yacht, trimaran, etc.) (required)
+2. Make and model (required)
+3. Year built
+4. Length overall (LOA), beam, and draft
+5. Hull material (fiberglass, aluminium, wood, steel, composite)
+6. Engine type, make, horsepower, and engine hours
+7. Fuel type and tank capacity
+8. Water tank capacity
+9. Number of cabins and berths
+10. Heads (toilets/bathrooms)
+11. Navigation equipment (autopilot, GPS, chartplotter, radar, sondeur/depth sounder)
+12. Safety equipment (life raft, flares, EPIRB, fire extinguishers)
+13. Sails (for sailboats: mainsail, genoa, spinnaker, condition and age)
+14. Electronics (AIS, VHF, radar, autopilot, chartplotter)
+15. Tender/dinghy included (details if yes)
+16. Current mooring or marina location
+17. Registration flag / port of registry
+18. Condition and maintenance history (recent refits, work done, receipts available)
+19. Last haul-out and antifouling date
+20. Asking price or pricing preference (fixed price / price on request / offers invited)
+21. Why are they selling? (helps TGC write the story)
+22. Photos description (what photos they can provide)
+
+In the JSON output, include these in category_fields:
+vessel_type, hull_material, loa, beam, draft, engine_make, engine_hp, engine_hours, fuel_type, fuel_capacity, water_capacity, cabins, berths, heads, navigation_equipment, safety_equipment, sails, electronics, tender, mooring_location, registration, maintenance_history, last_haul_out`;
+
+const HANGAR_PROMPT = `${BASE_PROMPT}
+
+CATEGORY: THE HANGAR (Aircraft, Helicopters, Drones)
+
+Collect the following, in conversational order:
+1. Aircraft type (single engine piston, twin engine, turboprop, light jet, midsize jet, helicopter, drone, ultralight) (required)
+2. Make and model (required)
+3. Year of manufacture
+4. Registration number (tail number)
+5. Total airframe hours (TTAF)
+6. Engine hours since major overhaul (SMOH) or since new (SNEW)
+7. Avionics suite (glass cockpit, steam gauges, specific brands like Garmin G1000, etc.)
+8. Useful load / payload capacity
+9. Range (nautical miles)
+10. Number of seats (including pilot)
+11. Fuel type and capacity
+12. Paint condition and year of last paint
+13. Interior condition and year of last refurbishment
+14. Maintenance program (annual inspection status, IFR certified, EASA or FAA)
+15. Hangar location (airport/airfield)
+16. Airworthiness Directives (ADs) compliance status
+17. Logbooks complete (airframe, engine, propeller)
+18. Damage history (any incidents, repairs, insurance claims)
+19. Asking price or pricing preference (fixed price / price on request / offers invited)
+20. Why are they selling? (helps TGC write the story)
+21. Photos description (what photos they can provide)
+
+In the JSON output, include these in category_fields:
+aircraft_type, registration, total_airframe_hours, engine_hours_smoh, avionics, useful_load, range_nm, seats, fuel_type, fuel_capacity, paint_condition, interior_condition, maintenance_program, hangar_location, ads_compliance, logbooks_complete, damage_history`;
+
 const PROMPTS: Record<string, string> = {
   horology: HOROLOGY_PROMPT,
   art: ART_PROMPT,
   automobiles: AUTOMOBILES_PROMPT,
   real_estate: REAL_ESTATE_PROMPT,
   artisan_products: ARTISAN_PROMPT,
+  the_marina: MARINA_PROMPT,
+  the_hangar: HANGAR_PROMPT,
 };
 
 function getSellerPrompt(category: string): string {

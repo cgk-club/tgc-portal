@@ -30,6 +30,8 @@ const CATEGORIES = [
   { slug: "automobiles", label: "Automobiles" },
   { slug: "real_estate", label: "Real Estate" },
   { slug: "artisan_products", label: "Artisan Products" },
+  { slug: "the_marina", label: "The Marina" },
+  { slug: "the_hangar", label: "The Hangar" },
 ];
 
 const SORT_OPTIONS = [
@@ -59,6 +61,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   automobiles: "Automobiles",
   real_estate: "Real Estate",
   artisan_products: "Artisan Products",
+  the_marina: "The Marina",
+  the_hangar: "The Hangar",
 };
 
 function formatPrice(price: number | null, display: string): string {
@@ -375,7 +379,7 @@ export default function ClientMarketplacePage() {
               <div>
                 <h3 className="font-heading text-sm font-semibold text-green mb-1">List with us</h3>
                 <p className="text-xs text-gray-400 font-body">
-                  Sell a timepiece, artwork, automobile, property, or artisan piece through our curated marketplace.
+                  Sell a timepiece, artwork, automobile, property, vessel, aircraft, or artisan piece through our curated marketplace.
                 </p>
               </div>
             </div>

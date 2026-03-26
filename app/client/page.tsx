@@ -49,6 +49,8 @@ const MARKETPLACE_CATEGORY_LABELS: Record<string, string> = {
   automobiles: 'Automobiles',
   real_estate: 'Real Estate',
   artisan_products: 'Artisan Products',
+  the_marina: 'The Marina',
+  the_hangar: 'The Hangar',
 }
 
 function formatMarketplacePrice(price: number | null, display: string): string {

@@ -11,6 +11,8 @@ const CATEGORIES = [
   { slug: 'automobiles', label: 'Automobiles', desc: 'Classic and collectible vehicles' },
   { slug: 'real_estate', label: 'Real Estate', desc: 'Properties and estates' },
   { slug: 'artisan_products', label: 'Artisan Products', desc: 'Handmade and crafted pieces' },
+  { slug: 'the_marina', label: 'The Marina', desc: 'Boats, yachts, and sailing vessels' },
+  { slug: 'the_hangar', label: 'The Hangar', desc: 'Planes, helicopters, and private aviation' },
 ]
 
 export default function ClientSellPage() {

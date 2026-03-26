@@ -81,6 +81,8 @@ const CATEGORIES = [
   { slug: "automobiles", label: "Automobiles", dbValue: "automobiles" },
   { slug: "real_estate", label: "Real Estate", dbValue: "real_estate" },
   { slug: "artisan_products", label: "Artisan Products", dbValue: "artisan_products" },
+  { slug: "the_marina", label: "The Marina", dbValue: "the_marina" },
+  { slug: "the_hangar", label: "The Hangar", dbValue: "the_hangar" },
 ];
 
 type Tab = "listings" | "enquiries" | "orders";
