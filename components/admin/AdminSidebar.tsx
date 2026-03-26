@@ -9,6 +9,8 @@ const navItems = [
   { label: 'Fiches', href: '/admin/fiches' },
   { label: 'Itineraries', href: '/admin/itineraries' },
   { label: 'Clients', href: '/admin/clients' },
+  { label: 'Partners', href: '/admin/partners' },
+  { label: 'Approvals', href: '/admin/approvals' },
   { label: 'Rates', href: '/admin/rates' },
   { label: 'Events', href: '/admin/events' },
   { label: 'Requests', href: '/admin/requests' },
