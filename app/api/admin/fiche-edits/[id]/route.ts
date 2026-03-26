@@ -25,7 +25,15 @@ export async function PATCH(
     if (editReq.fiche_id && editReq.changes) {
       const changes = typeof editReq.changes === 'string'
         ? JSON.parse(editReq.changes)
-        : editReq.changes
+        : { ...editReq.changes }
+
+      // Convert highlights string to JSONB array if needed
+      if (typeof changes.highlights === 'string' && changes.highlights) {
+        changes.highlights = changes.highlights
+          .split('\n')
+          .filter((h: string) => h.trim())
+          .map((h: string) => ({ icon: '✦', label: h.trim(), value: '' }))
+      }
 
       const { error: updateError } = await sb
         .from('fiches')
