@@ -28,13 +28,13 @@ export async function POST(
 
   let isOwner = fiche.partner_account_id === partnerId;
   if (!isOwner) {
-    const { data: partner } = await sb
+    const { data: org } = await sb
       .from("partner_accounts")
       .select("org_ids")
       .eq("id", partnerId)
       .single();
 
-    const orgIds = partner?.org_ids || [];
+    const orgIds = org?.org_ids || [];
     isOwner = !!(fiche.airtable_record_id && orgIds.includes(fiche.airtable_record_id));
   }
 

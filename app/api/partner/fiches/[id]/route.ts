@@ -16,13 +16,13 @@ async function verifyFicheOwnership(partnerId: string, ficheId: string) {
   // Check ownership: partner_account_id matches OR airtable_record_id is in partner's org_ids
   if (fiche.partner_account_id === partnerId) return fiche;
 
-  const { data: partner } = await sb
+  const { data: org } = await sb
     .from("partner_accounts")
     .select("org_ids")
     .eq("id", partnerId)
     .single();
 
-  const orgIds = partner?.org_ids || [];
+  const orgIds = org?.org_ids || [];
   if (fiche.airtable_record_id && orgIds.includes(fiche.airtable_record_id)) {
     return fiche;
   }

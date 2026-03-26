@@ -10,32 +10,41 @@ export async function POST(request: NextRequest) {
   }
 
   const sb = getSupabaseAdmin();
-  const { data: partner } = await sb
-    .from("partner_accounts")
-    .select("id, email, name, password_hash, status, org_ids")
+
+  // Look up user in partner_users table
+  const { data: user } = await sb
+    .from("partner_users")
+    .select("id, partner_id, email, name, password_hash, role")
     .eq("email", email.toLowerCase().trim())
     .single();
 
-  if (!partner || !partner.password_hash) {
+  if (!user || !user.password_hash) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  if (partner.status !== "active") {
+  // Check the parent partner account is active
+  const { data: partner } = await sb
+    .from("partner_accounts")
+    .select("id, status")
+    .eq("id", user.partner_id)
+    .single();
+
+  if (!partner || partner.status !== "active") {
     return NextResponse.json({ error: "Account is not active" }, { status: 403 });
   }
 
-  const valid = await bcrypt.compare(password, partner.password_hash);
+  const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  // Update last login
+  // Update last login on partner_users
   await sb
-    .from("partner_accounts")
+    .from("partner_users")
     .update({ last_login: new Date().toISOString() })
-    .eq("id", partner.id);
+    .eq("id", user.id);
 
-  const token = await createPartnerSession(partner.id, partner.email);
+  const token = await createPartnerSession(user.partner_id, user.id, user.email);
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(PARTNER_COOKIE_NAME, token, {

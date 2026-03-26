@@ -8,8 +8,8 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret)
 }
 
-export async function createPartnerSession(partnerId: string, email: string): Promise<string> {
-  const token = await new SignJWT({ role: 'partner', partnerId, email })
+export async function createPartnerSession(partnerId: string, userId: string, email: string): Promise<string> {
+  const token = await new SignJWT({ role: 'partner', partnerId, userId, email })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${THIRTY_DAYS}s`)
@@ -17,11 +17,15 @@ export async function createPartnerSession(partnerId: string, email: string): Pr
   return token
 }
 
-export async function verifyPartnerSession(token: string): Promise<{ partnerId: string; email: string } | null> {
+export async function verifyPartnerSession(token: string): Promise<{ partnerId: string; userId: string; email: string } | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret())
     if (payload.role !== 'partner') return null
-    return { partnerId: payload.partnerId as string, email: payload.email as string }
+    return {
+      partnerId: payload.partnerId as string,
+      userId: payload.userId as string,
+      email: payload.email as string,
+    }
   } catch {
     return null
   }

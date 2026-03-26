@@ -12,14 +12,14 @@ export async function GET(request: NextRequest) {
   const sb = getSupabaseAdmin();
   const partnerId = session.partnerId;
 
-  // Get partner's org_ids
-  const { data: partner } = await sb
+  // Get org's org_ids
+  const { data: org } = await sb
     .from("partner_accounts")
     .select("org_ids")
     .eq("id", partnerId)
     .single();
 
-  const orgIds = partner?.org_ids || [];
+  const orgIds = org?.org_ids || [];
 
   // Fetch fiches by partner_account_id
   const { data: fichesByAccount, error: err1 } = await sb

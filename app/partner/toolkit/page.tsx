@@ -6,9 +6,9 @@ import PartnerNav from "@/components/partner/PartnerNav";
 
 interface PartnerInfo {
   id: string;
-  name: string;
-  email: string;
+  org_name: string | null;
   org_ids: string[];
+  status: string;
 }
 
 interface FicheInfo {

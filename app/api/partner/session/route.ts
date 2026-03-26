@@ -9,10 +9,22 @@ export async function GET(request: NextRequest) {
   const session = await verifyPartnerSession(token);
   if (!session) return NextResponse.json({ authenticated: false }, { status: 401 });
 
-  const { data: partner } = await getSupabaseAdmin()
+  const sb = getSupabaseAdmin();
+
+  // Get user from partner_users
+  const { data: user } = await sb
+    .from("partner_users")
+    .select("id, email, name, role, password_hash, partner_id")
+    .eq("id", session.userId)
+    .single();
+
+  if (!user) return NextResponse.json({ authenticated: false }, { status: 401 });
+
+  // Get org from partner_accounts
+  const { data: partner } = await sb
     .from("partner_accounts")
-    .select("id, email, name, org_ids, status, password_hash")
-    .eq("id", session.partnerId)
+    .select("id, org_name, org_ids, status, primary_org_id")
+    .eq("id", user.partner_id)
     .single();
 
   if (!partner) return NextResponse.json({ authenticated: false }, { status: 401 });
@@ -21,11 +33,16 @@ export async function GET(request: NextRequest) {
     authenticated: true,
     partner: {
       id: partner.id,
-      email: partner.email,
-      name: partner.name,
+      org_name: partner.org_name,
       org_ids: partner.org_ids,
       status: partner.status,
-      hasPassword: !!partner.password_hash,
+    },
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      hasPassword: !!user.password_hash,
     },
   });
 }

@@ -18,9 +18,9 @@ export async function POST(request: NextRequest) {
   const hash = await bcrypt.hash(password, 12);
 
   const { error } = await getSupabaseAdmin()
-    .from("partner_accounts")
+    .from("partner_users")
     .update({ password_hash: hash })
-    .eq("id", session.partnerId);
+    .eq("id", session.userId);
 
   if (error) {
     return NextResponse.json({ error: "Failed to set password" }, { status: 500 });

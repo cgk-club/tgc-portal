@@ -8,7 +8,7 @@ export async function GET(
   const { id } = await params
   const sb = getSupabaseAdmin()
 
-  // Get partner account
+  // Get partner account (org-level)
   const { data: partner, error } = await sb
     .from('partner_accounts')
     .select('*')
@@ -18,6 +18,13 @@ export async function GET(
   if (error || !partner) {
     return NextResponse.json({ error: 'Partner not found' }, { status: 404 })
   }
+
+  // Get users for this org
+  const { data: users } = await sb
+    .from('partner_users')
+    .select('id, email, name, role, last_login, created_at')
+    .eq('partner_id', id)
+    .order('created_at', { ascending: true })
 
   // Get linked fiches (via partner_account_id OR airtable_record_id in org_ids)
   const orgIds = partner.org_ids || []
@@ -98,6 +105,7 @@ export async function GET(
 
   return NextResponse.json({
     ...partner,
+    users: users || [],
     fiches: fiches || [],
     offers: offers || [],
     events: events || [],
@@ -115,7 +123,7 @@ export async function PATCH(
   const body = await request.json()
 
   const updates: Record<string, unknown> = {}
-  const allowed = ['name', 'email', 'org_ids', 'status']
+  const allowed = ['org_name', 'email', 'org_ids', 'status', 'primary_org_id']
   for (const key of allowed) {
     if (key in body) {
       if (key === 'email') {

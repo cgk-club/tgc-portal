@@ -4,6 +4,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 
+interface PartnerUser {
+  id: string
+  email: string
+  name: string | null
+  role: string
+  last_login: string | null
+  created_at: string
+}
+
 interface PartnerFiche {
   id: string
   slug: string
@@ -56,12 +65,13 @@ interface ReferralStats {
 
 interface PartnerDetail {
   id: string
-  name: string | null
+  org_name: string | null
   email: string
   org_ids: string[]
+  primary_org_id: string | null
   status: string
-  last_login: string | null
   created_at: string
+  users: PartnerUser[]
   fiches: PartnerFiche[]
   offers: PartnerOffer[]
   events: PartnerEvent[]
@@ -76,41 +86,53 @@ export default function PartnerDetailPage() {
   const id = params.id as string
   const [partner, setPartner] = useState<PartnerDetail | null>(null)
   const [loading, setLoading] = useState(true)
-  const [sending, setSending] = useState(false)
-  const [linkSent, setLinkSent] = useState(false)
+  const [sending, setSending] = useState<string | null>(null)
+  const [linkSent, setLinkSent] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
-  const [editName, setEditName] = useState('')
+  const [editOrgName, setEditOrgName] = useState('')
   const [editEmail, setEditEmail] = useState('')
   const [editOrgIds, setEditOrgIds] = useState('')
+  const [editPrimaryOrgId, setEditPrimaryOrgId] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [showAddUser, setShowAddUser] = useState(false)
+  const [newUserName, setNewUserName] = useState('')
+  const [newUserEmail, setNewUserEmail] = useState('')
+  const [newUserRole, setNewUserRole] = useState('member')
+  const [addingUser, setAddingUser] = useState(false)
 
   const fetchPartner = useCallback(async () => {
     const res = await fetch(`/api/admin/partners/${id}`)
     if (res.ok) {
       const data = await res.json()
       setPartner(data)
-      setEditName(data.name || '')
+      setEditOrgName(data.org_name || '')
       setEditEmail(data.email)
       setEditOrgIds((data.org_ids || []).join(', '))
+      setEditPrimaryOrgId(data.primary_org_id || '')
     }
     setLoading(false)
   }, [id])
 
   useEffect(() => { fetchPartner() }, [fetchPartner])
 
-  async function sendPortalLink() {
-    setSending(true)
-    const res = await fetch(`/api/admin/partners/${id}/send-link`, { method: 'POST' })
+  async function sendPortalLink(userId?: string) {
+    const key = userId || 'all'
+    setSending(key)
+    const res = await fetch(`/api/admin/partners/${id}/send-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userId ? { user_id: userId } : {}),
+    })
     if (res.ok) {
-      setLinkSent(true)
-      setTimeout(() => setLinkSent(false), 5000)
+      setLinkSent(key)
+      setTimeout(() => setLinkSent(null), 5000)
     } else {
       const data = await res.json()
       setError(data.error || 'Failed to send link')
       setTimeout(() => setError(''), 5000)
     }
-    setSending(false)
+    setSending(null)
   }
 
   async function handleSave() {
@@ -124,7 +146,12 @@ export default function PartnerDetailPage() {
     const res = await fetch(`/api/admin/partners/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: editName.trim(), email: editEmail.trim(), org_ids: orgIds }),
+      body: JSON.stringify({
+        org_name: editOrgName.trim(),
+        email: editEmail.trim(),
+        org_ids: orgIds,
+        primary_org_id: editPrimaryOrgId.trim() || null,
+      }),
     })
 
     if (res.ok) {
@@ -151,6 +178,35 @@ export default function PartnerDetailPage() {
     if (res.ok) fetchPartner()
   }
 
+  async function handleAddUser(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newUserEmail.trim()) return
+    setAddingUser(true)
+    setError('')
+
+    const res = await fetch(`/api/admin/partners/${id}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newUserName.trim() || null,
+        email: newUserEmail.trim(),
+        role: newUserRole,
+      }),
+    })
+
+    if (res.ok) {
+      setShowAddUser(false)
+      setNewUserName('')
+      setNewUserEmail('')
+      setNewUserRole('member')
+      fetchPartner()
+    } else {
+      const data = await res.json()
+      setError(data.error || 'Failed to add user')
+    }
+    setAddingUser(false)
+  }
+
   if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>
   if (!partner) return <div className="p-8"><p className="text-gray-500 font-body">Partner not found.</p></div>
 
@@ -162,7 +218,7 @@ export default function PartnerDetailPage() {
 
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="font-heading text-2xl font-semibold text-green">{partner.name || partner.email}</h1>
+          <h1 className="font-heading text-2xl font-semibold text-green">{partner.org_name || partner.email}</h1>
           <p className="text-sm text-gray-500 font-body mt-1">{partner.email}</p>
           <div className="flex items-center gap-3 mt-2">
             <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
@@ -173,19 +229,21 @@ export default function PartnerDetailPage() {
             <span className="text-xs text-gray-400 font-body">
               Created {new Date(partner.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
-            <span className="text-xs text-gray-400 font-body">
-              Last login: {partner.last_login ? new Date(partner.last_login).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Never'}
-            </span>
           </div>
           {partner.org_ids.length > 0 && (
             <p className="text-xs text-gray-400 font-body mt-1">
               Org IDs: {partner.org_ids.join(', ')}
             </p>
           )}
+          {partner.primary_org_id && (
+            <p className="text-xs text-gray-400 font-body mt-0.5">
+              Primary: {partner.primary_org_id}
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
-          <Button onClick={sendPortalLink} disabled={sending || partner.status === 'suspended'} variant={linkSent ? 'ghost' : 'primary'}>
-            {sending ? 'Sending...' : linkSent ? 'Link sent' : 'Send portal link'}
+          <Button onClick={() => sendPortalLink()} disabled={sending !== null || partner.status === 'suspended'} variant={linkSent === 'all' ? 'ghost' : 'primary'}>
+            {sending === 'all' ? 'Sending...' : linkSent === 'all' ? 'Links sent' : 'Send link to all'}
           </Button>
           <Button variant="ghost" onClick={() => setEditing(!editing)}>
             {editing ? 'Cancel' : 'Edit'}
@@ -201,15 +259,15 @@ export default function PartnerDetailPage() {
           <h2 className="font-heading text-lg font-semibold text-green mb-4">Edit Partner</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-gray-500 font-body mb-1">Name</label>
+              <label className="block text-xs text-gray-500 font-body mb-1">Organisation Name</label>
               <input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                value={editOrgName}
+                onChange={(e) => setEditOrgName(e.target.value)}
                 className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 font-body mb-1">Email</label>
+              <label className="block text-xs text-gray-500 font-body mb-1">Contact Email</label>
               <input
                 type="email"
                 value={editEmail}
@@ -217,8 +275,16 @@ export default function PartnerDetailPage() {
                 className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className="block text-xs text-gray-500 font-body mb-1">Org IDs (comma-separated)</label>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">Primary Org ID</label>
+              <input
+                value={editPrimaryOrgId}
+                onChange={(e) => setEditPrimaryOrgId(e.target.value)}
+                className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">All Org IDs (comma-separated)</label>
               <input
                 value={editOrgIds}
                 onChange={(e) => setEditOrgIds(e.target.value)}
@@ -240,6 +306,117 @@ export default function PartnerDetailPage() {
             >
               {partner.status === 'active' ? 'Suspend Partner' : 'Activate Partner'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Users */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Users</h2>
+          <Button onClick={() => setShowAddUser(true)} variant="ghost">+ Add User</Button>
+        </div>
+        {partner.users.length === 0 ? (
+          <div className="bg-white rounded-lg border border-green/10 p-8 text-center">
+            <p className="text-gray-500 font-body text-sm">No users linked to this partner yet.</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg border border-green/10 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-green/10">
+                  <th className="text-left px-4 py-2 text-xs text-gray-400 font-body">Name</th>
+                  <th className="text-left px-4 py-2 text-xs text-gray-400 font-body">Email</th>
+                  <th className="text-center px-4 py-2 text-xs text-gray-400 font-body">Role</th>
+                  <th className="text-left px-4 py-2 text-xs text-gray-400 font-body">Last Login</th>
+                  <th className="text-right px-4 py-2 text-xs text-gray-400 font-body"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {partner.users.map((u) => (
+                  <tr key={u.id} className="border-b border-green/5 last:border-0">
+                    <td className="px-4 py-2 text-gray-800 font-body font-medium">{u.name || '-'}</td>
+                    <td className="px-4 py-2 text-gray-500 font-body">{u.email}</td>
+                    <td className="px-4 py-2 text-center">
+                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
+                        u.role === 'owner' ? 'bg-gold/20 text-gold'
+                          : u.role === 'admin' ? 'bg-blue-50 text-blue-600'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>{u.role}</span>
+                    </td>
+                    <td className="px-4 py-2 text-gray-500 font-body text-xs">
+                      {u.last_login
+                        ? new Date(u.last_login).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : 'Never'}
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); sendPortalLink(u.id) }}
+                        disabled={sending !== null || partner.status === 'suspended'}
+                        className="text-xs text-green hover:text-green-light font-medium disabled:opacity-50"
+                      >
+                        {sending === u.id ? 'Sending...' : linkSent === u.id ? 'Sent' : 'Send link'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[8px] w-full max-w-md">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="font-heading text-lg font-semibold text-green">Add User</h2>
+                <button onClick={() => setShowAddUser(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              </div>
+            </div>
+            <form onSubmit={handleAddUser} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  placeholder="e.g. Sophie Martin"
+                  className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="user@partner.com"
+                  required
+                  className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value)}
+                  className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+                >
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                  <option value="owner">Owner</option>
+                </select>
+              </div>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="ghost" type="button" onClick={() => setShowAddUser(false)}>Cancel</Button>
+                <Button type="submit" disabled={addingUser || !newUserEmail.trim()}>
+                  {addingUser ? 'Adding...' : 'Add User'}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -7,10 +7,16 @@ import PartnerNav from "@/components/partner/PartnerNav";
 
 interface PartnerInfo {
   id: string;
-  name: string;
-  email: string;
+  org_name: string | null;
   org_ids: string[];
   status: string;
+}
+
+interface UserInfo {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
   hasPassword: boolean;
 }
 
@@ -30,6 +36,7 @@ interface DashboardData {
 export default function PartnerDashboardPage() {
   const router = useRouter();
   const [partner, setPartner] = useState<PartnerInfo | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,8 +47,9 @@ export default function PartnerDashboardPage() {
         router.push("/partner/login");
         return;
       }
-      const { partner: p } = await sessionRes.json();
-      setPartner(p);
+      const data = await sessionRes.json();
+      setPartner(data.partner);
+      setUser(data.user);
 
       const dashRes = await fetch("/api/partner/dashboard");
       if (dashRes.ok) {
@@ -61,7 +69,8 @@ export default function PartnerDashboardPage() {
     );
   }
 
-  const firstName = partner?.name?.split(" ")[0] || partner?.email || "";
+  const firstName = user?.name?.split(" ")[0] || user?.email || "";
+  const orgName = partner?.org_name;
   const stats = dashboard?.referralStats;
   const commissionRate = 0.1;
   const commissionEarned = (stats?.totalRevenue || 0) * commissionRate;
@@ -79,6 +88,9 @@ export default function PartnerDashboardPage() {
           <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-green">
             {firstName}
           </h1>
+          {orgName && (
+            <p className="text-sm text-gray-500 font-body mt-1">{orgName}</p>
+          )}
         </div>
 
         {/* Stat Cards */}
