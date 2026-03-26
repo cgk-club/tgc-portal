@@ -82,11 +82,12 @@ export default function ApprovalsPage() {
   const [processing, setProcessing] = useState<string | null>(null)
 
   const fetchAll = useCallback(async () => {
+    const ts = Date.now()
     const [feRes, ofRes, evRes, coRes] = await Promise.all([
-      fetch('/api/admin/fiche-edits', { cache: 'no-store' }),
-      fetch('/api/admin/partner-offers', { cache: 'no-store' }),
-      fetch('/api/admin/partner-events', { cache: 'no-store' }),
-      fetch('/api/admin/partner-content', { cache: 'no-store' }),
+      fetch(`/api/admin/fiche-edits?_t=${ts}`, { cache: 'no-store' }),
+      fetch(`/api/admin/partner-offers?_t=${ts}`, { cache: 'no-store' }),
+      fetch(`/api/admin/partner-events?_t=${ts}`, { cache: 'no-store' }),
+      fetch(`/api/admin/partner-content?_t=${ts}`, { cache: 'no-store' }),
     ])
 
     if (feRes.ok) setFicheEdits(await feRes.json())
