@@ -82,12 +82,11 @@ export default function ApprovalsPage() {
   const [processing, setProcessing] = useState<string | null>(null)
 
   const fetchAll = useCallback(async () => {
-    setLoading(true)
     const [feRes, ofRes, evRes, coRes] = await Promise.all([
-      fetch('/api/admin/fiche-edits'),
-      fetch('/api/admin/partner-offers'),
-      fetch('/api/admin/partner-events'),
-      fetch('/api/admin/partner-content'),
+      fetch('/api/admin/fiche-edits', { cache: 'no-store' }),
+      fetch('/api/admin/partner-offers', { cache: 'no-store' }),
+      fetch('/api/admin/partner-events', { cache: 'no-store' }),
+      fetch('/api/admin/partner-content', { cache: 'no-store' }),
     ])
 
     if (feRes.ok) setFicheEdits(await feRes.json())
@@ -110,18 +109,21 @@ export default function ApprovalsPage() {
 
   async function handleAction(endpoint: string, id: string, action: string, extra?: Record<string, unknown>) {
     setProcessing(id)
-    const res = await fetch(`/api/admin/${endpoint}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, admin_note: actionNote || undefined, ...extra }),
-    })
+    try {
+      const res = await fetch(`/api/admin/${endpoint}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, admin_note: actionNote || undefined, ...extra }),
+      })
 
-    if (res.ok) {
-      setActionNote('')
-      setShowNoteFor(null)
-      fetchAll()
+      if (res.ok) {
+        setActionNote('')
+        setShowNoteFor(null)
+        await fetchAll()
+      }
+    } finally {
+      setProcessing(null)
     }
-    setProcessing(null)
   }
 
   function toggleNote(id: string) {
