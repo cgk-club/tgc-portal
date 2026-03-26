@@ -90,13 +90,7 @@ export default function ApprovalsPage() {
       fetch(`/api/admin/partner-content?_t=${ts}`, { cache: 'no-store' }),
     ])
 
-    if (feRes.ok) {
-      const feData = await feRes.json()
-      console.log('[Approvals] fiche-edits loaded:', feData.length, 'records', feData.map((e: FicheEdit) => ({ id: e.id.slice(0,8), status: e.status })))
-      setFicheEdits(feData)
-    } else {
-      console.error('[Approvals] fiche-edits fetch failed:', feRes.status, await feRes.text())
-    }
+    if (feRes.ok) setFicheEdits(await feRes.json())
     if (ofRes.ok) setOffers(await ofRes.json())
     if (evRes.ok) setEvents(await evRes.json())
     if (coRes.ok) setContent(await coRes.json())
