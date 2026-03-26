@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: "My Fiche", href: "/partner/fiche", key: "fiche" },
   { label: "Offers", href: "/partner/offers", key: "offers" },
   { label: "Events", href: "/partner/events", key: "events" },
+  { label: "Listings", href: "/partner/listings", key: "listings" },
   { label: "Referrals", href: "/partner/referrals", key: "referrals" },
   { label: "Content", href: "/partner/content", key: "content" },
   { label: "Availability", href: "/partner/availability", key: "availability" },

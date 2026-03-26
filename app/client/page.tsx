@@ -31,12 +31,45 @@ interface TGCEvent {
   featured: boolean
 }
 
+interface MarketplacePreview {
+  id: string
+  title: string
+  slug: string
+  category: string
+  price: number | null
+  price_display: string
+  hero_image_url: string | null
+  maker_brand: string | null
+  featured: boolean
+}
+
+const MARKETPLACE_CATEGORY_LABELS: Record<string, string> = {
+  horology: 'Horology',
+  art: 'Art & Objects',
+  automobiles: 'Automobiles',
+  real_estate: 'Real Estate',
+  artisan_products: 'Artisan Products',
+}
+
+function formatMarketplacePrice(price: number | null, display: string): string {
+  if (display === 'price_on_request') return 'Price on request'
+  if (display === 'offers_invited') return 'Offers invited'
+  if (price === null || price === undefined) return 'Price on request'
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
+
 export default function ClientDashboardPage() {
   const router = useRouter()
   const [client, setClient] = useState<ClientInfo | null>(null)
   const [itineraries, setItineraries] = useState<(Itinerary & { days?: { id: string }[], cover_image_url?: string, status?: string })[]>([])
   const [fiches, setFiches] = useState<Fiche[]>([])
   const [events, setEvents] = useState<TGCEvent[]>([])
+  const [marketplaceListings, setMarketplaceListings] = useState<MarketplacePreview[]>([])
   const [loading, setLoading] = useState(true)
   const [showPasswordBanner, setShowPasswordBanner] = useState(false)
   const [newPassword, setNewPassword] = useState('')
@@ -55,10 +88,11 @@ export default function ClientDashboardPage() {
       if (!c.password_hash) setShowPasswordBanner(true)
 
       // Load all data in parallel
-      const [itinRes, fichesRes, eventsRes] = await Promise.all([
+      const [itinRes, fichesRes, eventsRes, marketplaceRes] = await Promise.all([
         fetch('/api/client/itineraries'),
         fetch('/api/client/collection-preview'),
         fetch('/api/events/list'),
+        fetch('/api/client/marketplace?sort=newest'),
       ])
 
       if (itinRes.ok) setItineraries(await itinRes.json())
@@ -67,6 +101,16 @@ export default function ClientDashboardPage() {
         const allEvents = await eventsRes.json()
         const now = new Date().toISOString().split('T')[0]
         setEvents(allEvents.filter((ev: { date_end?: string | null }) => !ev.date_end || ev.date_end >= now).slice(0, 4))
+      }
+      if (marketplaceRes.ok) {
+        const allListings = await marketplaceRes.json()
+        // Show featured first, then newest, max 4
+        const sorted = allListings.sort((a: MarketplacePreview, b: MarketplacePreview) => {
+          if (a.featured && !b.featured) return -1
+          if (!a.featured && b.featured) return 1
+          return 0
+        })
+        setMarketplaceListings(sorted.slice(0, 4))
       }
 
       setLoading(false)
@@ -201,6 +245,38 @@ export default function ClientDashboardPage() {
                   <div className="p-2.5">
                     <h3 className="font-heading text-[11px] font-semibold text-gray-800 leading-snug line-clamp-1">{ev.title}</h3>
                     <p className="text-[10px] text-gray-400 font-body">{ev.date_display}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Marketplace Preview */}
+        {marketplaceListings.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">From the Marketplace</h2>
+              <Link href="/client/marketplace" className="text-xs text-green hover:underline font-body">Browse all</Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {marketplaceListings.map(listing => (
+                <Link key={listing.id} href={`/client/marketplace/${listing.slug}`} className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow group">
+                  <div className="h-28 bg-green-muted overflow-hidden relative">
+                    {listing.hero_image_url ? (
+                      <img src={listing.hero_image_url} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="flex items-center justify-center h-full"><span className="text-green/15 text-[10px] font-body">{MARKETPLACE_CATEGORY_LABELS[listing.category] || listing.category}</span></div>
+                    )}
+                    {listing.featured && (
+                      <span className="absolute top-1.5 right-1.5 bg-gold/90 text-white text-[8px] tracking-[0.5px] uppercase px-1.5 py-0.5 rounded-sm font-body">Featured</span>
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-[10px] text-green/50 font-body uppercase tracking-wide mb-0.5">{MARKETPLACE_CATEGORY_LABELS[listing.category] || listing.category}</p>
+                    <h3 className="font-heading text-[11px] font-semibold text-gray-800 leading-snug line-clamp-1">{listing.title}</h3>
+                    {listing.maker_brand && <p className="text-[10px] text-gray-400 font-body line-clamp-1">{listing.maker_brand}</p>}
+                    <p className="text-[11px] font-body font-medium text-green mt-0.5">{formatMarketplacePrice(listing.price, listing.price_display)}</p>
                   </div>
                 </Link>
               ))}
