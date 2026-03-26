@@ -39,6 +39,11 @@ export default function PartnerDashboardPage() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsPassword, setNeedsPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [settingPassword, setSettingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -50,6 +55,7 @@ export default function PartnerDashboardPage() {
       const data = await sessionRes.json();
       setPartner(data.partner);
       setUser(data.user);
+      if (!data.user.hasPassword) setNeedsPassword(true);
 
       const dashRes = await fetch("/api/partner/dashboard");
       if (dashRes.ok) {
@@ -61,10 +67,94 @@ export default function PartnerDashboardPage() {
     load();
   }, [router]);
 
+  async function handleSetPassword() {
+    setPasswordError("");
+    if (newPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+    setSettingPassword(true);
+    const res = await fetch("/api/partner/set-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: newPassword }),
+    });
+    if (res.ok) {
+      setNeedsPassword(false);
+    } else {
+      const data = await res.json();
+      setPasswordError(data.error || "Failed to set password.");
+    }
+    setSettingPassword(false);
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-pearl">
         <p className="text-gray-400 font-body">Loading...</p>
+      </div>
+    );
+  }
+
+  // Mandatory password setup gate
+  if (needsPassword) {
+    return (
+      <div className="min-h-screen bg-pearl flex items-center justify-center">
+        <div className="bg-white border border-green/10 rounded-lg p-8 max-w-md w-full mx-4 shadow-sm">
+          <div className="text-center mb-6">
+            <span className="font-heading text-sm font-semibold tracking-wider text-gold">
+              THE GATEKEEPERS CLUB
+            </span>
+            <h1 className="font-heading text-xl font-semibold text-green mt-3">
+              Welcome, {user?.name?.split(" ")[0] || "Partner"}
+            </h1>
+            <p className="text-sm text-gray-500 font-body mt-2">
+              Please set a password to secure your partner portal access.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min 8 characters"
+                minLength={8}
+                className="w-full px-3 py-2 border border-green/20 rounded-md text-sm font-body focus:outline-none focus:ring-1 focus:ring-green/30"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                Confirm password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat password"
+                onKeyDown={(e) => e.key === "Enter" && handleSetPassword()}
+                className="w-full px-3 py-2 border border-green/20 rounded-md text-sm font-body focus:outline-none focus:ring-1 focus:ring-green/30"
+              />
+            </div>
+            {passwordError && (
+              <p className="text-sm text-red-600 font-body">{passwordError}</p>
+            )}
+            <button
+              onClick={handleSetPassword}
+              disabled={settingPassword || newPassword.length < 8}
+              className="w-full py-2.5 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50"
+            >
+              {settingPassword ? "Setting password..." : "Set Password & Continue"}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
