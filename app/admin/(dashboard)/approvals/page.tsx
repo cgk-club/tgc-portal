@@ -118,9 +118,19 @@ export default function ApprovalsPage() {
       })
 
       if (res.ok) {
+        // Optimistically update the local state immediately
+        const newStatus = action === 'approve' ? 'approved' : 'rejected'
+        if (endpoint === 'fiche-edits') {
+          setFicheEdits(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e))
+        } else if (endpoint === 'partner-offers') {
+          setOffers(prev => prev.map(o => o.id === id ? { ...o, status: newStatus === 'approved' ? 'active' : newStatus } : o))
+        } else if (endpoint === 'partner-events') {
+          setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus === 'approved' ? 'active' : newStatus } : e))
+        } else if (endpoint === 'partner-content') {
+          setContent(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c))
+        }
         setActionNote('')
         setShowNoteFor(null)
-        await fetchAll()
       }
     } finally {
       setProcessing(null)
