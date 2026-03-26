@@ -362,13 +362,55 @@ export default function ClientMarketplacePage() {
           </div>
         )}
 
-        {/* Orders link */}
-        <div className="mt-10 text-center">
+        {/* Sell & Request CTAs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10">
+          <Link
+            href="/client/marketplace/sell"
+            className="bg-white border border-green/10 rounded-lg p-6 hover:border-green/30 hover:shadow-sm transition-all group"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-green/5 flex items-center justify-center flex-none group-hover:bg-green/10 transition-colors">
+                <span className="text-green text-lg">+</span>
+              </div>
+              <div>
+                <h3 className="font-heading text-sm font-semibold text-green mb-1">List with us</h3>
+                <p className="text-xs text-gray-400 font-body">
+                  Sell a timepiece, artwork, automobile, property, or artisan piece through our curated marketplace.
+                </p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href="/client/marketplace/request"
+            className="bg-white border border-green/10 rounded-lg p-6 hover:border-gold/30 hover:shadow-sm transition-all group"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-gold/5 flex items-center justify-center flex-none group-hover:bg-gold/10 transition-colors">
+                <span className="text-gold text-lg">?</span>
+              </div>
+              <div>
+                <h3 className="font-heading text-sm font-semibold text-green mb-1">Looking for something?</h3>
+                <p className="text-xs text-gray-400 font-body">
+                  Tell us what you are looking for and we will source it for you from our network.
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Orders & Wishlist links */}
+        <div className="flex justify-center gap-6 mt-8">
           <Link
             href="/client/marketplace/orders"
             className="text-xs text-green/60 hover:text-green font-body"
           >
-            View your marketplace orders
+            My orders
+          </Link>
+          <Link
+            href="/client/marketplace/wishlist"
+            className="text-xs text-green/60 hover:text-green font-body"
+          >
+            My wishlist
           </Link>
         </div>
       </div>
