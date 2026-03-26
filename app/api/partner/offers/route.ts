@@ -28,15 +28,15 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
-  if (!body.title || !body.fiche_id) {
-    return NextResponse.json({ error: "Title and fiche_id required" }, { status: 400 });
+  if (!body.title) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
 
   const { data, error } = await getSupabaseAdmin()
     .from("partner_offers")
     .insert({
       partner_id: session.partnerId,
-      fiche_id: body.fiche_id,
+      fiche_id: body.fiche_id || null,
       title: body.title,
       description: body.description || null,
       discount_type: body.discount_type || null,

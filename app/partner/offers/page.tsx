@@ -95,8 +95,8 @@ export default function PartnerOffersPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !description.trim()) {
-      setError("Title and description are required.");
+    if (!title.trim()) {
+      setError("Title is required.");
       return;
     }
 
@@ -117,7 +117,7 @@ export default function PartnerOffersPage() {
     const url = editingId
       ? `/api/partner/offers/${editingId}`
       : "/api/partner/offers";
-    const method = editingId ? "PUT" : "POST";
+    const method = editingId ? "PATCH" : "POST";
 
     const res = await fetch(url, {
       method,
