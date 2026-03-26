@@ -640,15 +640,12 @@ export default function PartnerEventsPage() {
                           Edit
                         </button>
                       )}
-                      {(event.status === "draft" ||
-                        event.status === "pending") && (
-                        <button
-                          onClick={() => handleDelete(event.id)}
-                          className="text-xs text-red-400 hover:text-red-600 font-body"
-                        >
-                          Delete
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        className="text-xs text-red-400 hover:text-red-600 font-body"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>

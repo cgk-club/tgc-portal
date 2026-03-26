@@ -82,10 +82,6 @@ export async function DELETE(
 
   if (!event) return NextResponse.json({ error: "Event not found" }, { status: 404 });
 
-  if (event.status !== "draft") {
-    return NextResponse.json({ error: "Only draft events can be deleted" }, { status: 403 });
-  }
-
   const { error } = await sb
     .from("partner_events")
     .delete()
