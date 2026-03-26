@@ -40,8 +40,10 @@ export async function POST(
 
   if (!isOwner) return NextResponse.json({ error: "Fiche not found" }, { status: 404 });
 
-  const { changes } = await request.json();
-  if (!changes || typeof changes !== "object") {
+  const body = await request.json();
+  // Accept either { changes: {...} } or flat fields directly
+  const changes = body.changes || body;
+  if (!changes || typeof changes !== "object" || Object.keys(changes).length === 0) {
     return NextResponse.json({ error: "Changes object required" }, { status: 400 });
   }
 

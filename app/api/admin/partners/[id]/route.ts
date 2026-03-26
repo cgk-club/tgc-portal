@@ -99,7 +99,7 @@ export async function GET(
   // Get fiche edit requests
   const { data: ficheEdits } = await sb
     .from('fiche_edit_requests')
-    .select('*, fiches(slug, name)')
+    .select('*, fiches(slug, headline)')
     .eq('partner_id', id)
     .order('submitted_at', { ascending: false })
 

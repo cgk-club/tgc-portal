@@ -53,7 +53,7 @@ interface FicheEdit {
   changes: Record<string, unknown>
   status: string
   submitted_at: string
-  fiches?: { slug: string; name: string }
+  fiches?: { slug: string; headline: string }
 }
 
 interface ReferralStats {
@@ -625,7 +625,7 @@ export default function PartnerDetailPage() {
               <tbody>
                 {partner.fiche_edits.map((fe) => (
                   <tr key={fe.id} className="border-b border-green/5 last:border-0">
-                    <td className="px-4 py-2 text-gray-800 font-body font-medium">{fe.fiches?.name || fe.fiches?.slug || '-'}</td>
+                    <td className="px-4 py-2 text-gray-800 font-body font-medium">{fe.fiches?.headline || fe.fiches?.slug || '-'}</td>
                     <td className="px-4 py-2 text-gray-500 font-body text-xs">{Object.keys(fe.changes || {}).join(', ')}</td>
                     <td className="px-4 py-2 text-gray-500 font-body text-xs">
                       {new Date(fe.submitted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}

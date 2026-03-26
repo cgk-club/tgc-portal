@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
   let query = getSupabaseAdmin()
     .from('partner_content')
-    .select('*, partner:partner_accounts(name, email)')
+    .select('*, partner:partner_accounts(org_name, email)')
     .order('created_at', { ascending: false })
 
   if (status) {

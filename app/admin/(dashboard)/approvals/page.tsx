@@ -12,8 +12,8 @@ interface FicheEdit {
   status: string
   submitted_at: string
   admin_note: string | null
-  partner: { name: string | null; email: string } | null
-  fiche: { slug: string; name: string } | null
+  partner: { org_name: string | null; email: string } | null
+  fiche: { slug: string; headline: string } | null
 }
 
 interface PartnerOffer {
@@ -29,8 +29,8 @@ interface PartnerOffer {
   status: string
   created_at: string
   admin_note: string | null
-  partner: { name: string | null; email: string } | null
-  fiche: { slug: string; name: string } | null
+  partner: { org_name: string | null; email: string } | null
+  fiche: { slug: string; headline: string } | null
 }
 
 interface PartnerEvent {
@@ -48,7 +48,7 @@ interface PartnerEvent {
   status: string
   created_at: string
   admin_note: string | null
-  partner: { name: string | null; email: string } | null
+  partner: { org_name: string | null; email: string } | null
 }
 
 interface PartnerContentItem {
@@ -60,7 +60,7 @@ interface PartnerContentItem {
   status: string
   created_at: string
   admin_note: string | null
-  partner: { name: string | null; email: string } | null
+  partner: { org_name: string | null; email: string } | null
 }
 
 const TABS: { key: TabKey; label: string }[] = [
@@ -193,9 +193,9 @@ export default function ApprovalsPage() {
                           <div key={fe.id} className="bg-white rounded-lg border border-green/10 p-5">
                             <div className="flex items-start justify-between">
                               <div>
-                                <p className="font-body font-medium text-gray-900">{fe.fiche?.name || 'Unknown fiche'}</p>
+                                <p className="font-body font-medium text-gray-900">{fe.fiche?.headline || fe.fiche?.slug || 'Unknown fiche'}</p>
                                 <p className="text-xs text-gray-500 font-body mt-1">
-                                  By {fe.partner?.name || fe.partner?.email || 'Unknown'} on {new Date(fe.submitted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  By {fe.partner?.org_name || fe.partner?.email || 'Unknown'} on {new Date(fe.submitted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
                               </div>
                               <span className="inline-block px-2 py-0.5 text-xs rounded-full font-medium bg-gold/20 text-gold">pending</span>
@@ -271,8 +271,8 @@ export default function ApprovalsPage() {
                           <tbody>
                             {reviewedFicheEdits.map((fe) => (
                               <tr key={fe.id} className="border-b border-green/5 last:border-0">
-                                <td className="px-4 py-2 text-gray-800 font-body">{fe.fiche?.name || '-'}</td>
-                                <td className="px-4 py-2 text-gray-500 font-body">{fe.partner?.name || fe.partner?.email || '-'}</td>
+                                <td className="px-4 py-2 text-gray-800 font-body">{fe.fiche?.headline || fe.fiche?.slug || '-'}</td>
+                                <td className="px-4 py-2 text-gray-500 font-body">{fe.partner?.org_name || fe.partner?.email || '-'}</td>
                                 <td className="px-4 py-2 text-gray-500 font-body text-xs">{new Date(fe.submitted_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</td>
                                 <td className="px-4 py-2 text-center">
                                   <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
@@ -310,8 +310,8 @@ export default function ApprovalsPage() {
                               <div>
                                 <p className="font-body font-medium text-gray-900">{o.title}</p>
                                 <p className="text-xs text-gray-500 font-body mt-1">
-                                  By {o.partner?.name || o.partner?.email || 'Unknown'}
-                                  {o.fiche ? ` for ${o.fiche.name}` : ''}
+                                  By {o.partner?.org_name || o.partner?.email || 'Unknown'}
+                                  {o.fiche ? ` for ${o.fiche.headline}` : ''}
                                 </p>
                               </div>
                               <span className="inline-block px-2 py-0.5 text-xs rounded-full font-medium bg-gold/20 text-gold">pending</span>
@@ -367,7 +367,7 @@ export default function ApprovalsPage() {
                             {reviewedOffers.map((o) => (
                               <tr key={o.id} className="border-b border-green/5 last:border-0">
                                 <td className="px-4 py-2 text-gray-800 font-body">{o.title}</td>
-                                <td className="px-4 py-2 text-gray-500 font-body">{o.partner?.name || o.partner?.email || '-'}</td>
+                                <td className="px-4 py-2 text-gray-500 font-body">{o.partner?.org_name || o.partner?.email || '-'}</td>
                                 <td className="px-4 py-2 text-gray-500 font-body">{o.discount_type}</td>
                                 <td className="px-4 py-2 text-center">
                                   <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
@@ -405,7 +405,7 @@ export default function ApprovalsPage() {
                               <div>
                                 <p className="font-body font-medium text-gray-900">{ev.title}</p>
                                 <p className="text-xs text-gray-500 font-body mt-1">
-                                  By {ev.partner?.name || ev.partner?.email || 'Unknown'}
+                                  By {ev.partner?.org_name || ev.partner?.email || 'Unknown'}
                                 </p>
                               </div>
                               <span className="inline-block px-2 py-0.5 text-xs rounded-full font-medium bg-gold/20 text-gold">pending</span>
@@ -467,7 +467,7 @@ export default function ApprovalsPage() {
                             {reviewedEvents.map((ev) => (
                               <tr key={ev.id} className="border-b border-green/5 last:border-0">
                                 <td className="px-4 py-2 text-gray-800 font-body">{ev.title}</td>
-                                <td className="px-4 py-2 text-gray-500 font-body">{ev.partner?.name || ev.partner?.email || '-'}</td>
+                                <td className="px-4 py-2 text-gray-500 font-body">{ev.partner?.org_name || ev.partner?.email || '-'}</td>
                                 <td className="px-4 py-2 text-gray-500 font-body text-xs">{ev.date_display}</td>
                                 <td className="px-4 py-2 text-center">
                                   <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
@@ -505,7 +505,7 @@ export default function ApprovalsPage() {
                               <div>
                                 <p className="font-body font-medium text-gray-900">{c.title}</p>
                                 <p className="text-xs text-gray-500 font-body mt-1">
-                                  {c.type} by {c.partner?.name || c.partner?.email || 'Unknown'} on {new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  {c.type} by {c.partner?.org_name || c.partner?.email || 'Unknown'} on {new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
                               </div>
                               <span className="inline-block px-2 py-0.5 text-xs rounded-full font-medium bg-gold/20 text-gold">submitted</span>
@@ -560,7 +560,7 @@ export default function ApprovalsPage() {
                             {reviewedContent.map((c) => (
                               <tr key={c.id} className="border-b border-green/5 last:border-0">
                                 <td className="px-4 py-2 text-gray-800 font-body">{c.title}</td>
-                                <td className="px-4 py-2 text-gray-500 font-body">{c.partner?.name || c.partner?.email || '-'}</td>
+                                <td className="px-4 py-2 text-gray-500 font-body">{c.partner?.org_name || c.partner?.email || '-'}</td>
                                 <td className="px-4 py-2 text-gray-500 font-body">{c.type}</td>
                                 <td className="px-4 py-2 text-center">
                                   <span className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${
