@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
       description: body.description || null,
       highlights: body.highlights || null,
       image_url: body.image_url || null,
+      is_free: body.is_free || false,
+      pricing_tiers: body.pricing_tiers || [],
       status: "pending",
     })
     .select()

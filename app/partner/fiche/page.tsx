@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
+import ImageUpload from "@/components/partner/ImageUpload";
 
 interface HighlightItem {
   icon?: string;
@@ -51,6 +52,7 @@ export default function PartnerFichePage() {
   const [description, setDescription] = useState("");
   const [highlights, setHighlights] = useState<string[]>([]);
   const [newHighlight, setNewHighlight] = useState("");
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [newGalleryUrl, setNewGalleryUrl] = useState("");
   const [priceDisplay, setPriceDisplay] = useState("");
@@ -92,6 +94,7 @@ export default function PartnerFichePage() {
     } else {
       setHighlights([]);
     }
+    setHeroImageUrl(fiche.hero_image_url || null);
     setGalleryUrls(fiche.gallery_urls || []);
     setPriceDisplay(fiche.price_display || "");
     setTemplateFields(fiche.template_fields || {});
@@ -144,6 +147,7 @@ export default function PartnerFichePage() {
           headline,
           description,
           highlights: highlights.join("\n"),
+          hero_image_url: heroImageUrl,
           gallery_urls: galleryUrls,
           price_display: priceDisplay,
           template_fields: templateFields,
@@ -262,16 +266,14 @@ export default function PartnerFichePage() {
 
         {selectedFiche && (
           <div className="space-y-6">
-            {/* Hero Image Preview */}
-            {selectedFiche.hero_image_url && (
-              <div className="rounded-lg overflow-hidden border border-green/10">
-                <img
-                  src={selectedFiche.hero_image_url}
-                  alt={selectedFiche.headline}
-                  className="w-full h-48 sm:h-64 object-cover"
-                />
-              </div>
-            )}
+            {/* Hero Image */}
+            <div className="bg-white border border-green/10 rounded-lg p-5">
+              <ImageUpload
+                value={heroImageUrl}
+                onChange={(url) => setHeroImageUrl(url)}
+                label="Hero Image"
+              />
+            </div>
 
             {/* Enrichment Score */}
             <div className="bg-white border border-green/10 rounded-lg p-5">

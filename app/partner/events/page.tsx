@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
+import ImageUpload from "@/components/partner/ImageUpload";
+
+interface PricingTier {
+  name: string;
+  price: string;
+  description: string;
+}
 
 interface PartnerEvent {
   id: string;
@@ -17,6 +24,8 @@ interface PartnerEvent {
   description: string | null;
   highlights: string | null;
   image_url: string | null;
+  is_free: boolean;
+  pricing_tiers: PricingTier[];
   status: string;
   enquiry_count: number;
   created_at: string;
@@ -51,6 +60,7 @@ export default function PartnerEventsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingWasActive, setEditingWasActive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -66,6 +76,8 @@ export default function PartnerEventsPage() {
   const [description, setDescription] = useState("");
   const [highlights, setHighlights] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [isFree, setIsFree] = useState(false);
+  const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -99,7 +111,10 @@ export default function PartnerEventsPage() {
     setDescription("");
     setHighlights("");
     setImageUrl("");
+    setIsFree(false);
+    setPricingTiers([]);
     setEditingId(null);
+    setEditingWasActive(false);
     setError("");
   }
 
@@ -115,9 +130,53 @@ export default function PartnerEventsPage() {
     setDescription(event.description || "");
     setHighlights(event.highlights || "");
     setImageUrl(event.image_url || "");
+    setIsFree(event.is_free || false);
+    setPricingTiers(
+      Array.isArray(event.pricing_tiers) && event.pricing_tiers.length > 0
+        ? event.pricing_tiers
+        : []
+    );
     setEditingId(event.id);
+    setEditingWasActive(event.status === "approved");
     setShowForm(true);
     setError("");
+  }
+
+  // Compute the display price from pricing tiers
+  function computeDisplayPrice(tiers: PricingTier[]): string {
+    const prices = tiers
+      .map((t) => {
+        const match = t.price.match(/[\d,.]+/);
+        return match ? parseFloat(match[0].replace(",", "")) : null;
+      })
+      .filter((p): p is number => p !== null && !isNaN(p));
+
+    if (prices.length === 0) return "";
+
+    const cheapest = Math.min(...prices);
+    // Try to extract the currency from the first tier
+    const currencyMatch = tiers[0]?.price.match(/[A-Z]{3}|[\$\u00a3\u20ac]/);
+    const currency = currencyMatch ? currencyMatch[0] : "EUR";
+
+    return `From ${currency} ${cheapest.toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
+  }
+
+  function addPricingTier() {
+    setPricingTiers([...pricingTiers, { name: "", price: "", description: "" }]);
+  }
+
+  function removePricingTier(index: number) {
+    setPricingTiers(pricingTiers.filter((_, i) => i !== index));
+  }
+
+  function updatePricingTier(
+    index: number,
+    field: keyof PricingTier,
+    value: string
+  ) {
+    const updated = [...pricingTiers];
+    updated[index] = { ...updated[index], [field]: value };
+    setPricingTiers(updated);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -130,7 +189,17 @@ export default function PartnerEventsPage() {
     setSaving(true);
     setError("");
 
-    const body = {
+    // Auto-compute display price from tiers if paid and tiers exist
+    let displayPrice = price.trim() || null;
+    if (!isFree && pricingTiers.length > 0) {
+      const computed = computeDisplayPrice(pricingTiers);
+      if (computed) displayPrice = computed;
+    }
+    if (isFree) {
+      displayPrice = "Free";
+    }
+
+    const body: Record<string, unknown> = {
       title: title.trim(),
       category,
       date_display: dateDisplay.trim(),
@@ -138,16 +207,18 @@ export default function PartnerEventsPage() {
       date_end: dateEnd || null,
       location: location.trim() || null,
       capacity: capacity ? parseInt(capacity) : null,
-      price: price.trim() || null,
+      price: displayPrice,
       description: description.trim() || null,
       highlights: highlights.trim() || null,
       image_url: imageUrl.trim() || null,
+      is_free: isFree,
+      pricing_tiers: isFree ? [] : pricingTiers.filter((t) => t.name.trim()),
     };
 
     const url = editingId
       ? `/api/partner/events/${editingId}`
       : "/api/partner/events";
-    const method = editingId ? "PUT" : "POST";
+    const method = editingId ? "PATCH" : "POST";
 
     const res = await fetch(url, {
       method,
@@ -212,6 +283,15 @@ export default function PartnerEventsPage() {
             <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
               {editingId ? "Edit Event" : "New Event"}
             </h2>
+
+            {editingWasActive && (
+              <div className="bg-gold/5 border border-gold/20 rounded-md p-3">
+                <p className="text-xs text-green font-body">
+                  This event is currently live. Saving changes will set it back
+                  to pending for re-approval.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs text-gray-500 font-body mb-1">
@@ -308,18 +388,123 @@ export default function PartnerEventsPage() {
               </div>
             </div>
 
+            {/* Free/Paid Toggle */}
             <div>
-              <label className="block text-xs text-gray-500 font-body mb-1">
-                Price
+              <label className="block text-xs text-gray-500 font-body mb-2">
+                Pricing
               </label>
-              <input
-                type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="e.g. From EUR 450 per person"
-                className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
-              />
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsFree(false)}
+                  className={`px-4 py-2 text-xs font-body rounded-md border transition-colors ${
+                    !isFree
+                      ? "bg-green text-white border-green"
+                      : "bg-white text-gray-500 border-green/20 hover:border-green/40"
+                  }`}
+                >
+                  Paid
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFree(true)}
+                  className={`px-4 py-2 text-xs font-body rounded-md border transition-colors ${
+                    isFree
+                      ? "bg-green text-white border-green"
+                      : "bg-white text-gray-500 border-green/20 hover:border-green/40"
+                  }`}
+                >
+                  Free
+                </button>
+              </div>
             </div>
+
+            {/* Pricing Tiers (only when paid) */}
+            {!isFree && (
+              <div>
+                <label className="block text-xs text-gray-500 font-body mb-2">
+                  Pricing Tiers
+                </label>
+                <div className="space-y-3 mb-3">
+                  {pricingTiers.map((tier, i) => (
+                    <div
+                      key={i}
+                      className="bg-green/[0.02] border border-green/10 rounded-md p-3 space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-gray-400 font-body uppercase tracking-wider">
+                          Tier {i + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removePricingTier(i)}
+                          className="text-xs text-red-400 hover:text-red-600 font-body"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={tier.name}
+                          onChange={(e) =>
+                            updatePricingTier(i, "name", e.target.value)
+                          }
+                          placeholder="e.g. General Admission, VIP, Table of 10"
+                          className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                        />
+                        <input
+                          type="text"
+                          value={tier.price}
+                          onChange={(e) =>
+                            updatePricingTier(i, "price", e.target.value)
+                          }
+                          placeholder="e.g. EUR 450"
+                          className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={tier.description}
+                        onChange={(e) =>
+                          updatePricingTier(i, "description", e.target.value)
+                        }
+                        placeholder="Description (optional)"
+                        className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addPricingTier}
+                  className="text-xs text-green hover:text-green-light font-body flex items-center gap-1 transition-colors"
+                >
+                  <span className="text-sm">+</span> Add pricing tier
+                </button>
+
+                {pricingTiers.length === 0 && (
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-500 font-body mb-1">
+                      Price (or add tiers above)
+                    </label>
+                    <input
+                      type="text"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="e.g. From EUR 450 per person"
+                      className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                    />
+                  </div>
+                )}
+
+                {pricingTiers.length > 0 && (
+                  <p className="text-[10px] text-gray-400 font-body mt-2">
+                    Display price will be auto-generated from the cheapest tier.
+                  </p>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="block text-xs text-gray-500 font-body mb-1">
@@ -346,18 +531,12 @@ export default function PartnerEventsPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-xs text-gray-500 font-body mb-1">
-                Image URL
-              </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
-              />
-            </div>
+            {/* Image Upload */}
+            <ImageUpload
+              value={imageUrl || null}
+              onChange={(url) => setImageUrl(url || "")}
+              label="Event Image"
+            />
 
             {error && <p className="text-sm text-red-500 font-body">{error}</p>}
 
@@ -426,6 +605,11 @@ export default function PartnerEventsPage() {
                       >
                         {event.status}
                       </span>
+                      {event.is_free && (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-green/5 text-green font-body flex-none">
+                          Free
+                        </span>
+                      )}
                     </div>
                     <p className="text-[10px] text-green/50 uppercase tracking-wide font-body mb-1">
                       {event.category}
@@ -448,22 +632,22 @@ export default function PartnerEventsPage() {
                         {event.enquiry_count}{" "}
                         {event.enquiry_count === 1 ? "enquiry" : "enquiries"}
                       </span>
+                      {event.status !== "rejected" && (
+                        <button
+                          onClick={() => startEdit(event)}
+                          className="text-xs text-green hover:underline font-body"
+                        >
+                          Edit
+                        </button>
+                      )}
                       {(event.status === "draft" ||
                         event.status === "pending") && (
-                        <>
-                          <button
-                            onClick={() => startEdit(event)}
-                            className="text-xs text-green hover:underline font-body"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(event.id)}
-                            className="text-xs text-red-400 hover:text-red-600 font-body"
-                          >
-                            Delete
-                          </button>
-                        </>
+                        <button
+                          onClick={() => handleDelete(event.id)}
+                          className="text-xs text-red-400 hover:text-red-600 font-body"
+                        >
+                          Delete
+                        </button>
                       )}
                     </div>
                   </div>

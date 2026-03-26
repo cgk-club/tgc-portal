@@ -30,6 +30,7 @@ export async function PATCH(
   const allowedFields = [
     "title", "category", "date_display", "date_start", "date_end",
     "location", "capacity", "price", "description", "highlights", "image_url",
+    "is_free", "pricing_tiers",
   ];
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -37,6 +38,12 @@ export async function PATCH(
     if (field in body) {
       updates[field] = body[field];
     }
+  }
+
+  // If editing an approved/active event, reset status to pending for re-approval
+  if (event.status === "approved") {
+    updates.status = "pending";
+    updates.admin_note = "Updated by partner, pending re-approval";
   }
 
   const { data, error } = await sb
