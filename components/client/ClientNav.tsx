@@ -8,13 +8,13 @@ interface ClientNavProps {
 }
 
 const NAV_ITEMS = [
-  { label: "Home", href: "/client", key: "home" },
-  { label: "Our Collection", href: "/client/collection", key: "collection" },
-  { label: "Marketplace", href: "/client/marketplace", key: "marketplace" },
-  { label: "My Journeys", href: "/client/journeys", key: "journeys" },
-  { label: "Events", href: "/client/events", key: "events" },
-  { label: "Payments", href: "/client/payments", key: "payments" },
-  { label: "Points", href: "/client/points", key: "points" },
+  { label: "Home", href: "/client", key: "home", tourId: "tour-nav-home" },
+  { label: "Our Collection", href: "/client/collection", key: "collection", tourId: "tour-nav-collection" },
+  { label: "Marketplace", href: "/client/marketplace", key: "marketplace", tourId: "tour-nav-marketplace" },
+  { label: "My Journeys", href: "/client/journeys", key: "journeys", tourId: "tour-nav-journeys" },
+  { label: "Events", href: "/client/events", key: "events", tourId: "tour-nav-events" },
+  { label: "Payments", href: "/client/payments", key: "payments", tourId: "tour-nav-payments" },
+  { label: "Points", href: "/client/points", key: "points", tourId: "tour-nav-points" },
 ];
 
 export default function ClientNav({ active }: ClientNavProps) {
@@ -39,10 +39,11 @@ export default function ClientNav({ active }: ClientNavProps) {
             Sign out
           </button>
         </div>
-        <nav className="flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
+        <nav id="tour-nav" className="flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.key}
+              id={item.tourId}
               href={item.href}
               className={`text-xs font-body whitespace-nowrap px-3 py-2 rounded-sm transition-colors ${
                 active === item.key

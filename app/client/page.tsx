@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Itinerary } from '@/types'
 import ClientNav from '@/components/client/ClientNav'
+import GuidedTour, { TOUR_STORAGE_KEY } from '@/components/client/GuidedTour'
 
 interface ClientInfo {
   id: string
@@ -77,6 +78,7 @@ export default function ClientDashboardPage() {
   const [newPassword, setNewPassword] = useState('')
   const [settingPassword, setSettingPassword] = useState(false)
   const [passwordSet, setPasswordSet] = useState(false)
+  const [showTour, setShowTour] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -116,6 +118,12 @@ export default function ClientDashboardPage() {
       }
 
       setLoading(false)
+
+      // Auto-show guided tour for first-time visitors
+      if (typeof window !== 'undefined' && !localStorage.getItem(TOUR_STORAGE_KEY)) {
+        // Small delay so the DOM is fully rendered before tour targets elements
+        setTimeout(() => setShowTour(true), 600)
+      }
     }
     load()
   }, [router])
@@ -154,6 +162,7 @@ export default function ClientDashboardPage() {
             Your concierge is here whenever you need us.
           </p>
           <Link
+            id="tour-conversation-btn"
             href="/client/conversation"
             className="inline-block px-6 py-3 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body"
           >
@@ -296,7 +305,7 @@ export default function ClientDashboardPage() {
             <h3 className="font-heading text-sm font-semibold text-green mb-1">Plan an Event</h3>
             <p className="text-xs text-gray-400 font-body">Bespoke event planning</p>
           </Link>
-          <Link href="/client/points" className="bg-white border border-green/10 rounded-lg p-5 hover:border-green/30 transition-colors text-center">
+          <Link id="tour-points-card" href="/client/points" className="bg-white border border-green/10 rounded-lg p-5 hover:border-green/30 transition-colors text-center">
             <div className="font-heading text-lg font-semibold text-gold mb-0.5">{points.toLocaleString()}</div>
             <h3 className="font-heading text-sm font-semibold text-green mb-0.5">Gatekeeper Points</h3>
             <p className="text-xs text-gray-400 font-body">EUR {(points / 100).toFixed(2)}</p>
@@ -366,7 +375,21 @@ export default function ClientDashboardPage() {
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">THE GATEKEEPERS CLUB</span>
         <p className="text-sm text-gray-400 font-body mt-2">christian@thegatekeepers.club</p>
         <p className="text-xs text-gray-300 font-body mt-1">thegatekeepers.club</p>
+        <button
+          onClick={() => {
+            localStorage.removeItem(TOUR_STORAGE_KEY)
+            setShowTour(true)
+          }}
+          className="text-xs text-gray-300 hover:text-green font-body mt-3 inline-block transition-colors"
+        >
+          Take a tour
+        </button>
       </footer>
+
+      <GuidedTour
+        show={showTour}
+        onComplete={() => setShowTour(false)}
+      />
     </div>
   )
 }
