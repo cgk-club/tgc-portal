@@ -8,6 +8,10 @@ import FicheInbox, { FicheInboxItem } from '@/components/admin/dashboard/FicheIn
 import RecentActivity, { ClientLogin, ChoiceSelection, RequestItem } from '@/components/admin/dashboard/RecentActivity'
 import QuickActions from '@/components/admin/dashboard/QuickActions'
 import TaskBoard from '@/components/admin/dashboard/TaskBoard'
+import PartnerActivity from '@/components/admin/dashboard/PartnerActivity'
+import MarketplacePulse from '@/components/admin/dashboard/MarketplacePulse'
+import FeedbackQueue from '@/components/admin/dashboard/FeedbackQueue'
+import UpcomingDeadlines, { UpcomingDeadlineItem } from '@/components/admin/dashboard/UpcomingDeadlines'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,7 +118,6 @@ export default async function AdminDashboard() {
     allChoiceGroups = choicesRes.data || []
     selectedOptions = optionsRes.data || []
     itineraryDayCounts = []
-    // Count days per itinerary
     const dayCountMap: Record<string, number> = {}
     for (const d of daysRes.data || []) {
       dayCountMap[d.itinerary_id] = (dayCountMap[d.itinerary_id] || 0) + 1
@@ -126,26 +129,22 @@ export default async function AdminDashboard() {
   const today = new Date()
   const todayTime = today.getTime()
 
-  // Build itinerary lookup
   const itineraryLookup: Record<string, { clientName: string; title: string }> = {}
   for (const it of itineraries) {
     itineraryLookup[it.id] = { clientName: it.client_name, title: it.title }
   }
 
-  // Day count lookup
   const dayCountLookup: Record<string, number> = {}
   for (const dc of itineraryDayCounts) {
     dayCountLookup[dc.itinerary_id] = dc.count
   }
 
-  // Group payments by itinerary
   const paymentsByItinerary: Record<string, typeof allPayments> = {}
   for (const p of allPayments) {
     if (!paymentsByItinerary[p.itinerary_id]) paymentsByItinerary[p.itinerary_id] = []
     paymentsByItinerary[p.itinerary_id].push(p)
   }
 
-  // Group choices by itinerary
   const choicesByItinerary: Record<string, typeof allChoiceGroups> = {}
   for (const cg of allChoiceGroups) {
     if (!choicesByItinerary[cg.itinerary_id]) choicesByItinerary[cg.itinerary_id] = []
@@ -219,7 +218,6 @@ export default async function AdminDashboard() {
     }
   }
 
-  // Sort: red first, then amber
   deadlines.sort((a, b) => {
     if (a.urgency === 'red' && b.urgency !== 'red') return -1
     if (a.urgency !== 'red' && b.urgency === 'red') return 1
@@ -238,7 +236,6 @@ export default async function AdminDashboard() {
   const collected = paidPayments.reduce((s, p) => s + getAmt(p), 0)
   const outstanding = pipelineTotal - collected
 
-  // Fees pending: items with "concierge" or "planning" or "fee" in service_name, status pending
   const feesPending = nonCancelled
     .filter((p) => {
       const name = p.service_name.toLowerCase()
@@ -247,7 +244,6 @@ export default async function AdminDashboard() {
     })
     .reduce((s, p) => s + getAmt(p), 0)
 
-  // Determine primary currency (most common among active itineraries)
   const currencyCounts: Record<string, number> = {}
   for (const it of itineraries) {
     const c = it.currency || 'EUR'
@@ -274,7 +270,6 @@ export default async function AdminDashboard() {
         type: 'trip_start',
         itineraryId: it.id,
       })
-      // Compute end date from day count
       const dayCount = dayCountLookup[it.id] || 0
       if (dayCount > 0) {
         const end = new Date(it.start_date)
@@ -300,6 +295,20 @@ export default async function AdminDashboard() {
         label: `${lookup?.clientName || ''} — ${p.service_name}`,
         type: 'payment_deadline',
         itineraryId: p.itinerary_id,
+      })
+    }
+  }
+
+  // Add scheduled tasks to calendar events
+  const allTasks = dashboardTasks || []
+  for (const task of allTasks) {
+    if (task.scheduled_date && !task.completed) {
+      calendarEvents.push({
+        date: task.scheduled_date,
+        label: task.title,
+        type: 'task',
+        time: task.scheduled_time ? task.scheduled_time.substring(0, 5) : undefined,
+        taskId: task.id,
       })
     }
   }
@@ -332,7 +341,6 @@ export default async function AdminDashboard() {
     }
   })
 
-  // Sort: most complete first (fewest missing fields)
   ficheInbox.sort((a, b) => a.missingCount - b.missingCount)
 
   // ── Recent activity ───────────────────────────────────────────
@@ -344,7 +352,6 @@ export default async function AdminDashboard() {
     lastLogin: c.last_login,
   }))
 
-  // Build choice group lookup for option context
   const choiceGroupLookup: Record<string, { title: string; itinerary_id: string }> = {}
   for (const cg of allChoiceGroups) {
     choiceGroupLookup[cg.id] = { title: cg.title, itinerary_id: cg.itinerary_id }
@@ -365,14 +372,14 @@ export default async function AdminDashboard() {
     })
 
   const requests: RequestItem[] = [
-  
+
     ...(clientRequests || []).map((r: any) => ({
       id: r.id as string,
       type: (r.type || 'Request') as string,
       name: (r.name || 'Unknown') as string,
       createdAt: r.created_at as string,
     })),
-  
+
     ...(eventEnquiries || []).map((e: any) => ({
       id: e.id as string,
       type: 'Event Enquiry',
@@ -380,6 +387,44 @@ export default async function AdminDashboard() {
       createdAt: e.created_at as string,
     })),
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+  // ── Upcoming Deadlines (14 days) ──────────────────────────────
+  const upcomingDeadlines: Array<{
+    serviceName: string
+    supplierName: string
+    clientName: string
+    amount: number
+    currency: string
+    depositDeadline: string
+    daysUntil: number
+    paymentStatus: string
+    itineraryId: string
+  }> = []
+
+  for (const p of allPayments) {
+    if (p.payment_status === 'cancelled' || p.payment_status === 'fully_paid' || p.payment_status === 'confirmed') continue
+    if (!p.deposit_deadline) continue
+
+    const deadline = new Date(p.deposit_deadline)
+    const daysUntil = Math.ceil((deadline.getTime() - todayTime) / 86400000)
+
+    if (daysUntil <= 14) {
+      const lookup = itineraryLookup[p.itinerary_id]
+      upcomingDeadlines.push({
+        serviceName: p.service_name,
+        supplierName: p.supplier_name || '',
+        clientName: lookup?.clientName || '',
+        amount: p.client_amount || p.amount || 0,
+        currency: p.currency || primaryCurrency,
+        depositDeadline: p.deposit_deadline,
+        daysUntil,
+        paymentStatus: p.payment_status,
+        itineraryId: p.itinerary_id,
+      })
+    }
+  }
+
+  upcomingDeadlines.sort((a, b) => a.daysUntil - b.daysUntil)
 
   // ── Render ────────────────────────────────────────────────────
   return (
@@ -401,13 +446,25 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <CalendarView events={calendarEvents} />
         <TaskBoard
-          initialTasks={dashboardTasks || []}
+          initialTasks={allTasks}
           itineraries={itineraries.map((it) => ({
             id: it.id,
             clientName: it.client_name,
             title: it.title,
           }))}
         />
+      </div>
+
+      {/* Partner Activity + Marketplace Pulse */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <PartnerActivity />
+        <MarketplacePulse />
+      </div>
+
+      {/* Feedback Queue + Upcoming Deadlines */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <FeedbackQueue />
+        <UpcomingDeadlines deadlines={upcomingDeadlines} />
       </div>
 
       {/* Fiche Inbox + Recent Activity */}

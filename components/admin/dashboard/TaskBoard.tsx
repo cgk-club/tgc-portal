@@ -1,7 +1,21 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, cn } from '@/lib/utils'
+
+const CATEGORIES = [
+  { value: 'admin', label: 'Admin', color: 'bg-gray-100 text-gray-700' },
+  { value: 'client_work', label: 'Client', color: 'bg-green-muted text-green' },
+  { value: 'outreach', label: 'Outreach', color: 'bg-blue-50 text-blue-700' },
+  { value: 'content', label: 'Content', color: 'bg-purple-50 text-purple-700' },
+  { value: 'scraping', label: 'Scraping', color: 'bg-amber-50 text-amber-700' },
+  { value: 'cleanup', label: 'Cleanup', color: 'bg-red-50 text-red-600' },
+]
+
+const CATEGORY_MAP: Record<string, { label: string; color: string }> = {}
+for (const c of CATEGORIES) {
+  CATEGORY_MAP[c.value] = { label: c.label, color: c.color }
+}
 
 interface Task {
   id: string
@@ -12,6 +26,11 @@ interface Task {
   priority: number
   created_at: string
   completed_at: string | null
+  scheduled_date: string | null
+  scheduled_time: string | null
+  is_recurring: boolean
+  recurrence: string | null
+  category: string | null
 }
 
 interface Props {
@@ -24,8 +43,15 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
   const [newTitle, setNewTitle] = useState('')
   const [newDueDate, setNewDueDate] = useState('')
   const [newItineraryId, setNewItineraryId] = useState('')
+  const [newCategory, setNewCategory] = useState('admin')
+  const [newScheduledDate, setNewScheduledDate] = useState('')
+  const [newScheduledTime, setNewScheduledTime] = useState('')
+  const [newIsRecurring, setNewIsRecurring] = useState(false)
+  const [newRecurrence, setNewRecurrence] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [filterCategory, setFilterCategory] = useState<string>('all')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -46,6 +72,11 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
         title: newTitle.trim(),
         due_date: newDueDate || null,
         itinerary_id: newItineraryId || null,
+        category: newCategory || 'admin',
+        scheduled_date: newScheduledDate || null,
+        scheduled_time: newScheduledTime || null,
+        is_recurring: newIsRecurring,
+        recurrence: newIsRecurring && newRecurrence ? newRecurrence : null,
       }),
     })
 
@@ -55,13 +86,18 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
       setNewTitle('')
       setNewDueDate('')
       setNewItineraryId('')
+      setNewCategory('admin')
+      setNewScheduledDate('')
+      setNewScheduledTime('')
+      setNewIsRecurring(false)
+      setNewRecurrence('')
       setShowForm(false)
+      setShowAdvanced(false)
     }
     setLoading(false)
   }
 
   async function toggleComplete(id: string, completed: boolean) {
-    // Optimistic update
     setTasks((prev) =>
       prev.map((t) =>
         t.id === id
@@ -85,10 +121,14 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
     })
   }
 
-  const openTasks = tasks.filter((t) => !t.completed)
-  const completedTasks = tasks.filter((t) => t.completed)
+  // Filter by category
+  const filteredTasks = filterCategory === 'all'
+    ? tasks
+    : tasks.filter((t) => (t.category || 'admin') === filterCategory)
 
-  // Check if a due date is overdue
+  const openTasks = filteredTasks.filter((t) => !t.completed)
+  const completedTasks = filteredTasks.filter((t) => t.completed)
+
   function isOverdue(dueDate: string | null): boolean {
     if (!dueDate) return false
     return new Date(dueDate).getTime() < new Date().setHours(0, 0, 0, 0)
@@ -100,10 +140,49 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
     return diff >= 0 && diff <= 3 * 86400000
   }
 
-  // Find itinerary label
   const itineraryLookup: Record<string, string> = {}
   for (const it of itineraries) {
     itineraryLookup[it.id] = it.clientName
+  }
+
+  function renderTaskMeta(task: Task) {
+    const cat = CATEGORY_MAP[task.category || 'admin'] || CATEGORY_MAP.admin
+    return (
+      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+        <span className={cn('text-[10px] font-medium px-1.5 py-0.5 rounded', cat.color)}>
+          {cat.label}
+        </span>
+        {task.due_date && (
+          <span
+            className={cn(
+              'text-[10px] font-medium',
+              isOverdue(task.due_date)
+                ? 'text-red-600'
+                : isDueSoon(task.due_date)
+                  ? 'text-amber-600'
+                  : 'text-gray-400'
+            )}
+          >
+            Due {formatDate(task.due_date)}
+          </span>
+        )}
+        {task.scheduled_date && (
+          <span className="text-[10px] text-purple-500 font-medium">
+            {task.scheduled_time ? `${task.scheduled_time.substring(0, 5)}` : ''} {formatDate(task.scheduled_date)}
+          </span>
+        )}
+        {task.is_recurring && task.recurrence && (
+          <span className="text-[10px] text-blue-500 font-medium">
+            {task.recurrence}
+          </span>
+        )}
+        {task.itinerary_id && itineraryLookup[task.itinerary_id] && (
+          <span className="text-[10px] text-gray-400">
+            {itineraryLookup[task.itinerary_id]}
+          </span>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -121,6 +200,31 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
       </div>
 
       <div className="bg-white rounded-[8px] border border-gray-200">
+        {/* Category filter */}
+        <div className="flex items-center gap-1 p-2 border-b border-gray-100 overflow-x-auto">
+          <button
+            onClick={() => setFilterCategory('all')}
+            className={cn(
+              'px-2 py-0.5 text-[10px] font-medium rounded font-body transition-colors whitespace-nowrap',
+              filterCategory === 'all' ? 'bg-green text-white' : 'text-gray-500 hover:bg-gray-100'
+            )}
+          >
+            All
+          </button>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setFilterCategory(cat.value)}
+              className={cn(
+                'px-2 py-0.5 text-[10px] font-medium rounded font-body transition-colors whitespace-nowrap',
+                filterCategory === cat.value ? 'bg-green text-white' : 'text-gray-500 hover:bg-gray-100'
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
         {/* Add form */}
         {showForm && (
           <form onSubmit={addTask} className="p-3 border-b border-gray-100">
@@ -138,7 +242,19 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
                 className="text-xs border border-gray-200 rounded-[4px] px-2 py-1.5 focus:outline-none focus:border-green font-body flex-1"
+                title="Due date"
               />
+              <select
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className="text-xs border border-gray-200 rounded-[4px] px-2 py-1.5 focus:outline-none focus:border-green font-body flex-1"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 mt-2">
               <select
                 value={newItineraryId}
                 onChange={(e) => setNewItineraryId(e.target.value)}
@@ -146,12 +262,67 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
               >
                 <option value="">No project</option>
                 {itineraries.map((it) => (
-                  <option key={it.id} value={it.id}>
-                    {it.clientName}
-                  </option>
+                  <option key={it.id} value={it.id}>{it.clientName}</option>
                 ))}
               </select>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="text-xs text-gray-400 hover:text-gray-600 font-body px-2"
+              >
+                {showAdvanced ? 'Less' : 'Schedule'}
+              </button>
             </div>
+
+            {/* Advanced scheduling fields */}
+            {showAdvanced && (
+              <div className="mt-2 p-2 bg-gray-50 rounded space-y-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-gray-400 font-body block mb-0.5">Scheduled date</label>
+                    <input
+                      type="date"
+                      value={newScheduledDate}
+                      onChange={(e) => setNewScheduledDate(e.target.value)}
+                      className="w-full text-xs border border-gray-200 rounded-[4px] px-2 py-1.5 focus:outline-none focus:border-green font-body"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] text-gray-400 font-body block mb-0.5">Time</label>
+                    <input
+                      type="time"
+                      value={newScheduledTime}
+                      onChange={(e) => setNewScheduledTime(e.target.value)}
+                      className="w-full text-xs border border-gray-200 rounded-[4px] px-2 py-1.5 focus:outline-none focus:border-green font-body"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newIsRecurring}
+                      onChange={(e) => setNewIsRecurring(e.target.checked)}
+                      className="rounded border-gray-300 text-green focus:ring-green"
+                    />
+                    <span className="text-xs text-gray-600 font-body">Recurring</span>
+                  </label>
+                  {newIsRecurring && (
+                    <select
+                      value={newRecurrence}
+                      onChange={(e) => setNewRecurrence(e.target.value)}
+                      className="text-xs border border-gray-200 rounded-[4px] px-2 py-1.5 focus:outline-none focus:border-green font-body"
+                    >
+                      <option value="">Select...</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  )}
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading || !newTitle.trim()}
@@ -165,7 +336,9 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
         {/* Open tasks */}
         {openTasks.length === 0 && !showForm && (
           <div className="p-4 text-center">
-            <p className="text-sm text-gray-400">All clear</p>
+            <p className="text-sm text-gray-400">
+              {filterCategory === 'all' ? 'All clear' : 'No tasks in this category'}
+            </p>
           </div>
         )}
 
@@ -181,26 +354,7 @@ export default function TaskBoard({ initialTasks, itineraries }: Props) {
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-900 font-body">{task.title}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                {task.due_date && (
-                  <span
-                    className={`text-[10px] font-medium ${
-                      isOverdue(task.due_date)
-                        ? 'text-red-600'
-                        : isDueSoon(task.due_date)
-                          ? 'text-amber-600'
-                          : 'text-gray-400'
-                    }`}
-                  >
-                    {formatDate(task.due_date)}
-                  </span>
-                )}
-                {task.itinerary_id && itineraryLookup[task.itinerary_id] && (
-                  <span className="text-[10px] text-gray-400">
-                    {itineraryLookup[task.itinerary_id]}
-                  </span>
-                )}
-              </div>
+              {renderTaskMeta(task)}
             </div>
             <button
               onClick={() => deleteTask(task.id)}

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const sb = getSupabaseAdmin()
   const { data, error } = await sb
@@ -19,7 +21,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { title, due_date, itinerary_id, priority } = body
+  const {
+    title,
+    due_date,
+    itinerary_id,
+    priority,
+    category,
+    scheduled_date,
+    scheduled_time,
+    is_recurring,
+    recurrence,
+  } = body
 
   if (!title?.trim()) {
     return NextResponse.json({ error: 'Title required' }, { status: 400 })
@@ -33,6 +45,11 @@ export async function POST(request: Request) {
       due_date: due_date || null,
       itinerary_id: itinerary_id || null,
       priority: priority || 0,
+      category: category || 'admin',
+      scheduled_date: scheduled_date || null,
+      scheduled_time: scheduled_time || null,
+      is_recurring: is_recurring || false,
+      recurrence: recurrence || null,
     })
     .select()
     .single()

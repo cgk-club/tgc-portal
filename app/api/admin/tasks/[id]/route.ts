@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -17,6 +19,11 @@ export async function PATCH(
   }
   if ('due_date' in body) updates.due_date = body.due_date
   if ('priority' in body) updates.priority = body.priority
+  if ('category' in body) updates.category = body.category
+  if ('scheduled_date' in body) updates.scheduled_date = body.scheduled_date
+  if ('scheduled_time' in body) updates.scheduled_time = body.scheduled_time
+  if ('is_recurring' in body) updates.is_recurring = body.is_recurring
+  if ('recurrence' in body) updates.recurrence = body.recurrence
 
   const { data, error } = await sb
     .from('dashboard_tasks')
