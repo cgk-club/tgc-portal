@@ -10,6 +10,7 @@ export interface CalendarEvent {
   type: 'trip_start' | 'trip_end' | 'payment_deadline' | 'gcal' | 'task'
   itineraryId?: string
   time?: string // e.g. "10:00"
+  endTime?: string // e.g. "11:30"
   taskId?: string
 }
 
@@ -105,17 +106,22 @@ export default function CalendarView({ events }: { events: CalendarEvent[] }) {
         if (cancelled) return
 
         const mapped: CalendarEvent[] = (data.events || []).map(
-          (ev: { id: string; summary: string; start: string; allDay: boolean }) => {
+          (ev: { id: string; summary: string; start: string; end?: string; allDay: boolean }) => {
             const startDate = ev.start.substring(0, 10)
             let time: string | undefined
+            let endTime: string | undefined
             if (!ev.allDay && ev.start.length > 10) {
               time = ev.start.substring(11, 16)
+            }
+            if (!ev.allDay && ev.end && ev.end.length > 10) {
+              endTime = ev.end.substring(11, 16)
             }
             return {
               date: startDate,
               label: ev.summary,
               type: 'gcal' as const,
               time,
+              endTime,
             }
           }
         )
@@ -341,6 +347,34 @@ export default function CalendarView({ events }: { events: CalendarEvent[] }) {
     const timedEvents = dayEvents.filter((e) => e.time)
     const allDayEvents = dayEvents.filter((e) => !e.time)
 
+    const ROW_HEIGHT = 48 // px per hour slot
+    const TOTAL_HOURS = 13 // 8:00 to 20:00
+    const GRID_HEIGHT = TOTAL_HOURS * ROW_HEIGHT
+
+    function parseTime(t: string): { h: number; m: number } {
+      const [hStr, mStr] = t.split(':')
+      return { h: parseInt(hStr, 10), m: parseInt(mStr || '0', 10) }
+    }
+
+    function getEventPosition(ev: CalendarEvent) {
+      if (!ev.time) return null
+      const start = parseTime(ev.time)
+      const startMinutes = (start.h - 8) * 60 + start.m
+
+      let durationMinutes = 60 // default 1 hour
+      if (ev.endTime) {
+        const end = parseTime(ev.endTime)
+        durationMinutes = (end.h - 8) * 60 + end.m - startMinutes
+      }
+      // Minimum 30 minutes
+      if (durationMinutes < 30) durationMinutes = 30
+
+      const top = (startMinutes / (TOTAL_HOURS * 60)) * 100
+      const height = (durationMinutes / (TOTAL_HOURS * 60)) * 100
+
+      return { top, height, durationMinutes }
+    }
+
     return (
       <div>
         {/* All-day events */}
@@ -365,42 +399,69 @@ export default function CalendarView({ events }: { events: CalendarEvent[] }) {
           </div>
         )}
 
-        {/* Hour grid */}
-        <div className="border border-gray-100 rounded">
-          {HOURS.map((hour) => {
-            const hourStr = String(hour).padStart(2, '0')
-            const eventsThisHour = timedEvents.filter((e) => e.time && e.time.startsWith(hourStr))
+        {/* Hour grid with absolutely positioned events */}
+        <div className="border border-gray-100 rounded flex">
+          {/* Time labels */}
+          <div className="w-12 shrink-0">
+            {HOURS.map((hour) => {
+              const hourStr = String(hour).padStart(2, '0')
+              return (
+                <div
+                  key={hour}
+                  className="border-b border-gray-50 last:border-b-0 border-r border-gray-100"
+                  style={{ height: ROW_HEIGHT }}
+                >
+                  <div className="text-[10px] text-gray-400 font-body py-1 text-right pr-2">
+                    {hourStr}:00
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
-            return (
+          {/* Events column */}
+          <div className="flex-1 relative" style={{ height: GRID_HEIGHT }}>
+            {/* Hour gridlines */}
+            {HOURS.map((hour) => (
               <div
                 key={hour}
-                className="flex border-b border-gray-50 last:border-b-0 min-h-[36px]"
-              >
-                <div className="w-12 shrink-0 text-[10px] text-gray-400 font-body py-1 text-right pr-2 border-r border-gray-100">
-                  {hourStr}:00
-                </div>
-                <div className="flex-1 p-0.5 space-y-0.5">
-                  {eventsThisHour.map((ev, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleEventClick(ev)}
-                      className={cn(
-                        'w-full text-left px-2 py-1 rounded text-xs font-body border',
-                        eventBgColor(ev.type),
-                        ev.itineraryId ? 'cursor-pointer' : 'cursor-default'
-                      )}
-                    >
-                      <span className="font-medium mr-1">{ev.time}</span>
-                      {ev.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
+                className="absolute w-full border-b border-gray-50"
+                style={{ top: (hour - 8) * ROW_HEIGHT, height: ROW_HEIGHT }}
+              />
+            ))}
+
+            {/* Positioned events */}
+            {timedEvents.map((ev, i) => {
+              const pos = getEventPosition(ev)
+              if (!pos) return null
+
+              const timeDisplay = ev.endTime ? `${ev.time} - ${ev.endTime}` : ev.time
+
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleEventClick(ev)}
+                  className={cn(
+                    'absolute left-1 right-1 px-2 py-1 rounded text-xs font-body border overflow-hidden z-10',
+                    eventBgColor(ev.type),
+                    ev.itineraryId ? 'cursor-pointer' : 'cursor-default'
+                  )}
+                  style={{
+                    top: `${pos.top}%`,
+                    height: `${pos.height}%`,
+                    minHeight: 24,
+                  }}
+                  title={`${typeLabel(ev.type)}: ${ev.label} (${timeDisplay})`}
+                >
+                  <span className="font-medium mr-1">{timeDisplay}</span>
+                  <span className="truncate">{ev.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Events without specific time that aren't "all day" events with type */}
+        {/* No events message */}
         {dayEvents.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-8 font-body">No events this day</p>
         )}

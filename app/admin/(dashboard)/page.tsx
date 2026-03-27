@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
+import { getCalendarEvents } from '@/lib/google-calendar'
 import DeadlinesStrip, { DeadlineItem } from '@/components/admin/dashboard/DeadlinesStrip'
 import ActivePipeline, { PipelineItem } from '@/components/admin/dashboard/ActivePipeline'
 import RevenueSnapshot, { RevenueData } from '@/components/admin/dashboard/RevenueSnapshot'
@@ -311,6 +312,35 @@ export default async function AdminDashboard() {
         taskId: task.id,
       })
     }
+  }
+
+  // ── Google Calendar events (server-side) ────────────────────
+  try {
+    const now = new Date()
+    const timeMin = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1)).toISOString()
+    const timeMax = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 2, 1)).toISOString()
+    const gcalEvents = await getCalendarEvents(timeMin, timeMax)
+
+    for (const gev of gcalEvents) {
+      const startDate = gev.start.substring(0, 10)
+      let time: string | undefined
+      let endTime: string | undefined
+      if (!gev.allDay && gev.start.length > 10) {
+        time = gev.start.substring(11, 16)
+      }
+      if (!gev.allDay && gev.end && gev.end.length > 10) {
+        endTime = gev.end.substring(11, 16)
+      }
+      calendarEvents.push({
+        date: startDate,
+        label: gev.summary,
+        type: 'gcal',
+        time,
+        endTime,
+      })
+    }
+  } catch {
+    // Graceful fallback: Google Calendar unavailable, continue without
   }
 
   // ── Fiche inbox ───────────────────────────────────────────────

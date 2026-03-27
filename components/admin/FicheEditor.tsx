@@ -20,7 +20,7 @@ import WineEstateFieldsEditor from '@/components/admin/template-fields/WineEstat
 import WellnessFieldsEditor from '@/components/admin/template-fields/WellnessFields'
 import EventsSportFieldsEditor from '@/components/admin/template-fields/EventsSportFields'
 import ArtsCultureFieldsEditor from '@/components/admin/template-fields/ArtsCultureFields'
-import { FicheTemplate, getTemplate } from '@/lib/ficheTemplates'
+import { FicheTemplate, getTemplate, TEMPLATE_LABELS } from '@/lib/ficheTemplates'
 
 interface FicheEditorProps {
   fiche: FicheWithOrg
@@ -57,6 +57,14 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
   const [showPrice, setShowPrice] = useState(initial.show_price ?? false)
   const [priceDisplay, setPriceDisplay] = useState(initial.price_display || '')
   const [showOutreach, setShowOutreach] = useState(false)
+  const [showInvitePartner, setShowInvitePartner] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState(initial.org?.email || '')
+  const [inviteTemplateType, setInviteTemplateType] = useState<FicheTemplate>(
+    (initial.template_type as FicheTemplate) || 'default'
+  )
+  const [inviting, setInviting] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [inviteSuccess, setInviteSuccess] = useState(false)
   const [lastContacted, setLastContacted] = useState<string | null>(null)
 
   useEffect(() => {
@@ -127,8 +135,42 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
     setSaving(false)
   }
 
+  async function handleInvitePartner() {
+    if (!inviteEmail) return
+    setInviting(true)
+    setInviteError(null)
+    setInviteSuccess(false)
+
+    try {
+      const res = await fetch(`/api/admin/fiches/${initial.id}/invite-partner`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: inviteEmail,
+          template_type: inviteTemplateType,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setInviteError(data.error || 'Failed to invite partner')
+      } else {
+        setInviteSuccess(true)
+        setTimeout(() => {
+          setShowInvitePartner(false)
+          setInviteSuccess(false)
+        }, 2000)
+      }
+    } catch {
+      setInviteError('Network error. Please try again.')
+    } finally {
+      setInviting(false)
+    }
+  }
+
   const org = initial.org
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || ''
+  const appUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || '')
   const publicUrl = `${appUrl}/fiche/${slug}`
 
   return (
@@ -453,6 +495,19 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           >
             Copy link
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              setInviteEmail(initial.org?.email || '')
+              setInviteTemplateType(templateType)
+              setInviteError(null)
+              setInviteSuccess(false)
+              setShowInvitePartner(true)
+            }}
+            className="block w-full text-center rounded-[4px] border border-gold text-gold px-4 py-2 text-sm font-medium hover:bg-gold/5 transition-colors"
+          >
+            Invite as Partner
+          </button>
         </div>
 
         {/* Save */}
@@ -482,6 +537,91 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           onClose={() => setShowOutreach(false)}
           onSent={() => setLastContacted(new Date().toISOString())}
         />
+      )}
+
+      {/* Invite Partner Modal */}
+      {showInvitePartner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-[8px] border border-gray-200 shadow-xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-heading font-semibold text-gray-900 mb-1">
+              Invite as Partner
+            </h3>
+            <p className="text-sm text-gray-500 font-body mb-4">
+              This will create a partner account for <span className="font-medium text-gray-700">{org?.name || slug}</span> and send a portal invitation.
+            </p>
+
+            {/* Template type display */}
+            <div className="mb-4 p-3 rounded bg-gray-50 border border-gray-100">
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">
+                Template type
+              </label>
+              <select
+                value={inviteTemplateType}
+                onChange={(e) => setInviteTemplateType(e.target.value as FicheTemplate)}
+                className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+              >
+                {(['default', 'hospitality', 'real_estate', 'dining', 'maker', 'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture'] as FicheTemplate[]).map((t) => (
+                  <option key={t} value={t}>{TEMPLATE_LABELS[t]}</option>
+                ))}
+              </select>
+              {inviteTemplateType === 'default' && (
+                <p className="text-xs text-amber-600 mt-1.5 font-body">
+                  Template is set to &lsquo;default&rsquo;. Consider selecting the correct template before inviting.
+                </p>
+              )}
+            </div>
+
+            {/* Email input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Partner contact email <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="partner@example.com"
+                className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+              />
+              {!inviteEmail && (
+                <p className="text-xs text-gray-400 mt-1 font-body">
+                  No email found for this organisation. Please enter one.
+                </p>
+              )}
+            </div>
+
+            {/* Error / Success */}
+            {inviteError && (
+              <div className="mb-4 p-2 rounded bg-red-50 border border-red-200 text-sm text-red-700 font-body">
+                {inviteError}
+              </div>
+            )}
+            {inviteSuccess && (
+              <div className="mb-4 p-2 rounded bg-green-50 border border-green-200 text-sm text-green-700 font-body">
+                Partner invited successfully. Magic link sent.
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowInvitePartner(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleInvitePartner}
+                disabled={!inviteEmail || inviting || inviteSuccess}
+                className="px-4 py-2 text-sm font-medium rounded-[4px] bg-green text-white hover:bg-green/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {inviting ? 'Inviting...' : inviteSuccess ? 'Invited' : 'Confirm & Send Invitation'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
