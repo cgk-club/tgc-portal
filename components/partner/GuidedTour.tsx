@@ -53,6 +53,13 @@ const TOUR_STEPS: TourStep[] = [
     position: 'bottom',
   },
   {
+    id: 'projects',
+    title: 'Projects',
+    description: 'See projects you are working on with TGC clients. Submit updates, quotes, and invoices.',
+    target: '#tour-partner-projects',
+    position: 'bottom',
+  },
+  {
     id: 'referrals',
     title: 'Referrals',
     description: 'Your unique referral link. Track who you have referred and conversions.',

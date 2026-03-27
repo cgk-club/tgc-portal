@@ -17,6 +17,7 @@ const navItems = [
   { label: 'Fiches', href: '/admin/fiches', badgeKey: null },
   { label: 'Itineraries', href: '/admin/itineraries', badgeKey: null },
   { label: 'Clients', href: '/admin/clients', badgeKey: null },
+  { label: 'Projects', href: '/admin/projects', badgeKey: null },
   { label: 'Partners', href: '/admin/partners', badgeKey: null },
   { label: 'Approvals', href: '/admin/approvals', badgeKey: 'approvals' as const },
   { label: 'Marketplace', href: '/admin/marketplace', badgeKey: 'marketplace_review' as const },

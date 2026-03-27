@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Our Collection", href: "/client/collection", key: "collection", tourId: "tour-nav-collection" },
   { label: "Marketplace", href: "/client/marketplace", key: "marketplace", tourId: "tour-nav-marketplace" },
   { label: "My Journeys", href: "/client/journeys", key: "journeys", tourId: "tour-nav-journeys" },
+  { label: "My Projects", href: "/client/projects", key: "projects", tourId: "tour-nav-projects" },
   { label: "Events", href: "/client/events", key: "events", tourId: "tour-nav-events" },
   { label: "Payments", href: "/client/payments", key: "payments", tourId: "tour-nav-payments" },
   { label: "Points", href: "/client/points", key: "points", tourId: "tour-nav-points" },

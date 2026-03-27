@@ -46,6 +46,13 @@ const TOUR_STEPS: TourStep[] = [
     position: 'bottom',
   },
   {
+    id: 'projects',
+    title: 'My Projects',
+    description: 'Track your property and real estate projects. Renovations, acquisitions, rental management, and more.',
+    target: '#tour-nav-projects',
+    position: 'bottom',
+  },
+  {
     id: 'events',
     title: 'Events',
     description: 'Discover upcoming events from TGC and our partners. Enquire directly from here.',

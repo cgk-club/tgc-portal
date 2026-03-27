@@ -13,6 +13,7 @@ import PartnerActivity from '@/components/admin/dashboard/PartnerActivity'
 import MarketplacePulse from '@/components/admin/dashboard/MarketplacePulse'
 import FeedbackQueue from '@/components/admin/dashboard/FeedbackQueue'
 import UpcomingDeadlines, { UpcomingDeadlineItem } from '@/components/admin/dashboard/UpcomingDeadlines'
+import ClientProjects from '@/components/admin/dashboard/ClientProjects'
 
 export const dynamic = 'force-dynamic'
 
@@ -485,10 +486,15 @@ export default async function AdminDashboard() {
         />
       </div>
 
-      {/* Partner Activity + Marketplace Pulse */}
+      {/* Client Projects + Marketplace Pulse */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <ClientProjects />
+        <MarketplacePulse />
+      </div>
+
+      {/* Partner Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <PartnerActivity />
-        <MarketplacePulse />
       </div>
 
       {/* Feedback Queue + Upcoming Deadlines */}

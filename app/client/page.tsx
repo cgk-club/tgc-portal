@@ -33,6 +33,16 @@ interface TGCEvent {
   featured: boolean
 }
 
+interface ProjectPreview {
+  id: string
+  type: string
+  title: string
+  property_city: string | null
+  status: string
+  milestones_total: number
+  milestones_completed: number
+}
+
 interface MarketplacePreview {
   id: string
   title: string
@@ -73,6 +83,7 @@ export default function ClientDashboardPage() {
   const [itineraries, setItineraries] = useState<(Itinerary & { days?: { id: string }[], cover_image_url?: string, status?: string })[]>([])
   const [fiches, setFiches] = useState<Fiche[]>([])
   const [events, setEvents] = useState<TGCEvent[]>([])
+  const [activeProjects, setActiveProjects] = useState<ProjectPreview[]>([])
   const [marketplaceListings, setMarketplaceListings] = useState<MarketplacePreview[]>([])
   const [loading, setLoading] = useState(true)
   const [showPasswordBanner, setShowPasswordBanner] = useState(false)
@@ -93,11 +104,12 @@ export default function ClientDashboardPage() {
       if (!c.password_hash) setShowPasswordBanner(true)
 
       // Load all data in parallel
-      const [itinRes, fichesRes, eventsRes, marketplaceRes] = await Promise.all([
+      const [itinRes, fichesRes, eventsRes, marketplaceRes, projectsRes] = await Promise.all([
         fetch('/api/client/itineraries'),
         fetch('/api/client/collection-preview'),
         fetch('/api/events/list'),
         fetch('/api/client/marketplace?sort=newest'),
+        fetch('/api/client/projects'),
       ])
 
       if (itinRes.ok) setItineraries(await itinRes.json())
@@ -116,6 +128,14 @@ export default function ClientDashboardPage() {
           return 0
         })
         setMarketplaceListings(sorted.slice(0, 4))
+      }
+      if (projectsRes.ok) {
+        const allProjects = await projectsRes.json()
+        setActiveProjects(
+          allProjects
+            .filter((p: ProjectPreview) => ['planning', 'active', 'on_hold'].includes(p.status))
+            .slice(0, 4)
+        )
       }
 
       setLoading(false)
@@ -354,6 +374,75 @@ export default function ClientDashboardPage() {
             </div>
           )}
         </div>
+
+        {/* My Projects */}
+        {activeProjects.length > 0 && (
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">My Projects</h2>
+              <Link href="/client/projects" className="text-xs text-green hover:underline font-body">View all</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeProjects.map(proj => {
+                const typeColors: Record<string, string> = {
+                  renovation: 'bg-amber-50 text-amber-700 border-amber-200',
+                  rental_management: 'bg-blue-50 text-blue-700 border-blue-200',
+                  property_search: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                  acquisition: 'bg-purple-50 text-purple-700 border-purple-200',
+                  appraisal: 'bg-teal-50 text-teal-700 border-teal-200',
+                  tenant_management: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                  upgrade: 'bg-rose-50 text-rose-700 border-rose-200',
+                  other: 'bg-gray-50 text-gray-600 border-gray-200',
+                }
+                const typeLabelsMap: Record<string, string> = {
+                  renovation: 'Renovation', rental_management: 'Rental Management',
+                  property_search: 'Property Search', acquisition: 'Acquisition',
+                  appraisal: 'Appraisal', tenant_management: 'Tenant Management',
+                  upgrade: 'Upgrade', other: 'Other',
+                }
+                const progress = proj.milestones_total > 0
+                  ? Math.round((proj.milestones_completed / proj.milestones_total) * 100)
+                  : 0
+                const statusStyleMap: Record<string, string> = {
+                  planning: 'bg-amber-100 text-amber-800',
+                  active: 'bg-green-100 text-green-800',
+                  on_hold: 'bg-gray-200 text-gray-600',
+                }
+                const statusLabelMap: Record<string, string> = {
+                  planning: 'Planning', active: 'Active', on_hold: 'On Hold',
+                }
+                return (
+                  <Link key={proj.id} href={`/client/projects/${proj.id}`}
+                    className="bg-white rounded-lg border border-green/10 p-4 hover:shadow-md transition-shadow group">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-[10px] font-body font-medium px-2 py-0.5 rounded border ${typeColors[proj.type] || typeColors.other}`}>
+                        {typeLabelsMap[proj.type] || 'Other'}
+                      </span>
+                      <span className={`text-[10px] font-body font-medium px-2 py-0.5 rounded-full ${statusStyleMap[proj.status] || 'bg-gray-100 text-gray-500'}`}>
+                        {statusLabelMap[proj.status] || proj.status}
+                      </span>
+                    </div>
+                    <h3 className="font-heading text-sm font-semibold text-green mb-1 truncate">{proj.title}</h3>
+                    {proj.property_city && (
+                      <p className="text-xs text-gray-400 font-body mb-2">{proj.property_city}</p>
+                    )}
+                    {proj.milestones_total > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-400 font-body">Progress</span>
+                          <span className="text-[10px] text-gray-500 font-body font-medium">{proj.milestones_completed}/{proj.milestones_total}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-green rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+                        </div>
+                      </div>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Quotes */}
         {quotes.length > 0 && (

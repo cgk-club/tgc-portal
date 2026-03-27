@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Offers", href: "/partner/offers", key: "offers", tourId: "tour-partner-offers" },
   { label: "Events", href: "/partner/events", key: "events", tourId: "tour-partner-events" },
   { label: "Listings", href: "/partner/listings", key: "listings", tourId: "tour-partner-listings" },
+  { label: "Projects", href: "/partner/projects", key: "projects", tourId: "tour-partner-projects" },
   { label: "Referrals", href: "/partner/referrals", key: "referrals", tourId: "tour-partner-referrals" },
   { label: "Content", href: "/partner/content", key: "content", tourId: "tour-partner-content" },
   { label: "Availability", href: "/partner/availability", key: "availability", tourId: "tour-partner-availability" },
