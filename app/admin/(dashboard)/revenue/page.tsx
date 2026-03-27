@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/quote'
 
-type FilterType = 'all' | 'pipeline' | 'fees' | 'collected' | 'outstanding'
+type FilterType = 'all' | 'tgc_revenue' | 'commissions' | 'fees' | 'partner_revenue' | 'collected' | 'outstanding'
 
 interface PaymentItem {
   id: string
@@ -25,6 +25,7 @@ interface PaymentItem {
   client_amount: number | null
   commission_type: string | null
   commission_value: number | null
+  is_zero_margin: boolean | null
   sort_order: number
   created_at: string
   updated_at: string
@@ -37,15 +38,32 @@ interface PaymentItem {
 }
 
 interface Summary {
+  tgcRevenue: number
+  commissionsEarned: number
+  commissionBookingCount: number
+  avgCommissionRate: number
+  planningFees: number
+  planningFeesPending: number
+  planningFeesCollected: number
+  planningFeeItineraryCount: number
+  adminFees: number
+  adminFeeCount: number
+  retainers: number
+  activeRetainerCount: number
+  feesAndRetainers: number
+  partnerRevenue: number
+  partnerRevenuePaid: number
+  marketplaceCommission: number
+  ccFeeImpact: number
+  netTgcRevenue: number
   pipelineTotal: number
-  feesPending: number
   collected: number
   outstanding: number
   currency: string
 }
 
 interface Breakdowns {
-  byClient: Record<string, { pipeline: number; collected: number }>
+  byClient: Record<string, { pipeline: number; collected: number; commission: number }>
   byStatus: Record<string, { count: number; total: number }>
   byMonth: Record<string, number>
   commission: { totalCommissionable: number; estimatedCommission: number }
@@ -56,6 +74,8 @@ interface ProjectSummary {
   totalExpenses: number
   retainers: number
   adminFees: number
+  adminFeeCount: number
+  activeRetainerCount: number
   items: Array<Record<string, unknown>>
 }
 
@@ -260,11 +280,11 @@ function RevenuePageContent() {
 
   const { summary, payments, breakdowns, projectFinancials, marketplaceSummary, clientNames } = data
 
-  const summaryCards: Array<{ key: FilterType; label: string; value: number; color: string }> = [
-    { key: 'pipeline', label: 'Pipeline Value', value: summary.pipelineTotal, color: 'text-green' },
-    { key: 'fees', label: 'Fees Pending', value: summary.feesPending, color: 'text-gold' },
-    { key: 'collected', label: 'Collected', value: summary.collected, color: 'text-green' },
-    { key: 'outstanding', label: 'Outstanding', value: summary.outstanding, color: 'text-red-600' },
+  const summaryCards: Array<{ key: FilterType; label: string; value: number; color: string; subtitle?: string }> = [
+    { key: 'tgc_revenue', label: 'TGC Revenue', value: summary.tgcRevenue, color: 'text-green', subtitle: 'What TGC earns' },
+    { key: 'commissions', label: 'Commissions', value: summary.commissionsEarned, color: 'text-gold', subtitle: `${summary.commissionBookingCount} bookings at avg ${summary.avgCommissionRate}%` },
+    { key: 'fees', label: 'Fees & Retainers', value: summary.feesAndRetainers, color: 'text-green', subtitle: 'Planning + admin + retainers' },
+    { key: 'partner_revenue', label: 'Partner Revenue', value: summary.partnerRevenue, color: 'text-blue-600', subtitle: 'Driven to partners' },
   ]
 
   // Sort byMonth for chart
@@ -297,7 +317,7 @@ function RevenuePageContent() {
         )}
       </div>
 
-      {/* Summary cards (larger) */}
+      {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {summaryCards.map((card) => {
           const isActive = activeFilter === card.key
@@ -314,7 +334,12 @@ function RevenuePageContent() {
               <p className={cn('text-2xl font-heading font-semibold mt-2', card.color)}>
                 {formatCurrency(card.value, summary.currency)}
               </p>
-              <p className="text-[10px] text-gray-400 font-body mt-1">
+              {card.subtitle && (
+                <p className="text-[10px] text-gray-400 font-body mt-1">
+                  {card.subtitle}
+                </p>
+              )}
+              <p className="text-[10px] text-gray-400 font-body mt-0.5">
                 {isActive ? 'Showing filtered results' : 'Click to filter'}
               </p>
             </button>
@@ -322,25 +347,146 @@ function RevenuePageContent() {
         })}
       </div>
 
+      {/* TGC Revenue Sources breakdown */}
+      <div className="bg-white rounded-[8px] border border-gray-200 p-5">
+        <h3 className="text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          TGC Revenue Sources
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Commissions */}
+          <div className="border border-gray-100 rounded-[8px] p-3">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wide">Commissions</p>
+            <p className="text-lg font-heading font-semibold text-gold mt-1">
+              {formatCurrency(summary.commissionsEarned, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-500 font-body mt-1">
+              from {summary.commissionBookingCount} bookings at avg {summary.avgCommissionRate}%
+            </p>
+          </div>
+
+          {/* Planning fees */}
+          <div className="border border-gray-100 rounded-[8px] p-3">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wide">Planning Fees</p>
+            <p className="text-lg font-heading font-semibold text-green mt-1">
+              {formatCurrency(summary.planningFees, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-500 font-body mt-1">
+              from {summary.planningFeeItineraryCount} itinerar{summary.planningFeeItineraryCount === 1 ? 'y' : 'ies'}
+              {summary.planningFeesPending > 0 && (
+                <> ({formatCurrency(summary.planningFeesPending, summary.currency)} pending)</>
+              )}
+            </p>
+          </div>
+
+          {/* Admin fees */}
+          <div className="border border-gray-100 rounded-[8px] p-3">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wide">Admin Fees</p>
+            <p className="text-lg font-heading font-semibold text-green mt-1">
+              {formatCurrency(summary.adminFees, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-500 font-body mt-1">
+              from {summary.adminFeeCount} project{summary.adminFeeCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {/* Retainers */}
+          <div className="border border-gray-100 rounded-[8px] p-3">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wide">Retainers</p>
+            <p className="text-lg font-heading font-semibold text-green mt-1">
+              {formatCurrency(summary.retainers, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-500 font-body mt-1">
+              {summary.activeRetainerCount} active retainer{summary.activeRetainerCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {/* Marketplace */}
+          <div className="border border-gray-100 rounded-[8px] p-3">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wide">Marketplace</p>
+            <p className="text-lg font-heading font-semibold text-green mt-1">
+              {formatCurrency(summary.marketplaceCommission, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-500 font-body mt-1">
+              from {marketplaceSummary.totalOrders} order{marketplaceSummary.totalOrders !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
+
+        {/* CC fee note */}
+        {summary.ccFeeImpact > 0 && (
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <div className="text-xs font-body text-gray-500">
+              CC processing fees (3.5% on card payments): <span className="text-red-500 font-semibold">-{formatCurrency(summary.ccFeeImpact, summary.currency)}</span>
+            </div>
+            <div className="text-sm font-heading font-semibold text-green">
+              Net TGC Revenue: {formatCurrency(summary.netTgcRevenue, summary.currency)}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Partner Revenue Generated */}
+      <div className="bg-white rounded-[8px] border border-blue-100 p-5">
+        <h3 className="text-xs font-heading font-semibold text-blue-600 uppercase tracking-wider mb-2">
+          Partner Revenue Generated
+        </h3>
+        <p className="text-[10px] text-gray-500 font-body mb-3">
+          Total booking value TGC drives to partners and suppliers. This is not TGC income.
+        </p>
+        <div className="flex items-center gap-6">
+          <div>
+            <p className="text-2xl font-heading font-semibold text-blue-600">
+              {formatCurrency(summary.partnerRevenue, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-400 font-body">Total booking value</p>
+          </div>
+          <div className="h-10 w-px bg-gray-200" />
+          <div>
+            <p className="text-lg font-heading font-semibold text-blue-500">
+              {formatCurrency(summary.partnerRevenuePaid, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-400 font-body">Confirmed/paid to partners</p>
+          </div>
+          <div className="h-10 w-px bg-gray-200" />
+          <div>
+            <p className="text-lg font-heading font-semibold text-gray-500">
+              {formatCurrency(summary.partnerRevenue - summary.partnerRevenuePaid, summary.currency)}
+            </p>
+            <p className="text-[10px] text-gray-400 font-body">Outstanding</p>
+          </div>
+        </div>
+      </div>
+
       {/* Filter bar */}
       <div className="bg-white rounded-[8px] border border-gray-200 p-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Tab buttons */}
-          <div className="flex bg-gray-100 rounded-[4px] p-0.5">
-            {(['all', 'pipeline', 'fees', 'collected', 'outstanding'] as FilterType[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => handleFilterChange(f)}
-                className={cn(
-                  'px-3 py-1.5 text-xs font-body rounded-[4px] transition-colors capitalize',
-                  activeFilter === f
-                    ? 'bg-green text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                )}
-              >
-                {f === 'all' ? 'All' : f === 'fees' ? 'Fees' : f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+          <div className="flex bg-gray-100 rounded-[4px] p-0.5 flex-wrap">
+            {(['all', 'tgc_revenue', 'commissions', 'fees', 'partner_revenue', 'collected', 'outstanding'] as FilterType[]).map((f) => {
+              const labels: Record<string, string> = {
+                all: 'All',
+                tgc_revenue: 'TGC Revenue',
+                commissions: 'Commissions',
+                fees: 'Fees',
+                partner_revenue: 'Partner Revenue',
+                collected: 'Collected',
+                outstanding: 'Outstanding',
+              }
+              return (
+                <button
+                  key={f}
+                  onClick={() => handleFilterChange(f)}
+                  className={cn(
+                    'px-3 py-1.5 text-xs font-body rounded-[4px] transition-colors',
+                    activeFilter === f
+                      ? 'bg-green text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {labels[f]}
+                </button>
+              )
+            })}
           </div>
 
           <div className="h-5 w-px bg-gray-200" />
@@ -393,12 +539,12 @@ function RevenuePageContent() {
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Client</th>
                 <th className="text-left px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Service / Supplier</th>
-                <th className="text-right px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                <th className="text-right px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Booking Value</th>
+                <th className="text-right px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">TGC Earns</th>
                 <th className="text-center px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Currency</th>
                 <th className="text-left px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Method</th>
                 <th className="text-center px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="text-left px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Deadline</th>
-                <th className="text-left px-4 py-3 text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">Updated</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -411,10 +557,29 @@ function RevenuePageContent() {
               ) : (
                 payments.map((p) => {
                   const isExpanded = expandedRow === p.id
-                  const isEditing = editingCell?.id === p.id
                   const isSaving = saving === p.id
                   const amount = getAmount(p)
                   const hasAdjustmentLog = p.notes?.includes('--- Adjustment ---')
+
+                  // Calculate TGC earnings for this item
+                  const svc = p.service_name.toLowerCase()
+                  const sup = (p.supplier_name || '').toLowerCase()
+                  const isFeeItem = (svc.includes('concierge') || svc.includes('planning') || svc.includes('fee')) &&
+                    (sup.includes('gatekeeper') || sup.includes('tgc') || sup === '')
+
+                  let tgcEarns = 0
+                  if (isFeeItem) {
+                    tgcEarns = amount // TGC keeps the full fee
+                  } else if (!p.is_zero_margin) {
+                    // Commission from partner booking
+                    if (p.commission_type === 'percentage' && p.commission_value && p.commission_value > 0) {
+                      tgcEarns = amount * (p.commission_value / 100)
+                    } else if (p.commission_type === 'fixed' && p.commission_value && p.commission_value > 0) {
+                      tgcEarns = p.commission_value
+                    } else {
+                      tgcEarns = amount * 0.10 // default 10%
+                    }
+                  }
 
                   return (
                     <Fragment key={p.id}>
@@ -436,9 +601,19 @@ function RevenuePageContent() {
                         <td className="px-4 py-3">
                           <div className="font-body text-sm text-gray-900">{p.service_name}</div>
                           <div className="text-xs text-gray-400 font-body">{p.supplier_name}</div>
+                          {isFeeItem && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-green/10 text-green mt-0.5">
+                              TGC Fee
+                            </span>
+                          )}
+                          {p.is_zero_margin && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-gray-100 text-gray-500 mt-0.5">
+                              Pass-through
+                            </span>
+                          )}
                         </td>
 
-                        {/* Amount (editable) */}
+                        {/* Booking Value (editable) */}
                         <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                           {editingCell?.id === p.id && editingCell?.field === 'amount' ? (
                             <div className="flex items-center justify-end gap-1">
@@ -468,6 +643,25 @@ function RevenuePageContent() {
                             >
                               {formatCurrency(amount, p.currency || summary.currency)}
                             </button>
+                          )}
+                        </td>
+
+                        {/* TGC Earns */}
+                        <td className="px-4 py-3 text-right">
+                          <span className={cn(
+                            'font-body text-sm font-semibold',
+                            tgcEarns > 0 ? 'text-gold' : 'text-gray-300'
+                          )}>
+                            {tgcEarns > 0 ? formatCurrency(tgcEarns, p.currency || summary.currency) : '-'}
+                          </span>
+                          {!isFeeItem && !p.is_zero_margin && tgcEarns > 0 && (
+                            <div className="text-[9px] text-gray-400 font-body">
+                              {p.commission_type === 'percentage' && p.commission_value
+                                ? `${p.commission_value}%`
+                                : p.commission_type === 'fixed' && p.commission_value
+                                  ? 'fixed'
+                                  : '10% default'}
+                            </div>
                           )}
                         </td>
 
@@ -534,16 +728,6 @@ function RevenuePageContent() {
                             </button>
                           )}
                         </td>
-
-                        {/* Updated */}
-                        <td className="px-4 py-3">
-                          <div className="text-xs font-body text-gray-400">
-                            {formatDateShort(p.updated_at)}
-                          </div>
-                          {hasAdjustmentLog && (
-                            <div className="text-[10px] text-gold font-body">Adjusted</div>
-                          )}
-                        </td>
                       </tr>
 
                       {/* Expanded detail row */}
@@ -557,6 +741,9 @@ function RevenuePageContent() {
                                 <p className="text-gray-500 whitespace-pre-wrap">
                                   {p.notes || 'No notes'}
                                 </p>
+                                {hasAdjustmentLog && (
+                                  <p className="text-[10px] text-gold mt-1">Has adjustment history</p>
+                                )}
                               </div>
 
                               {/* Client notes */}
@@ -599,6 +786,9 @@ function RevenuePageContent() {
                                       Commission: {p.commission_value}
                                       {p.commission_type === 'percentage' ? '%' : ` ${p.currency || 'EUR'}`}
                                     </p>
+                                    <p className="text-gray-500">
+                                      TGC earns: {formatCurrency(tgcEarns, p.currency || summary.currency)}
+                                    </p>
                                   </div>
                                 )}
 
@@ -629,12 +819,14 @@ function RevenuePageContent() {
           <p className="text-xs text-gray-500 font-body">
             {payments.length} record{payments.length !== 1 ? 's' : ''}
           </p>
-          <p className="text-sm font-heading font-semibold text-green">
-            Total: {formatCurrency(
-              payments.reduce((s, p) => s + getAmount(p), 0),
-              summary.currency
-            )}
-          </p>
+          <div className="text-right">
+            <p className="text-xs text-gray-400 font-body">
+              Booking value: {formatCurrency(
+                payments.reduce((s, p) => s + getAmount(p), 0),
+                summary.currency
+              )}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -657,7 +849,7 @@ function RevenuePageContent() {
 
         {showBreakdowns && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* By Client */}
+            {/* By Client (with commission) */}
             <div className="bg-white rounded-[8px] border border-gray-200 p-5">
               <h3 className="text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider mb-4">
                 Revenue by Client
@@ -689,8 +881,8 @@ function RevenuePageContent() {
                         <span className="text-[10px] font-body text-gray-400">
                           Collected: {formatCurrency(data.collected, summary.currency)}
                         </span>
-                        <span className="text-[10px] font-body text-gray-400">
-                          Outstanding: {formatCurrency(data.pipeline - data.collected, summary.currency)}
+                        <span className="text-[10px] font-body text-gold">
+                          TGC commission: {formatCurrency(data.commission, summary.currency)}
                         </span>
                       </div>
                     </div>
@@ -710,7 +902,6 @@ function RevenuePageContent() {
                 {Object.entries(breakdowns.byStatus)
                   .sort(([, a], [, b]) => b.total - a.total)
                   .map(([status, data]) => {
-                    const badge = STATUS_BADGES[status] || STATUS_BADGES.pending
                     const pct = summary.pipelineTotal > 0
                       ? ((data.total / summary.pipelineTotal) * 100).toFixed(1)
                       : '0'
@@ -740,7 +931,7 @@ function RevenuePageContent() {
             {/* By Month */}
             <div className="bg-white rounded-[8px] border border-gray-200 p-5">
               <h3 className="text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                Revenue by Month
+                Partner Revenue by Month
               </h3>
               {sortedMonths.length > 0 ? (
                 <div className="space-y-2">
@@ -781,13 +972,13 @@ function RevenuePageContent() {
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-body text-gray-600">Total Commissionable</span>
+                  <span className="text-sm font-body text-gray-600">Partner Booking Value</span>
                   <span className="text-sm font-body font-semibold text-gray-900">
                     {formatCurrency(breakdowns.commission.totalCommissionable, summary.currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-body text-gray-600">Estimated Commission</span>
+                  <span className="text-sm font-body text-gray-600">Commissions Earned</span>
                   <span className="text-sm font-body font-semibold text-gold">
                     {formatCurrency(breakdowns.commission.estimatedCommission, summary.currency)}
                   </span>
@@ -802,126 +993,17 @@ function RevenuePageContent() {
                     </span>
                   </div>
                 )}
+                <div className="flex items-center justify-between border-t border-gray-100 pt-2">
+                  <span className="text-xs font-body text-gray-400">Total TGC Revenue</span>
+                  <span className="text-sm font-heading font-semibold text-green">
+                    {formatCurrency(summary.tgcRevenue, summary.currency)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Additional revenue sources */}
-      {(projectFinancials.totalIncome > 0 || projectFinancials.retainers > 0 || projectFinancials.adminFees > 0 || marketplaceSummary.totalOrders > 0) && (
-        <div className="bg-white rounded-[8px] border border-gray-200 p-5">
-          <h3 className="text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider mb-4">
-            Additional Revenue Sources
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Project financials */}
-            {(projectFinancials.totalIncome > 0 || projectFinancials.retainers > 0 || projectFinancials.adminFees > 0) && (
-              <div>
-                <h4 className="text-sm font-heading font-semibold text-gray-700 mb-2">Project Financials</h4>
-                <div className="space-y-1.5">
-                  {projectFinancials.retainers > 0 && (
-                    <div className="flex justify-between text-xs font-body">
-                      <span className="text-gray-500">Retainers</span>
-                      <span className="text-gray-900 font-semibold">
-                        {formatCurrency(projectFinancials.retainers, summary.currency)}
-                      </span>
-                    </div>
-                  )}
-                  {projectFinancials.adminFees > 0 && (
-                    <div className="flex justify-between text-xs font-body">
-                      <span className="text-gray-500">Admin Fees</span>
-                      <span className="text-gray-900 font-semibold">
-                        {formatCurrency(projectFinancials.adminFees, summary.currency)}
-                      </span>
-                    </div>
-                  )}
-                  {projectFinancials.totalIncome > 0 && (
-                    <div className="flex justify-between text-xs font-body">
-                      <span className="text-gray-500">Other Income</span>
-                      <span className="text-gray-900 font-semibold">
-                        {formatCurrency(projectFinancials.totalIncome, summary.currency)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Marketplace */}
-            {marketplaceSummary.totalOrders > 0 && (
-              <div>
-                <h4 className="text-sm font-heading font-semibold text-gray-700 mb-2">Marketplace</h4>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-body">
-                    <span className="text-gray-500">Orders</span>
-                    <span className="text-gray-900 font-semibold">{marketplaceSummary.totalOrders}</span>
-                  </div>
-                  <div className="flex justify-between text-xs font-body">
-                    <span className="text-gray-500">Revenue</span>
-                    <span className="text-gray-900 font-semibold">
-                      {formatCurrency(marketplaceSummary.totalRevenue, summary.currency)}
-                    </span>
-                  </div>
-                  {marketplaceSummary.totalCommission > 0 && (
-                    <div className="flex justify-between text-xs font-body">
-                      <span className="text-gray-500">Commission</span>
-                      <span className="text-gold font-semibold">
-                        {formatCurrency(marketplaceSummary.totalCommission, summary.currency)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Aggregate totals */}
-            <div>
-              <h4 className="text-sm font-heading font-semibold text-gray-700 mb-2">All Sources Total</h4>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs font-body">
-                  <span className="text-gray-500">Itinerary Pipeline</span>
-                  <span className="text-gray-900 font-semibold">
-                    {formatCurrency(summary.pipelineTotal, summary.currency)}
-                  </span>
-                </div>
-                {projectFinancials.totalIncome + projectFinancials.retainers + projectFinancials.adminFees > 0 && (
-                  <div className="flex justify-between text-xs font-body">
-                    <span className="text-gray-500">Project Income</span>
-                    <span className="text-gray-900 font-semibold">
-                      {formatCurrency(
-                        projectFinancials.totalIncome + projectFinancials.retainers + projectFinancials.adminFees,
-                        summary.currency
-                      )}
-                    </span>
-                  </div>
-                )}
-                {marketplaceSummary.totalRevenue > 0 && (
-                  <div className="flex justify-between text-xs font-body">
-                    <span className="text-gray-500">Marketplace</span>
-                    <span className="text-gray-900 font-semibold">
-                      {formatCurrency(marketplaceSummary.totalRevenue, summary.currency)}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm font-body border-t border-gray-100 pt-2 mt-2">
-                  <span className="font-semibold text-gray-700">Grand Total</span>
-                  <span className="font-heading font-semibold text-green">
-                    {formatCurrency(
-                      summary.pipelineTotal +
-                      projectFinancials.totalIncome +
-                      projectFinancials.retainers +
-                      projectFinancials.adminFees +
-                      marketplaceSummary.totalRevenue,
-                      summary.currency
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

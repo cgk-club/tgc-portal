@@ -226,25 +226,52 @@ export default async function AdminDashboard() {
     return 0
   })
 
-  // ── Revenue snapshot ──────────────────────────────────────────
+  // ── Revenue snapshot (TGC actual revenue, not client spend) ──
   const nonCancelled = allPayments.filter((p) => p.payment_status !== 'cancelled')
-  const paidPayments = nonCancelled.filter(
-    (p) => p.payment_status === 'fully_paid' || p.payment_status === 'confirmed'
-  )
 
   const getAmt = (p: typeof nonCancelled[0]) => p.client_amount || p.amount || 0
 
-  const pipelineTotal = nonCancelled.reduce((s, p) => s + getAmt(p), 0)
-  const collected = paidPayments.reduce((s, p) => s + getAmt(p), 0)
-  const outstanding = pipelineTotal - collected
+  // Helper: is this a TGC fee item (planning/concierge fee)?
+  const isTgcFee = (p: typeof nonCancelled[0]) => {
+    const name = p.service_name.toLowerCase()
+    const supplier = (p.supplier_name || '').toLowerCase()
+    return (
+      (name.includes('concierge') || name.includes('planning') || name.includes('fee')) &&
+      (supplier.includes('gatekeeper') || supplier.includes('tgc') || supplier === '')
+    )
+  }
 
-  const feesPending = nonCancelled
-    .filter((p) => {
-      const name = p.service_name.toLowerCase()
-      return (name.includes('concierge') || name.includes('planning') || name.includes('fee')) &&
-        (p.payment_status === 'pending' || p.payment_status === 'deposit_paid')
-    })
+  // Partner bookings: not TGC fees, not zero-margin, not cancelled
+  const partnerBookings = nonCancelled.filter((p) => !isTgcFee(p))
+
+  // Commissions earned: 10% default on partner bookings (use commission_value if set)
+  let commissionsEarned = 0
+  for (const p of partnerBookings) {
+    const amt = getAmt(p)
+    const commType = p.commission_type || ''
+    const commVal = p.commission_value || 0
+    if (commType === 'percentage' && commVal > 0) {
+      commissionsEarned += amt * (commVal / 100)
+    } else if (commType === 'fixed' && commVal > 0) {
+      commissionsEarned += commVal
+    } else {
+      commissionsEarned += amt * 0.10 // default 10%
+    }
+  }
+
+  // Planning fees (TGC fee items)
+  const planningFeesTotal = nonCancelled
+    .filter((p) => isTgcFee(p))
     .reduce((s, p) => s + getAmt(p), 0)
+
+  // Partner revenue generated (total booking value driven to partners)
+  const partnerRevenueTotal = partnerBookings.reduce((s, p) => s + getAmt(p), 0)
+
+  // Fees & retainers placeholder (project_financials fetched separately on revenue page)
+  const feesAndRetainers = planningFeesTotal
+
+  // TGC Revenue total
+  const tgcRevenueTotal = commissionsEarned + feesAndRetainers
 
   const currencyCounts: Record<string, number> = {}
   for (const it of itineraries) {
@@ -254,10 +281,10 @@ export default async function AdminDashboard() {
   const primaryCurrency = Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'EUR'
 
   const revenue: RevenueData = {
-    pipelineTotal,
-    feesPending,
-    collected,
-    outstanding,
+    tgcRevenue: tgcRevenueTotal,
+    commissionsEarned,
+    feesAndRetainers,
+    partnerRevenue: partnerRevenueTotal,
     currency: primaryCurrency,
   }
 

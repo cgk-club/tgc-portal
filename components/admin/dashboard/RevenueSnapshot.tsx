@@ -2,19 +2,19 @@ import Link from 'next/link'
 import { formatCurrency } from '@/lib/quote'
 
 export interface RevenueData {
-  pipelineTotal: number
-  feesPending: number
-  collected: number
-  outstanding: number
+  tgcRevenue: number
+  commissionsEarned: number
+  feesAndRetainers: number
+  partnerRevenue: number
   currency: string
 }
 
 export default function RevenueSnapshot({ revenue }: { revenue: RevenueData }) {
   const cards = [
-    { label: 'Pipeline Value', value: revenue.pipelineTotal, color: 'text-green', filter: 'pipeline' },
-    { label: 'Fees Pending', value: revenue.feesPending, color: 'text-gold', filter: 'fees' },
-    { label: 'Collected', value: revenue.collected, color: 'text-green', filter: 'collected' },
-    { label: 'Outstanding', value: revenue.outstanding, color: 'text-red-600', filter: 'outstanding' },
+    { label: 'TGC Revenue', value: revenue.tgcRevenue, color: 'text-green', filter: 'tgc_revenue' },
+    { label: 'Commissions', value: revenue.commissionsEarned, color: 'text-gold', filter: 'commissions' },
+    { label: 'Fees & Retainers', value: revenue.feesAndRetainers, color: 'text-green', filter: 'fees' },
+    { label: 'Partner Revenue', value: revenue.partnerRevenue, color: 'text-blue-600', filter: 'partner_revenue' },
   ]
 
   return (
