@@ -12,6 +12,7 @@ const navItems = [
   { label: 'Partners', href: '/admin/partners' },
   { label: 'Approvals', href: '/admin/approvals' },
   { label: 'Marketplace', href: '/admin/marketplace' },
+  { label: 'Feedback', href: '/admin/feedback' },
   { label: 'Rates', href: '/admin/rates' },
   { label: 'Events', href: '/admin/events' },
   { label: 'Requests', href: '/admin/requests' },

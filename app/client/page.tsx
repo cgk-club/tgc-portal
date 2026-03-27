@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Itinerary } from '@/types'
 import ClientNav from '@/components/client/ClientNav'
 import GuidedTour, { TOUR_STORAGE_KEY } from '@/components/client/GuidedTour'
+import PortalHelpButton from '@/components/shared/PortalHelpButton'
 
 interface ClientInfo {
   id: string
@@ -390,6 +391,7 @@ export default function ClientDashboardPage() {
         show={showTour}
         onComplete={() => setShowTour(false)}
       />
+      <PortalHelpButton userType="client" />
     </div>
   )
 }

@@ -9,16 +9,16 @@ interface PartnerNavProps {
 }
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/partner", key: "dashboard" },
-  { label: "My Fiche", href: "/partner/fiche", key: "fiche" },
-  { label: "Offers", href: "/partner/offers", key: "offers" },
-  { label: "Events", href: "/partner/events", key: "events" },
-  { label: "Listings", href: "/partner/listings", key: "listings" },
-  { label: "Referrals", href: "/partner/referrals", key: "referrals" },
-  { label: "Content", href: "/partner/content", key: "content" },
-  { label: "Availability", href: "/partner/availability", key: "availability" },
-  { label: "Toolkit", href: "/partner/toolkit", key: "toolkit" },
-  { label: "Network", href: "/partner/network", key: "network" },
+  { label: "Dashboard", href: "/partner", key: "dashboard", tourId: "tour-partner-dashboard" },
+  { label: "My Fiche", href: "/partner/fiche", key: "fiche", tourId: "tour-partner-fiche" },
+  { label: "Offers", href: "/partner/offers", key: "offers", tourId: "tour-partner-offers" },
+  { label: "Events", href: "/partner/events", key: "events", tourId: "tour-partner-events" },
+  { label: "Listings", href: "/partner/listings", key: "listings", tourId: "tour-partner-listings" },
+  { label: "Referrals", href: "/partner/referrals", key: "referrals", tourId: "tour-partner-referrals" },
+  { label: "Content", href: "/partner/content", key: "content", tourId: "tour-partner-content" },
+  { label: "Availability", href: "/partner/availability", key: "availability", tourId: "tour-partner-availability" },
+  { label: "Toolkit", href: "/partner/toolkit", key: "toolkit", tourId: "tour-partner-toolkit" },
+  { label: "Network", href: "/partner/network", key: "network", tourId: "tour-partner-network" },
 ];
 
 export default function PartnerNav({ active }: PartnerNavProps) {
@@ -90,10 +90,11 @@ export default function PartnerNav({ active }: PartnerNavProps) {
         </div>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
+        <nav id="tour-partner-nav" className="hidden sm:flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.key}
+              id={item.tourId}
               href={item.href}
               className={`text-xs font-body whitespace-nowrap px-3 py-2 rounded-sm transition-colors ${
                 active === item.key

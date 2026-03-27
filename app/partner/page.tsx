@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PartnerNav from "@/components/partner/PartnerNav";
+import PartnerGuidedTour, { PARTNER_TOUR_STORAGE_KEY } from "@/components/partner/GuidedTour";
 
 interface PartnerInfo {
   id: string;
@@ -44,6 +45,7 @@ export default function PartnerDashboardPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [settingPassword, setSettingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -63,6 +65,11 @@ export default function PartnerDashboardPage() {
       }
 
       setLoading(false);
+
+      // Auto-show guided tour for first-time visitors
+      if (typeof window !== 'undefined' && !localStorage.getItem(PARTNER_TOUR_STORAGE_KEY)) {
+        setTimeout(() => setShowTour(true), 600);
+      }
     }
     load();
   }, [router]);
@@ -385,7 +392,21 @@ export default function PartnerDashboardPage() {
         <p className="text-sm text-gray-400 font-body mt-2">
           christian@thegatekeepers.club
         </p>
+        <button
+          onClick={() => {
+            localStorage.removeItem(PARTNER_TOUR_STORAGE_KEY);
+            setShowTour(true);
+          }}
+          className="text-xs text-gray-300 hover:text-green font-body mt-3 inline-block transition-colors"
+        >
+          Take a tour
+        </button>
       </footer>
+
+      <PartnerGuidedTour
+        show={showTour}
+        onComplete={() => setShowTour(false)}
+      />
     </div>
   );
 }
