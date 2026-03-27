@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
       members_only: body.members_only || false,
       active: body.active !== false,
       sort_order: body.sort_order || 0,
+      ticket_url: body.ticket_url || null,
+      ticket_provider: body.ticket_provider || null,
+      ticket_commission_rate: body.ticket_commission_rate || null,
     })
     .select()
     .single();

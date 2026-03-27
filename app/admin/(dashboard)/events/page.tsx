@@ -2,6 +2,17 @@
 
 import { useState, useEffect } from "react";
 
+interface AffiliateLink {
+  id: string;
+  event_name: string;
+  url: string;
+  category: string;
+  provider: string;
+  affiliate_id: string;
+  commission_rate: number;
+  notes: string | null;
+}
+
 interface TGCEvent {
   id: string;
   title: string;
@@ -20,6 +31,9 @@ interface TGCEvent {
   members_only: boolean;
   active: boolean;
   sort_order: number;
+  ticket_url: string | null;
+  ticket_provider: string | null;
+  ticket_commission_rate: number | null;
 }
 
 const CATEGORIES = [
@@ -53,6 +67,9 @@ const EMPTY_EVENT: Omit<TGCEvent, "id"> = {
   members_only: false,
   active: true,
   sort_order: 0,
+  ticket_url: null,
+  ticket_provider: null,
+  ticket_commission_rate: null,
 };
 
 export default function AdminEventsPage() {
@@ -61,11 +78,31 @@ export default function AdminEventsPage() {
   const [editing, setEditing] = useState<TGCEvent | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Omit<TGCEvent, "id">>(EMPTY_EVENT);
+  const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>([]);
+  const [showAffiliatePicker, setShowAffiliatePicker] = useState(false);
 
   async function loadEvents() {
     const res = await fetch("/api/admin/events");
     if (res.ok) setEvents(await res.json());
     setLoading(false);
+  }
+
+  async function loadAffiliateLinks() {
+    const res = await fetch("/api/admin/affiliate-links");
+    if (res.ok) {
+      const data = await res.json();
+      setAffiliateLinks(data.links || []);
+    }
+  }
+
+  function selectAffiliateLink(link: AffiliateLink) {
+    setForm((prev) => ({
+      ...prev,
+      ticket_url: link.url,
+      ticket_provider: link.provider || "GooTickets",
+      ticket_commission_rate: link.commission_rate || 2.5,
+    }));
+    setShowAffiliatePicker(false);
   }
 
   useEffect(() => { loadEvents(); }, []);
@@ -96,6 +133,9 @@ export default function AdminEventsPage() {
       members_only: ev.members_only,
       active: ev.active,
       sort_order: ev.sort_order,
+      ticket_url: ev.ticket_url || null,
+      ticket_provider: ev.ticket_provider || null,
+      ticket_commission_rate: ev.ticket_commission_rate || null,
     });
   }
 
@@ -234,6 +274,58 @@ export default function AdminEventsPage() {
               <label className="block text-xs text-gray-500 font-body mb-1">Sort order</label>
               <input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
             </div>
+
+            {/* Ticket Booking Fields */}
+            <div className="sm:col-span-2 border-t border-green/10 pt-4 mt-2">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-xs font-medium text-gold uppercase tracking-wider font-body">Ticket Booking</h3>
+                <button
+                  type="button"
+                  onClick={() => { if (affiliateLinks.length === 0) loadAffiliateLinks(); setShowAffiliatePicker(!showAffiliatePicker); }}
+                  className="text-[10px] px-2 py-0.5 bg-gold/10 text-gold rounded hover:bg-gold/20 transition-colors font-body"
+                >
+                  Browse Affiliate Links
+                </button>
+              </div>
+
+              {/* Affiliate Link Picker */}
+              {showAffiliatePicker && (
+                <div className="mb-4 bg-pearl border border-green/10 rounded-lg p-3 max-h-48 overflow-y-auto">
+                  {affiliateLinks.length === 0 ? (
+                    <p className="text-xs text-gray-400 font-body">No affiliate links found. Add them via the API or database.</p>
+                  ) : (
+                    <div className="space-y-1">
+                      {affiliateLinks.map((link) => (
+                        <button
+                          key={link.id}
+                          type="button"
+                          onClick={() => selectAffiliateLink(link)}
+                          className="w-full text-left px-3 py-2 rounded hover:bg-gold/10 transition-colors flex items-center justify-between"
+                        >
+                          <div>
+                            <p className="text-xs font-medium text-gray-700 font-body">{link.event_name}</p>
+                            <p className="text-[10px] text-gray-400 font-body">{link.provider} &middot; {link.commission_rate}% commission</p>
+                          </div>
+                          <span className="text-[9px] text-green/60 bg-green-muted px-1.5 py-0.5 rounded font-body">{link.category}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-500 font-body mb-1">Ticket Booking URL</label>
+              <input value={form.ticket_url || ""} onChange={(e) => setForm({ ...form, ticket_url: e.target.value || null })} placeholder="https://www.gootickets.com/en/..." className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">Ticket Provider</label>
+              <input value={form.ticket_provider || ""} onChange={(e) => setForm({ ...form, ticket_provider: e.target.value || null })} placeholder="e.g. GooTickets" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">Commission Rate (%)</label>
+              <input type="number" step="0.1" value={form.ticket_commission_rate || ""} onChange={(e) => setForm({ ...form, ticket_commission_rate: e.target.value ? parseFloat(e.target.value) : null })} placeholder="e.g. 2.5" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+            </div>
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2 text-sm font-body">
                 <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
@@ -284,13 +376,18 @@ export default function AdminEventsPage() {
                   <span className="text-xs text-green/70 bg-green-muted px-2 py-0.5 rounded">{ev.category}</span>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
                     <button onClick={() => toggleActive(ev)} className={`text-[10px] px-2 py-0.5 rounded font-body ${ev.active ? "bg-green/10 text-green" : "bg-gray-100 text-gray-400"}`}>
                       {ev.active ? "Active" : "Inactive"}
                     </button>
                     <button onClick={() => toggleFeatured(ev)} className={`text-[10px] px-2 py-0.5 rounded font-body ${ev.featured ? "bg-gold/20 text-gold" : "bg-gray-50 text-gray-300"}`}>
                       {ev.featured ? "Featured" : "Standard"}
                     </button>
+                    {ev.ticket_url && (
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-gold/10 text-gold">
+                        Tickets
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-right">

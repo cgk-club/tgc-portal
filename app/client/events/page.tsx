@@ -19,6 +19,9 @@ interface TGCEvent {
   includes: string | null;
   image_url: string | null;
   featured: boolean;
+  ticket_url: string | null;
+  ticket_provider: string | null;
+  ticket_commission_rate: number | null;
 }
 
 export default function ClientEventsPage() {
@@ -98,7 +101,14 @@ export default function ClientEventsPage() {
                   <p className="text-xs text-gray-500 font-body">{ev.date_display}</p>
                   <p className="text-xs text-gray-400 font-body mb-2">{ev.location}</p>
                   <p className="text-xs text-gray-400 font-body line-clamp-2">{ev.description}</p>
-                  <span className="inline-block mt-3 text-xs text-green font-body">View details &#8594;</span>
+                  <div className="flex items-center gap-2 mt-3">
+                    <span className="text-xs text-green font-body">View details &#8594;</span>
+                    {ev.ticket_url && (
+                      <span className="text-[9px] text-gold bg-gold/10 px-1.5 py-0.5 rounded font-body">
+                        Tickets available
+                      </span>
+                    )}
+                  </div>
                 </div>
               </button>
             ))}
@@ -245,8 +255,33 @@ export default function ClientEventsPage() {
                 </div>
               )}
 
+              {/* Ticket Booking */}
+              {selectedEvent.ticket_url && (
+                <div className="mt-8 pt-6 border-t border-green/10">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <a
+                      href={selectedEvent.ticket_url}
+                      target="_blank"
+                      rel="noopener"
+                      onClick={() => console.log(`[TGC] Ticket click: ${selectedEvent.title}`, { provider: selectedEvent.ticket_provider, url: selectedEvent.ticket_url })}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-white text-sm font-medium rounded-md hover:bg-[#b89a3f] transition-colors font-body shadow-sm"
+                    >
+                      Book Tickets
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                    {selectedEvent.ticket_provider && (
+                      <span className="text-[10px] text-gray-400 font-body">
+                        via {selectedEvent.ticket_provider}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-green/10">
+              <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-green/10">
                 <a
                   href={`/events/enquiry?event=${encodeURIComponent(selectedEvent.title)}&type=enquiry`}
                   className="flex-1 text-center px-5 py-3 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body"
