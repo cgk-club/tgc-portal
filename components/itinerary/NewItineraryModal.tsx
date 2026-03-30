@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import ClientSelect from '@/components/admin/ClientSelect'
 
 interface NewItineraryModalProps {
   onClose: () => void
@@ -12,6 +13,7 @@ interface NewItineraryModalProps {
 export default function NewItineraryModal({ onClose, onCreated }: NewItineraryModalProps) {
   const [clientName, setClientName] = useState('')
   const [clientEmail, setClientEmail] = useState('')
+  const [clientAccountId, setClientAccountId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
   const [numDays, setNumDays] = useState(3)
@@ -31,6 +33,7 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
       body: JSON.stringify({
         client_name: clientName,
         client_email: clientEmail || undefined,
+        client_account_id: clientAccountId || undefined,
         title,
         start_date: startDate || undefined,
         num_days: numDays,
@@ -60,6 +63,16 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <ClientSelect
+            value={clientAccountId}
+            onChange={(id, client) => {
+              setClientAccountId(id)
+              if (client) {
+                setClientName(client.name || '')
+                setClientEmail(client.email)
+              }
+            }}
+          />
           <Input
             label="Client name"
             placeholder="e.g. Thompson Family"

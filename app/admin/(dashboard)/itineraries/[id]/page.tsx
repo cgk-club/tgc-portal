@@ -8,6 +8,7 @@ import ShareButton from '@/components/itinerary/ShareButton'
 import PDFExport from '@/components/itinerary/PDFExport'
 import QuotePanel from '@/components/quote/QuotePanel'
 import ImageUploader from '@/components/admin/ImageUploader'
+import ClientSelect from '@/components/admin/ClientSelect'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 // ChoiceGroupEditor loaded on full-width page at /admin/itineraries/[id]/choices
@@ -25,6 +26,7 @@ export default function ItineraryBuilderPage() {
   // Editable fields
   const [clientName, setClientName] = useState('')
   const [clientEmail, setClientEmail] = useState('')
+  const [clientAccountId, setClientAccountId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
   const [coverImageUrl, setCoverImageUrl] = useState('')
@@ -37,6 +39,7 @@ export default function ItineraryBuilderPage() {
       setItinerary(data)
       setClientName(data.client_name)
       setClientEmail(data.client_email || '')
+      setClientAccountId(data.client_account_id || null)
       setTitle(data.title)
       setStartDate(data.start_date || '')
       setCoverImageUrl(data.cover_image_url || '')
@@ -57,6 +60,7 @@ export default function ItineraryBuilderPage() {
       body: JSON.stringify({
         client_name: clientName,
         client_email: clientEmail || null,
+        client_account_id: clientAccountId || null,
         title,
         start_date: startDate || null,
         cover_image_url: coverImageUrl || null,
@@ -205,6 +209,16 @@ export default function ItineraryBuilderPage() {
             <div className="p-6">
               {activeTab === 'details' ? (
                 <div className="space-y-4">
+                  <ClientSelect
+                    value={clientAccountId}
+                    onChange={(id, client) => {
+                      setClientAccountId(id)
+                      if (client) {
+                        setClientName(client.name || '')
+                        setClientEmail(client.email)
+                      }
+                    }}
+                  />
                   <Input
                     label="Client name"
                     value={clientName}

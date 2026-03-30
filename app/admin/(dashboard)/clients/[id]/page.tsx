@@ -23,6 +23,14 @@ interface PointsEntry {
   created_at: string
 }
 
+interface UnlinkedItinerary {
+  id: string
+  title: string
+  client_name: string
+  client_account_id: string | null
+  status: string
+}
+
 export default function ClientDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -36,6 +44,10 @@ export default function ClientDetailPage() {
   const [pointsAmount, setPointsAmount] = useState('')
   const [pointsDesc, setPointsDesc] = useState('')
   const [addingPoints, setAddingPoints] = useState(false)
+  const [showAssign, setShowAssign] = useState(false)
+  const [unlinkedItineraries, setUnlinkedItineraries] = useState<UnlinkedItinerary[]>([])
+  const [assignSearch, setAssignSearch] = useState('')
+  const [assigning, setAssigning] = useState(false)
 
   const fetchClient = useCallback(async () => {
     const res = await fetch(`/api/admin/clients/${id}`)
@@ -80,6 +92,34 @@ export default function ClientDetailPage() {
       fetchPoints()
     }
     setAddingPoints(false)
+  }
+
+  async function fetchUnlinkedItineraries() {
+    const res = await fetch('/api/admin/itineraries')
+    if (res.ok) {
+      const all: UnlinkedItinerary[] = await res.json()
+      setUnlinkedItineraries(all.filter(it => !it.client_account_id))
+    }
+  }
+
+  async function assignItinerary(itineraryId: string) {
+    if (!client) return
+    setAssigning(true)
+    const res = await fetch(`/api/admin/itineraries/${itineraryId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_account_id: client.id,
+        client_name: client.name || client.email,
+        client_email: client.email,
+      }),
+    })
+    if (res.ok) {
+      setShowAssign(false)
+      setAssignSearch('')
+      fetchClient()
+    }
+    setAssigning(false)
   }
 
   if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>
@@ -166,12 +206,65 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Itineraries */}
-      <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4 font-body">Itineraries</h2>
-      {client.itineraries.length === 0 ? (
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Itineraries</h2>
+        <button
+          onClick={() => {
+            if (!showAssign) fetchUnlinkedItineraries()
+            setShowAssign(!showAssign)
+            setAssignSearch('')
+          }}
+          className="text-xs text-green hover:underline font-body"
+        >
+          {showAssign ? 'Cancel' : '+ Assign Itinerary'}
+        </button>
+      </div>
+
+      {showAssign && (
+        <div className="bg-pearl border border-green/10 rounded-lg p-4 mb-4">
+          <input
+            type="text"
+            placeholder="Search itineraries..."
+            value={assignSearch}
+            onChange={(e) => setAssignSearch(e.target.value)}
+            className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body mb-2 focus:border-green focus:outline-none"
+          />
+          <div className="max-h-48 overflow-y-auto">
+            {unlinkedItineraries
+              .filter(it => {
+                if (!assignSearch) return true
+                const q = assignSearch.toLowerCase()
+                return it.title.toLowerCase().includes(q) || it.client_name.toLowerCase().includes(q)
+              })
+              .map(it => (
+                <button
+                  key={it.id}
+                  onClick={() => assignItinerary(it.id)}
+                  disabled={assigning}
+                  className="w-full text-left px-3 py-2 text-sm font-body hover:bg-green-muted rounded transition-colors flex items-center justify-between disabled:opacity-50"
+                >
+                  <span>
+                    <span className="text-gray-900 font-medium">{it.title}</span>
+                    <span className="text-gray-400 ml-2">({it.client_name})</span>
+                  </span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${it.status === 'shared' ? 'bg-green-muted text-green' : it.status === 'archived' ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
+                    {it.status}
+                  </span>
+                </button>
+              ))
+            }
+            {unlinkedItineraries.length === 0 && (
+              <p className="text-sm text-gray-400 font-body px-3 py-2">No unlinked itineraries found</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {client.itineraries.length === 0 && !showAssign ? (
         <div className="bg-white rounded-lg border border-green/10 p-8 text-center">
           <p className="text-gray-500 font-body text-sm">No itineraries linked to this client yet.</p>
         </div>
-      ) : (
+      ) : client.itineraries.length > 0 ? (
         <div className="bg-white rounded-lg border border-green/10 overflow-hidden">
           <table className="w-full">
             <thead>
@@ -194,7 +287,7 @@ export default function ClientDetailPage() {
             </tbody>
           </table>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

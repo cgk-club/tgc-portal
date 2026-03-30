@@ -11,6 +11,7 @@ function sb() {
 export async function createItinerary(data: {
   client_name: string
   client_email?: string
+  client_account_id?: string
   title: string
   slug: string
   start_date?: string
@@ -20,6 +21,7 @@ export async function createItinerary(data: {
     .insert({
       client_name: data.client_name,
       client_email: data.client_email || null,
+      client_account_id: data.client_account_id || null,
       title: data.title,
       slug: data.slug,
       start_date: data.start_date || null,
