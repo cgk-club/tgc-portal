@@ -230,8 +230,9 @@ export default function ProjectDetailPage() {
   // Document state
   const [showAddDoc, setShowAddDoc] = useState(false)
   const [newDocTitle, setNewDocTitle] = useState('')
-  const [newDocUrl, setNewDocUrl] = useState('')
+  const [newDocFile, setNewDocFile] = useState<File | null>(null)
   const [newDocNotes, setNewDocNotes] = useState('')
+  const [uploadProgress, setUploadProgress] = useState(false)
 
   // Financial state
   const [showAddFinancial, setShowAddFinancial] = useState(false)
@@ -427,27 +428,62 @@ export default function ProjectDetailPage() {
 
   async function addDocument(e: React.FormEvent) {
     e.preventDefault()
-    if (!newDocTitle.trim() || !newDocUrl.trim()) return
+    if (!newDocTitle.trim() || !newDocFile) return
     setSaving(true)
+    setUploadProgress(true)
 
-    const res = await fetch(`/api/admin/projects/${id}/documents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: newDocTitle.trim(),
-        file_url: newDocUrl.trim(),
-        notes: newDocNotes.trim() || null,
-      }),
-    })
+    try {
+      // Step 1: Upload file to Supabase storage
+      const formData = new FormData()
+      formData.append('file', newDocFile)
 
-    if (res.ok) {
-      setShowAddDoc(false)
-      setNewDocTitle('')
-      setNewDocUrl('')
-      setNewDocNotes('')
-      fetchProject()
+      const uploadRes = await fetch(`/api/admin/projects/${id}/documents/upload`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!uploadRes.ok) {
+        const err = await uploadRes.json()
+        alert(`Upload failed: ${err.error || 'Unknown error'}`)
+        setSaving(false)
+        setUploadProgress(false)
+        return
+      }
+
+      const { url } = await uploadRes.json()
+
+      // Step 2: Detect file type from extension
+      const ext = newDocFile.name.split('.').pop()?.toLowerCase() || ''
+      const fileTypeMap: Record<string, string> = {
+        pdf: 'PDF', doc: 'Word', docx: 'Word',
+        jpg: 'Image', jpeg: 'Image', png: 'Image', webp: 'Image',
+      }
+      const fileType = fileTypeMap[ext] || ext.toUpperCase()
+
+      // Step 3: Save document record
+      const res = await fetch(`/api/admin/projects/${id}/documents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newDocTitle.trim(),
+          file_url: url,
+          file_type: fileType,
+          notes: newDocNotes.trim() || null,
+        }),
+      })
+
+      if (res.ok) {
+        setShowAddDoc(false)
+        setNewDocTitle('')
+        setNewDocFile(null)
+        setNewDocNotes('')
+        fetchProject()
+      }
+    } catch (err) {
+      alert('Upload failed. Please try again.')
     }
     setSaving(false)
+    setUploadProgress(false)
   }
 
   // ── Financial actions ────────────────────────────────────────
@@ -1119,14 +1155,23 @@ export default function ProjectDetailPage() {
                         {d.uploaded_by && <span className="ml-1 text-gray-300">by {d.uploaded_by}</span>}
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <a
-                          href={d.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-green hover:text-green-light font-medium"
-                        >
-                          Open
-                        </a>
+                        {d.file_url?.startsWith('local://') ? (
+                          <span
+                            className="text-xs text-gray-400 font-medium cursor-not-allowed"
+                            title="Local file path. Re-upload this document to make it accessible."
+                          >
+                            Local file
+                          </span>
+                        ) : (
+                          <a
+                            href={d.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-green hover:text-green-light font-medium"
+                          >
+                            Open
+                          </a>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1157,15 +1202,29 @@ export default function ProjectDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">File URL</label>
-                    <input
-                      required
-                      type="url"
-                      value={newDocUrl}
-                      onChange={(e) => setNewDocUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">File</label>
+                    <div className="relative">
+                      <input
+                        required
+                        type="file"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null
+                          setNewDocFile(file)
+                          // Auto-fill title from filename if title is empty
+                          if (file && !newDocTitle.trim()) {
+                            const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ')
+                            setNewDocTitle(nameWithoutExt)
+                          }
+                        }}
+                        className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 font-body file:mr-3 file:rounded-[4px] file:border-0 file:bg-green/10 file:px-3 file:py-1 file:text-xs file:font-medium file:text-green hover:file:bg-green/20 file:cursor-pointer"
+                      />
+                    </div>
+                    {newDocFile && (
+                      <p className="mt-1 text-xs text-gray-500 font-body">
+                        {newDocFile.name} ({(newDocFile.size / 1024 / 1024).toFixed(1)} MB)
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Notes</label>
@@ -1178,8 +1237,8 @@ export default function ProjectDetailPage() {
                   </div>
                   <div className="flex justify-end gap-3 pt-2">
                     <Button variant="ghost" type="button" onClick={() => setShowAddDoc(false)}>Cancel</Button>
-                    <Button type="submit" disabled={saving || !newDocTitle.trim() || !newDocUrl.trim()}>
-                      {saving ? 'Adding...' : 'Add Document'}
+                    <Button type="submit" disabled={saving || !newDocTitle.trim() || !newDocFile}>
+                      {uploadProgress ? 'Uploading...' : saving ? 'Saving...' : 'Upload Document'}
                     </Button>
                   </div>
                 </form>
