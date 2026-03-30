@@ -11,6 +11,7 @@ interface ClientAccount {
   created_at: string
   last_login: string | null
   points_balance: number
+  last_magic_link_sent: string | null
 }
 
 export default function ClientsPage() {
@@ -77,6 +78,7 @@ export default function ClientsPage() {
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Last login</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Magic link sent</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
@@ -94,6 +96,11 @@ export default function ClientsPage() {
                     {c.last_login
                       ? new Date(c.last_login).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                       : 'Never'}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-500">
+                    {c.last_magic_link_sent
+                      ? new Date(c.last_magic_link_sent).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : <span className="text-gray-300">&mdash;</span>}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-sm text-green hover:text-green-light font-medium">View</span>
