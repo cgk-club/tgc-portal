@@ -57,7 +57,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-semibold text-green">Clients</h1>
         <Button onClick={() => setShowNew(true)}>+ New Client</Button>
@@ -71,7 +71,8 @@ export default function ClientsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -109,6 +110,7 @@ export default function ClientsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

@@ -586,7 +586,7 @@ export default function AdminMarketplacePage() {
 
   // ── Render ─────────────────────────────────────────────────
 
-  if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading marketplace...</p></div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading marketplace...</p></div>
 
   return (
     <div className="p-6 sm:p-8">

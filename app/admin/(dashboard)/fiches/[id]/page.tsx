@@ -26,7 +26,7 @@ export default function FicheEditPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <p className="text-gray-500 font-body">Loading...</p>
       </div>
     )
@@ -34,14 +34,14 @@ export default function FicheEditPage() {
 
   if (error || !fiche) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <p className="text-red-600 font-body">{error || 'Fiche not found'}</p>
       </div>
     )
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="font-heading text-2xl font-semibold text-green mb-6">
         {fiche.org?.name || fiche.slug}
       </h1>

@@ -48,7 +48,7 @@ export default function AdminRequestsPage() {
     load();
   }, []);
 
-  if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>;
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading...</p></div>;
 
   const statusColor = (s: string) => {
     if (s === "new") return "bg-gold/15 text-gold";

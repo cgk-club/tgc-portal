@@ -207,11 +207,11 @@ export default function PartnerDetailPage() {
     setAddingUser(false)
   }
 
-  if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>
-  if (!partner) return <div className="p-8"><p className="text-gray-500 font-body">Partner not found.</p></div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading...</p></div>
+  if (!partner) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Partner not found.</p></div>
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <button onClick={() => router.push('/admin/partners')} className="text-sm text-gray-500 hover:text-green font-body mb-6 block">
         {'\u2190'} Back to Partners
       </button>

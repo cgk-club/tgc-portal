@@ -614,8 +614,8 @@ export default function ProjectDetailPage() {
 
   // ── Render ───────────────────────────────────────────────────
 
-  if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>
-  if (!project) return <div className="p-8"><p className="text-gray-500 font-body">Project not found.</p></div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading...</p></div>
+  if (!project) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Project not found.</p></div>
 
   const filteredUpdates = activityFilter
     ? project.updates.filter(u => u.author_type === activityFilter)

@@ -31,6 +31,7 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [open, setOpen] = useState(false)
   const [counts, setCounts] = useState<NotificationCounts>({
     approvals: 0,
     requests: 0,
@@ -61,21 +62,37 @@ export default function AdminSidebar() {
     }
   }, [])
 
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
   async function handleLogout() {
     await fetch('/api/admin/auth', { method: 'DELETE' })
     router.push('/admin/login')
     router.refresh()
   }
 
-  return (
-    <aside className="w-64 bg-green min-h-screen flex flex-col">
-      <div className="p-6">
+  const navContent = (
+    <>
+      <div className="p-6 flex items-center justify-between">
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">
           TGC ADMIN
         </span>
+        {/* Close button: mobile only */}
+        <button
+          onClick={() => setOpen(false)}
+          className="md:hidden text-white/70 hover:text-white p-1"
+          aria-label="Close menu"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
-      <nav className="flex-1 px-3">
+      <nav className="flex-1 px-3 overflow-y-auto">
         {navItems.map((item) => {
           const active = item.href === '/admin'
             ? pathname === '/admin'
@@ -113,6 +130,51 @@ export default function AdminSidebar() {
           Sign out
         </button>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-green h-14 flex items-center px-4 shadow-sm">
+        <button
+          onClick={() => setOpen(true)}
+          className="text-white p-1 mr-3"
+          aria-label="Open menu"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <span className="font-heading text-sm font-semibold tracking-wider text-gold">
+          TGC ADMIN
+        </span>
+      </div>
+
+      {/* Mobile overlay */}
+      {open && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/50"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Mobile slide-out sidebar */}
+      <aside
+        className={cn(
+          'md:hidden fixed top-0 left-0 z-50 w-64 bg-green h-full flex flex-col transition-transform duration-200 ease-in-out',
+          open ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {navContent}
+      </aside>
+
+      {/* Desktop sidebar (always visible) */}
+      <aside className="hidden md:flex w-64 bg-green min-h-screen flex-col flex-shrink-0">
+        {navContent}
+      </aside>
+    </>
   )
 }

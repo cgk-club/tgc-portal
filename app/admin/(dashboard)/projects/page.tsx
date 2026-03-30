@@ -241,7 +241,7 @@ export default function AdminProjectsPage() {
           placeholder="Search title or address..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-1.5 border border-green/20 rounded-[4px] text-xs font-body text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-green w-56"
+          className="px-3 py-1.5 border border-green/20 rounded-[4px] text-xs font-body text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-green w-full sm:w-56"
         />
       </div>
 
@@ -254,7 +254,8 @@ export default function AdminProjectsPage() {
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-green/10 overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-green/10 bg-pearl">
                 <th className="text-left px-4 py-3 text-xs text-gray-400 font-body font-medium">Client</th>
@@ -300,6 +301,7 @@ export default function AdminProjectsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

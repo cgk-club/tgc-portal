@@ -174,9 +174,9 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
   const publicUrl = `${appUrl}/fiche/${slug}`
 
   return (
-    <div className="flex gap-8">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
       {/* Left Column */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 min-w-0 space-y-6">
         <ImageUploader
           label="Hero Image"
           currentUrl={heroImageUrl || null}
@@ -330,7 +330,7 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
       </div>
 
       {/* Right Column */}
-      <div className="w-80 space-y-6">
+      <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
         {/* Airtable Source Data */}
         {org && (
           <div className="bg-white rounded-[8px] border border-gray-200 p-4">

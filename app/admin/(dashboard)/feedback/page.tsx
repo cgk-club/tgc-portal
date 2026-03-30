@@ -90,7 +90,7 @@ export default function AdminFeedbackPage() {
 
   if (loading) {
     return (
-      <div className="p-8 sm:p-12">
+      <div className="p-4 sm:p-6 lg:p-12">
         <p className="text-gray-400 font-body">Loading feedback...</p>
       </div>
     )
@@ -105,7 +105,7 @@ export default function AdminFeedbackPage() {
   }
 
   return (
-    <div className="p-8 sm:p-12 max-w-5xl">
+    <div className="p-4 sm:p-6 lg:p-12 max-w-5xl">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-heading text-2xl font-semibold text-green">Feedback</h1>

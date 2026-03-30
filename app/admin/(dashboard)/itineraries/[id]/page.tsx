@@ -81,28 +81,28 @@ export default function ItineraryBuilderPage() {
   }
 
   if (loading) {
-    return <div className="p-8"><p className="text-gray-500 font-body">Loading...</p></div>
+    return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading...</p></div>
   }
 
   if (!itinerary) {
-    return <div className="p-8"><p className="text-gray-500 font-body">Itinerary not found.</p></div>
+    return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Itinerary not found.</p></div>
   }
 
   const days = itinerary.days || []
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/admin/itineraries')}
             className="text-sm text-gray-500 hover:text-green font-body"
           >
-            {'\u2190'} Back to Itineraries
+            {'\u2190'} Back
           </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             variant="ghost"
             size="sm"
@@ -161,12 +161,12 @@ export default function ItineraryBuilderPage() {
 
         {/* Right Panel: Tabs */}
         <div className="w-full lg:w-80 flex-shrink-0">
-          <div className="bg-white rounded-[8px] border border-gray-200 sticky top-8">
+          <div className="bg-white rounded-[8px] border border-gray-200 lg:sticky lg:top-8">
             {/* Tab headers */}
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-gray-200 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('details')}
-                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex-1 min-w-0 px-3 sm:px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${
                   activeTab === 'details'
                     ? 'text-green border-b-2 border-green'
                     : 'text-gray-400 hover:text-gray-600'
@@ -176,7 +176,7 @@ export default function ItineraryBuilderPage() {
               </button>
               <button
                 onClick={() => setActiveTab('quote')}
-                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex-1 min-w-0 px-3 sm:px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${
                   activeTab === 'quote'
                     ? 'text-green border-b-2 border-green'
                     : 'text-gray-400 hover:text-gray-600'
@@ -186,17 +186,17 @@ export default function ItineraryBuilderPage() {
               </button>
               <button
                 onClick={() => setActiveTab('payments')}
-                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex-1 min-w-0 px-3 sm:px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${
                   activeTab === 'payments'
                     ? 'text-green border-b-2 border-green'
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
-                Payments
+                Pay
               </button>
               <button
                 onClick={() => setActiveTab('choices')}
-                className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex-1 min-w-0 px-3 sm:px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap ${
                   activeTab === 'choices'
                     ? 'text-green border-b-2 border-green'
                     : 'text-gray-400 hover:text-gray-600'

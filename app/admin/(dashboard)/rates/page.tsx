@@ -128,13 +128,13 @@ export default function RatesPage() {
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-semibold text-green">Supplier Rates</h1>
         <Button onClick={openNew}>Add Rate</Button>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
         <div className="flex-1">
           <Input
             placeholder="Search supplier, service, project..."
@@ -242,12 +242,12 @@ export default function RatesPage() {
               </h2>
               <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
             </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Supplier name" value={form.supplier_name} onChange={(e) => updateField('supplier_name', e.target.value)} />
                 <Input label="Service" placeholder="e.g. Sea View Deluxe Room" value={form.service} onChange={(e) => updateField('service', e.target.value)} />
               </div>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Input label="Rate" type="number" value={form.rate} onChange={(e) => updateField('rate', e.target.value)} />
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
@@ -279,17 +279,17 @@ export default function RatesPage() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input label="VAT %" type="number" placeholder="e.g. 10" value={form.vat_rate} onChange={(e) => updateField('vat_rate', e.target.value)} />
                 <Input label="Commission %" type="number" placeholder="e.g. 10" value={form.commission_pct} onChange={(e) => updateField('commission_pct', e.target.value)} />
                 <Input label="Variant" placeholder="e.g. Deluxe Sea View" value={form.variant} onChange={(e) => updateField('variant', e.target.value)} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Valid from" type="date" value={form.valid_from} onChange={(e) => updateField('valid_from', e.target.value)} />
                 <Input label="Valid to" type="date" value={form.valid_to} onChange={(e) => updateField('valid_to', e.target.value)} />
               </div>
               <Input label="Client project" placeholder="e.g. Vitor Lima Babymoon" value={form.client_project} onChange={(e) => updateField('client_project', e.target.value)} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Source contact" placeholder="e.g. Melania Laccioli" value={form.source_contact} onChange={(e) => updateField('source_contact', e.target.value)} />
                 <Input label="Source date" type="date" value={form.source_date} onChange={(e) => updateField('source_date', e.target.value)} />
               </div>
@@ -304,7 +304,7 @@ export default function RatesPage() {
                   placeholder="e.g. 30 days prior, full stay penalty"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select value={form.status} onChange={(e) => updateField('status', e.target.value)} className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm focus:border-green focus:outline-none focus:ring-1 focus:ring-green">

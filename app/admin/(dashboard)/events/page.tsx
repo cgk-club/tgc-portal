@@ -197,7 +197,7 @@ export default function AdminEventsPage() {
     setForm(EMPTY_EVENT);
   }
 
-  if (loading) return <div className="p-8"><p className="text-gray-500 font-body">Loading events...</p></div>;
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading events...</p></div>;
 
   const showForm = creating || editing;
 
@@ -354,7 +354,8 @@ export default function AdminEventsPage() {
 
       {/* Events List */}
       <div className="bg-white border border-green/10 rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-green/10 bg-pearl">
               <th className="text-left px-4 py-3 text-xs text-gray-500 font-body font-medium">Event</th>
@@ -398,6 +399,7 @@ export default function AdminEventsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

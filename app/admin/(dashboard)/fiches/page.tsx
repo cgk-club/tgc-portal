@@ -86,13 +86,13 @@ export default function FicheListPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-semibold text-green">Fiches</h1>
         <Button onClick={() => setShowNewModal(true)}>New Fiche</Button>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
         <div className="flex-1">
           <Input
             placeholder="Search by name..."
@@ -100,24 +100,26 @@ export default function FicheListPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-        >
-          <option value="">All statuses</option>
-          <option value="draft">Draft</option>
-          <option value="live">Live</option>
-          <option value="archived">Archived</option>
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'recent' | 'enrichment')}
-          className="rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
-        >
-          <option value="recent">Most recent</option>
-          <option value="enrichment">Needs attention</option>
-        </select>
+        <div className="flex gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="flex-1 sm:flex-none rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+          >
+            <option value="">All statuses</option>
+            <option value="draft">Draft</option>
+            <option value="live">Live</option>
+            <option value="archived">Archived</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'recent' | 'enrichment')}
+            className="flex-1 sm:flex-none rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+          >
+            <option value="recent">Most recent</option>
+            <option value="enrichment">Needs attention</option>
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -128,7 +130,8 @@ export default function FicheListPage() {
         </div>
       ) : (
         <div className="bg-white rounded-[8px] border border-gray-200 overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -180,6 +183,7 @@ export default function FicheListPage() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

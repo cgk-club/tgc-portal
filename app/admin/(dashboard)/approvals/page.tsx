@@ -157,7 +157,7 @@ export default function ApprovalsPage() {
   const reviewedContent = content.filter((c) => c.status !== 'submitted' && c.status !== 'draft')
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="font-heading text-2xl font-semibold text-green mb-6">Approvals</h1>
 
       {/* Tabs */}
