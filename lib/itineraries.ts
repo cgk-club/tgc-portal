@@ -16,12 +16,23 @@ export async function createItinerary(data: {
   slug: string
   start_date?: string
 }): Promise<Itinerary> {
+  // Auto-link: if email provided but no account ID, look up client account
+  let accountId = data.client_account_id || null
+  if (!accountId && data.client_email) {
+    const { data: account } = await sb()
+      .from('client_accounts')
+      .select('id')
+      .eq('email', data.client_email)
+      .single()
+    if (account) accountId = account.id
+  }
+
   const { data: itinerary, error } = await sb()
     .from('itineraries')
     .insert({
       client_name: data.client_name,
       client_email: data.client_email || null,
-      client_account_id: data.client_account_id || null,
+      client_account_id: accountId,
       title: data.title,
       slug: data.slug,
       start_date: data.start_date || null,
@@ -176,6 +187,16 @@ export async function updateItinerary(
     if (field in data) {
       updates[field] = (data as Record<string, unknown>)[field]
     }
+  }
+
+  // Auto-link: if client_email is being set/changed and no client_account_id provided, look up
+  if (updates.client_email && !updates.client_account_id) {
+    const { data: account } = await sb()
+      .from('client_accounts')
+      .select('id')
+      .eq('email', updates.client_email as string)
+      .single()
+    if (account) updates.client_account_id = account.id
   }
 
   const { data: itinerary, error } = await sb()
