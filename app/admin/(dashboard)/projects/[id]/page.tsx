@@ -486,6 +486,19 @@ export default function ProjectDetailPage() {
     setUploadProgress(false)
   }
 
+  async function deleteDocument(docId: string) {
+    if (!confirm('Delete this document?')) return
+    const res = await fetch(`/api/admin/projects/${id}/documents/${docId}`, {
+      method: 'DELETE',
+    })
+    if (res.ok) {
+      fetchProject()
+    } else {
+      const err = await res.json().catch(() => ({}))
+      alert(`Delete failed: ${err.error || 'Unknown error'}`)
+    }
+  }
+
   // ── Financial actions ────────────────────────────────────────
 
   async function addFinancial(e: React.FormEvent) {
@@ -1155,23 +1168,34 @@ export default function ProjectDetailPage() {
                         {d.uploaded_by && <span className="ml-1 text-gray-300">by {d.uploaded_by}</span>}
                       </td>
                       <td className="px-4 py-2 text-right">
-                        {d.file_url?.startsWith('local://') ? (
-                          <span
-                            className="text-xs text-gray-400 font-medium cursor-not-allowed"
-                            title="Local file path. Re-upload this document to make it accessible."
+                        <div className="flex items-center justify-end gap-2">
+                          {d.file_url?.startsWith('local://') ? (
+                            <span
+                              className="text-xs text-gray-400 font-medium cursor-not-allowed"
+                              title="Local file path. Re-upload this document to make it accessible."
+                            >
+                              Local file
+                            </span>
+                          ) : (
+                            <a
+                              href={d.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-green hover:text-green-light font-medium"
+                            >
+                              Open
+                            </a>
+                          )}
+                          <button
+                            onClick={() => deleteDocument(d.id)}
+                            className="text-xs text-gray-300 hover:text-red-500 transition-colors"
+                            title="Delete document"
                           >
-                            Local file
-                          </span>
-                        ) : (
-                          <a
-                            href={d.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-green hover:text-green-light font-medium"
-                          >
-                            Open
-                          </a>
-                        )}
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

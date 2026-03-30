@@ -225,6 +225,21 @@ export default function ProjectDetailPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  async function handleDeleteDocument(docId: string) {
+    if (!confirm("Delete this document?")) return;
+
+    const res = await fetch(`/api/client/projects/${projectId}/documents/${docId}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      loadProject();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      alert(err.error || "Failed to delete document");
+    }
+  }
+
   // ── Loading / Error states ──────────────────────────────────────
 
   if (loading) {
@@ -604,17 +619,24 @@ export default function ProjectDetailPage() {
                             : "bg-gold/10 text-gold";
 
                           return (
-                            <a
+                            <div
                               key={doc.id}
-                              href={doc.file_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
                               className="flex items-start gap-3 p-3 border border-green/10 rounded-lg hover:border-green/25 transition-colors group"
                             >
-                              <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center flex-none">
+                              <a
+                                href={doc.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center flex-none"
+                              >
                                 <span className="text-[10px] font-body font-bold text-gray-500">{typeLabel}</span>
-                              </div>
-                              <div className="flex-1 min-w-0">
+                              </a>
+                              <a
+                                href={doc.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 min-w-0"
+                              >
                                 <h4 className="text-xs font-body font-medium text-gray-700 truncate group-hover:text-green transition-colors">
                                   {doc.title}
                                 </h4>
@@ -632,8 +654,19 @@ export default function ProjectDetailPage() {
                                 {doc.notes && (
                                   <p className="text-[10px] text-gray-400 font-body mt-1 line-clamp-1">{doc.notes}</p>
                                 )}
-                              </div>
-                            </a>
+                              </a>
+                              {doc.uploaded_by_type === "client" && (
+                                <button
+                                  onClick={() => handleDeleteDocument(doc.id)}
+                                  className="flex-none p-1 text-gray-300 hover:text-red-500 transition-colors"
+                                  title="Delete document"
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                  </svg>
+                                </button>
+                              )}
+                            </div>
                           );
                         })}
                       </div>
