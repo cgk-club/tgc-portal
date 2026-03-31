@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
-import type { PaymentItem, PaymentMethod, PaymentStatus } from "@/types";
+import type { PaymentItem, PaymentMethod, PaymentStatus, PaymentDocument, BankDetails } from "@/types";
 
 const STATUS_OPTIONS: { value: PaymentStatus; label: string }[] = [
   { value: "pending", label: "Pending" },
@@ -25,6 +25,22 @@ const STATUS_COLORS: Record<PaymentStatus, string> = {
   fully_paid: "bg-green-100 text-green-800",
   confirmed: "bg-green-100 text-green-800",
   cancelled: "bg-gray-100 text-gray-500",
+};
+
+const DOC_CATEGORIES = [
+  { value: "contract", label: "Contract" },
+  { value: "invoice", label: "Invoice" },
+  { value: "cc_auth_form", label: "CC Auth Form" },
+  { value: "receipt", label: "Receipt" },
+  { value: "other", label: "Other" },
+];
+
+const DOC_CATEGORY_COLORS: Record<string, string> = {
+  contract: "bg-purple-100 text-purple-700",
+  invoice: "bg-blue-100 text-blue-700",
+  cc_auth_form: "bg-amber-100 text-amber-700",
+  receipt: "bg-green-100 text-green-700",
+  other: "bg-gray-100 text-gray-600",
 };
 
 const EMPTY_FORM = {
@@ -60,6 +76,11 @@ function InlineInput({ value, onChange, className = "", type = "text", step, pla
   );
 }
 
+function formatDate(d: string | null | undefined): string {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export default function AdminPaymentsPage() {
   const params = useParams();
   const itineraryId = params.id as string;
@@ -70,13 +91,41 @@ export default function AdminPaymentsPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
+  // Default bank details
+  const [defaultBank, setDefaultBank] = useState<BankDetails | null>(null);
+  const [showBankConfig, setShowBankConfig] = useState(false);
+  const [bankForm, setBankForm] = useState({ iban: "", bic: "", account_holder: "", bank_name: "", reference: "" });
+
+  // Documents per payment
+  const [docs, setDocs] = useState<Record<string, PaymentDocument[]>>({});
+  const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({});
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const load = useCallback(async () => {
     const res = await fetch(`/api/admin/itineraries/${itineraryId}/payments`);
     if (res.ok) setPayments(await res.json());
+    // Load itinerary for default bank details
+    const itinRes = await fetch(`/api/admin/itineraries/${itineraryId}`);
+    if (itinRes.ok) {
+      const itin = await itinRes.json();
+      if (itin.default_bank_details) {
+        setDefaultBank(itin.default_bank_details);
+        setBankForm(itin.default_bank_details);
+      }
+    }
     setLoading(false);
   }, [itineraryId]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function loadDocs(paymentId: string) {
+    const res = await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}/documents`);
+    if (res.ok) {
+      const data = await res.json();
+      setDocs(prev => ({ ...prev, [paymentId]: data }));
+    }
+  }
 
   function calcClientAmount(amount: number, commType?: string, commValue?: number): number | null {
     if (!commType || !commValue) return null;
@@ -146,6 +195,48 @@ export default function AdminPaymentsPage() {
     load();
   }
 
+  async function saveDefaultBank() {
+    const bankData = bankForm.iban ? bankForm : null;
+    await fetch(`/api/admin/itineraries/${itineraryId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ default_bank_details: bankData }),
+    });
+    setDefaultBank(bankData);
+    setShowBankConfig(false);
+  }
+
+  async function handleDocUpload(paymentId: string) {
+    const input = fileInputRefs.current[paymentId];
+    if (!input?.files?.[0]) return;
+
+    const file = input.files[0];
+    const title = file.name.replace(/\.[^.]+$/, "");
+    const category = (document.getElementById(`doc-cat-${paymentId}`) as HTMLSelectElement)?.value || "other";
+    const reqSig = (document.getElementById(`doc-sig-${paymentId}`) as HTMLInputElement)?.checked || false;
+
+    setUploadingDoc(paymentId);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("document_category", category);
+    formData.append("requires_signature", String(reqSig));
+
+    await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}/documents`, {
+      method: "POST",
+      body: formData,
+    });
+    input.value = "";
+    setUploadingDoc(null);
+    loadDocs(paymentId);
+  }
+
+  async function handleDocDelete(paymentId: string, docId: string) {
+    if (!confirm("Delete this document?")) return;
+    await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}/documents/${docId}`, { method: "DELETE" });
+    loadDocs(paymentId);
+  }
+
   const total = payments.reduce((s, p) => p.payment_status !== "cancelled" ? s + Number(p.amount) : s, 0);
   const clientTotal = payments.reduce((s, p) => p.payment_status !== "cancelled" ? s + (Number(p.client_amount) || Number(p.amount)) : s, 0);
   const paid = payments.reduce((s, p) => ["fully_paid", "confirmed"].includes(p.payment_status) ? s + (Number(p.client_amount) || Number(p.amount)) : s, 0);
@@ -166,6 +257,9 @@ export default function AdminPaymentsPage() {
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
+          <button onClick={() => setShowBankConfig(!showBankConfig)} className="text-xs font-body border border-green/20 text-green px-3 py-1.5 rounded hover:bg-green/5 transition-colors">
+            {defaultBank ? "Edit Bank" : "Set Bank"}
+          </button>
           <button onClick={importFromItinerary} className="text-xs font-body border border-green/20 text-green px-3 py-1.5 rounded hover:bg-green/5 transition-colors">
             Import from Itinerary
           </button>
@@ -174,6 +268,33 @@ export default function AdminPaymentsPage() {
           </button>
         </div>
       </div>
+
+      {/* Default bank account config */}
+      {showBankConfig && (
+        <div className="bg-gray-50 border rounded-lg p-4 mb-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-body font-medium text-gray-700 uppercase tracking-wider">Default Bank Account for Client</h3>
+            {defaultBank && (
+              <span className="text-[10px] font-body text-green bg-green/10 px-2 py-0.5 rounded-full">Active</span>
+            )}
+          </div>
+          <p className="text-[11px] font-body text-gray-400">Leave blank to use TGC default (FR76 1732 8844 0048 2021 3165 365). Set supplier bank details here for items like yacht charters where the client wires directly to the supplier.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input placeholder="IBAN" value={bankForm.iban} onChange={e => setBankForm({ ...bankForm, iban: e.target.value })} className="text-sm border rounded px-3 py-2" />
+            <input placeholder="BIC" value={bankForm.bic} onChange={e => setBankForm({ ...bankForm, bic: e.target.value })} className="text-sm border rounded px-3 py-2" />
+            <input placeholder="Account holder" value={bankForm.account_holder} onChange={e => setBankForm({ ...bankForm, account_holder: e.target.value })} className="text-sm border rounded px-3 py-2" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input placeholder="Bank name" value={bankForm.bank_name} onChange={e => setBankForm({ ...bankForm, bank_name: e.target.value })} className="text-sm border rounded px-3 py-2" />
+            <input placeholder="Reference" value={bankForm.reference} onChange={e => setBankForm({ ...bankForm, reference: e.target.value })} className="text-sm border rounded px-3 py-2" />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={saveDefaultBank} className="text-xs bg-green text-white px-4 py-2 rounded hover:bg-green/90">Save</button>
+            <button onClick={() => { setBankForm({ iban: "", bic: "", account_holder: "", bank_name: "", reference: "" }); saveDefaultBank(); }} className="text-xs text-red-500 px-4 py-2">Clear</button>
+            <button onClick={() => setShowBankConfig(false)} className="text-xs text-gray-500 px-4 py-2">Cancel</button>
+          </div>
+        </div>
+      )}
 
       {/* Add form */}
       {showForm && (
@@ -332,6 +453,81 @@ export default function AdminPaymentsPage() {
                     className="bg-transparent border-0 p-0 text-xs font-body text-gray-700 focus:outline-none focus:ring-0 hover:bg-gray-50 focus:bg-gray-50 rounded"
                   />
                 </div>
+              </div>
+
+              {/* Row 3: Payment dates + Click tracking + Bank badge */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[10px] text-gray-400">
+                {p.deposit_paid_at && <span>Deposit: {formatDate(p.deposit_paid_at)}</span>}
+                {p.paid_at && <span>Paid: {formatDate(p.paid_at)}</span>}
+                {p.payment_method === "cc_link" && (
+                  <span>Clicks: {p.link_click_count || 0}{p.last_clicked_at ? ` (last: ${formatDate(p.last_clicked_at)})` : ""}</span>
+                )}
+                {p.payment_method === "cc_link" && p.cc_payment_url && (
+                  <a href={p.cc_payment_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline truncate max-w-[200px]">{p.cc_payment_url}</a>
+                )}
+                {p.bank_details ? (
+                  <span className="text-purple-500">Custom bank: {p.bank_details.account_holder || p.bank_details.iban?.slice(-8)}</span>
+                ) : p.payment_method === "bank_transfer" && (
+                  <span className="text-gray-300">Using default bank</span>
+                )}
+              </div>
+
+              {/* Row 4: Documents section */}
+              <div className="mt-3 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    const isOpen = expandedDocs[p.id];
+                    if (!isOpen && !docs[p.id]) loadDocs(p.id);
+                    setExpandedDocs(prev => ({ ...prev, [p.id]: !isOpen }));
+                  }}
+                  className="text-[11px] font-body text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                >
+                  <span>{expandedDocs[p.id] ? "▼" : "▶"}</span>
+                  Documents {docs[p.id]?.length ? `(${docs[p.id].length})` : ""}
+                </button>
+
+                {expandedDocs[p.id] && (
+                  <div className="mt-2 space-y-2">
+                    {/* Document list */}
+                    {(docs[p.id] || []).map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-2 text-xs bg-gray-50 rounded px-2 py-1.5">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${DOC_CATEGORY_COLORS[doc.document_category] || DOC_CATEGORY_COLORS.other}`}>
+                          {DOC_CATEGORIES.find(c => c.value === doc.document_category)?.label || doc.document_category}
+                        </span>
+                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate flex-1">
+                          {doc.title}
+                        </a>
+                        {doc.requires_signature && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${doc.signature_status === "signed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                            {doc.signature_status === "signed" ? "Signed" : "Awaiting signature"}
+                            {doc.signatures?.[0]?.signed_at && ` ${formatDate(doc.signatures[0].signed_at)}`}
+                          </span>
+                        )}
+                        <span className="text-gray-300 text-[10px]">{formatDate(doc.created_at)}</span>
+                        <button onClick={() => handleDocDelete(p.id, doc.id)} className="text-red-400 hover:text-red-600 text-[10px]">Delete</button>
+                      </div>
+                    ))}
+
+                    {/* Upload form */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select id={`doc-cat-${p.id}`} className="text-[11px] border rounded px-2 py-1 text-gray-600">
+                        {DOC_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                      </select>
+                      <label className="flex items-center gap-1 text-[11px] text-gray-500">
+                        <input type="checkbox" id={`doc-sig-${p.id}`} className="w-3 h-3" />
+                        Requires signature
+                      </label>
+                      <input
+                        type="file"
+                        ref={(el) => { fileInputRefs.current[p.id] = el; }}
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        onChange={() => handleDocUpload(p.id)}
+                        className="text-[11px] text-gray-500 file:mr-2 file:text-[10px] file:border file:border-green/20 file:rounded file:px-2 file:py-0.5 file:text-green file:bg-white hover:file:bg-green/5"
+                      />
+                      {uploadingDoc === p.id && <span className="text-[10px] text-gray-400">Uploading...</span>}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}

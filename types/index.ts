@@ -170,11 +170,47 @@ export interface PaymentItem {
   cc_payment_url?: string
   bank_details?: BankDetails
   deposit_deadline?: string
+  paid_at?: string
+  deposit_paid_at?: string
+  link_click_count?: number
+  last_clicked_at?: string
   notes?: string
   client_notes?: string
   sort_order: number
   created_at: string
   updated_at: string
+  documents?: PaymentDocument[]
+}
+
+// Payment Document types
+export type DocumentCategory = 'contract' | 'invoice' | 'cc_auth_form' | 'receipt' | 'other'
+export type SignatureStatus = 'unsigned' | 'signed'
+
+export interface PaymentDocument {
+  id: string
+  payment_item_id: string
+  title: string
+  file_url: string
+  file_type?: string
+  document_category: DocumentCategory
+  uploaded_by?: string
+  uploaded_by_type: 'admin' | 'client'
+  requires_signature: boolean
+  signature_status: SignatureStatus
+  created_at: string
+  signatures?: DocumentSignature[]
+}
+
+export interface DocumentSignature {
+  id: string
+  payment_document_id: string
+  signed_by_name: string
+  signed_by_email: string
+  signed_at: string
+  ip_address?: string
+  user_agent?: string
+  signature_data?: string
+  created_at: string
 }
 
 // Choice Cards types
