@@ -69,12 +69,23 @@ export async function GET(
     .eq('partner_id', id)
     .order('created_at', { ascending: false })
 
-  // Get events
-  const { data: events } = await sb
+  // Get events from both partner_events (partner-submitted) and events (admin-linked)
+  const { data: partnerEvents } = await sb
     .from('partner_events')
     .select('*')
     .eq('partner_id', id)
     .order('created_at', { ascending: false })
+
+  const { data: linkedEvents } = await sb
+    .from('events')
+    .select('id, title, category, date_display, active, created_at')
+    .eq('partner_id', id)
+    .order('date_start', { ascending: true })
+
+  const events = [
+    ...(partnerEvents || []).map((e: Record<string, unknown>) => ({ ...e, source: 'partner' })),
+    ...(linkedEvents || []).map((e: Record<string, unknown>) => ({ ...e, status: e.active ? 'approved' : 'draft', source: 'admin' })),
+  ]
 
   // Get referral stats
   const { data: referrals } = await sb
