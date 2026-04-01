@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { createNotification } from '@/lib/notifications'
 
 export async function PATCH(
   request: NextRequest,
@@ -58,6 +59,10 @@ export async function PATCH(
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Notify partner users about approval
+    notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit approved', 'Your fiche changes have been approved and applied.', '/partner/fiche')
+
     return NextResponse.json(data)
 
   } else if (body.action === 'reject') {
@@ -73,9 +78,47 @@ export async function PATCH(
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Notify partner users about rejection
+    const rejectBody = body.admin_note
+      ? `Your fiche edit was not approved. Note: ${body.admin_note}`
+      : 'Your fiche edit was not approved. Please check with the team.'
+    notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit not approved', rejectBody, '/partner/fiche')
+
     return NextResponse.json(data)
 
   } else {
     return NextResponse.json({ error: 'Invalid action. Use "approve" or "reject".' }, { status: 400 })
+  }
+}
+
+// Helper: send notification to all users of a partner account
+async function notifyPartnerUsers(
+  sb: ReturnType<typeof getSupabaseAdmin>,
+  partnerId: string,
+  title: string,
+  body: string,
+  link: string
+) {
+  try {
+    const { data: users } = await sb
+      .from('partner_users')
+      .select('id')
+      .eq('partner_id', partnerId)
+
+    if (users && users.length > 0) {
+      for (const user of users) {
+        createNotification({
+          user_type: 'partner',
+          user_id: user.id,
+          title,
+          body,
+          type: 'approval',
+          link,
+        }).catch(() => {}) // fire and forget
+      }
+    }
+  } catch {
+    // Non-critical, don't block the response
   }
 }

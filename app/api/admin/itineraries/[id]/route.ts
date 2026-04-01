@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getItinerary, updateItinerary } from '@/lib/itineraries'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { createNotification } from '@/lib/notifications'
 
 export async function GET(
   request: NextRequest,
@@ -25,6 +26,19 @@ export async function PATCH(
 
   try {
     const itinerary = await updateItinerary(id, body)
+
+    // Auto-notify linked client when itinerary is updated
+    if (itinerary.client_account_id) {
+      createNotification({
+        user_type: 'client',
+        user_id: itinerary.client_account_id,
+        title: 'Itinerary updated',
+        body: `Your itinerary "${itinerary.title}" has been updated.`,
+        type: 'itinerary',
+        link: itinerary.share_token ? `/itinerary/${itinerary.share_token}` : '/client/journeys',
+      }).catch(() => {}) // fire and forget
+    }
+
     return NextResponse.json(itinerary)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'

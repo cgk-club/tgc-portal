@@ -9,7 +9,7 @@ interface TemplateFieldSelectorProps {
 
 const TEMPLATE_OPTIONS: FicheTemplate[] = [
   'default', 'hospitality', 'real_estate', 'dining', 'maker',
-  'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture',
+  'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture', 'personal_services',
 ]
 
 export default function TemplateFieldSelector({ value, onChange }: TemplateFieldSelectorProps) {

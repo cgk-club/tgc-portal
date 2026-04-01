@@ -14,6 +14,7 @@ import MarketplacePulse from '@/components/admin/dashboard/MarketplacePulse'
 import FeedbackQueue from '@/components/admin/dashboard/FeedbackQueue'
 import UpcomingDeadlines, { UpcomingDeadlineItem } from '@/components/admin/dashboard/UpcomingDeadlines'
 import ClientProjects from '@/components/admin/dashboard/ClientProjects'
+import NotificationPanel from '@/components/admin/NotificationPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -538,6 +539,11 @@ export default async function AdminDashboard() {
           choices={choiceSelections}
           requests={requests}
         />
+      </div>
+
+      {/* Notification Panel */}
+      <div className="mb-6">
+        <NotificationPanel />
       </div>
 
       {/* Quick Actions */}

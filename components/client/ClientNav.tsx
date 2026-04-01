@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import NotificationBell from "@/components/shared/NotificationBell";
 
 interface ClientNavProps {
   active?: string;
@@ -33,12 +34,15 @@ export default function ClientNav({ active }: ClientNavProps) {
           <Link href="/client" className="font-heading text-sm font-semibold tracking-wider text-gold">
             THE GATEKEEPERS CLUB
           </Link>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-gray-600 font-body sm:block hidden"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <button
+              onClick={handleLogout}
+              className="text-xs text-gray-400 hover:text-gray-600 font-body sm:block hidden"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
         <nav id="tour-nav" className="flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
           {NAV_ITEMS.map((item) => (

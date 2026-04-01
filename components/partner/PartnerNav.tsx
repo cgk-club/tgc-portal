@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import NotificationBell from "@/components/shared/NotificationBell";
 
 interface PartnerNavProps {
   active?: string;
@@ -42,13 +43,17 @@ export default function PartnerNav({ active }: PartnerNavProps) {
             TGC PARTNER
           </Link>
 
-          {/* Desktop sign out */}
-          <button
-            onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-gray-600 font-body hidden sm:block"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+
+            {/* Desktop sign out */}
+            <button
+              onClick={handleLogout}
+              className="text-xs text-gray-400 hover:text-gray-600 font-body hidden sm:block"
+            >
+              Sign out
+            </button>
+          </div>
 
           {/* Mobile hamburger */}
           <button

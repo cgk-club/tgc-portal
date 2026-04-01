@@ -34,6 +34,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Notification API routes: handled by route-level auth (check client or partner session)
+  if (pathname.startsWith('/api/notifications')) {
+    return NextResponse.next()
+  }
+
   // Client portal auth (protect /client and subpaths, but not /client/login or /client/auth)
   if (pathname === '/client' || pathname.startsWith('/client/collection') || pathname.startsWith('/client/conversation') || pathname.startsWith('/client/events') || pathname.startsWith('/client/points')) {
     const token = request.cookies.get(CLIENT_COOKIE_NAME)?.value
@@ -81,6 +86,7 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/api/admin/:path*',
+    '/api/notifications/:path*',
     '/client',
     '/client/collection/:path*',
     '/client/conversation/:path*',

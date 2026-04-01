@@ -9,6 +9,7 @@ export type FicheTemplate =
   | 'wellness'
   | 'events_sport'
   | 'arts_culture'
+  | 'personal_services'
   | 'default'
 
 export const TEMPLATE_LABELS: Record<FicheTemplate, string> = {
@@ -22,6 +23,7 @@ export const TEMPLATE_LABELS: Record<FicheTemplate, string> = {
   wellness: 'Wellness',
   events_sport: 'Events & Sport',
   arts_culture: 'Arts & Culture',
+  personal_services: 'Personal Services',
   default: 'Default',
 }
 
@@ -110,6 +112,14 @@ export const CATEGORY_TEMPLATE_MAP: Record<string, FicheTemplate> = {
   'Museums & Cultural Institutions': 'arts_culture',
   'Performing Arts': 'arts_culture',
   'Auction Houses': 'arts_culture',
+
+  // PERSONAL SERVICES template — individual bespoke service providers
+  'Personal Shopping': 'personal_services',
+  'Personal Styling': 'personal_services',
+  'Personal Training': 'personal_services',
+  'Accompaniment Services': 'personal_services',
+  'Private Guide Services': 'personal_services',
+  'Translation & Interpretation': 'personal_services',
 }
 
 export function getTemplate(categorySub?: string): FicheTemplate {
@@ -274,4 +284,19 @@ export interface ArtsCultureFields {
   shipping_logistics?: boolean
   visiting_hours?: string
   admission?: string
+}
+
+export interface PersonalServicesFields {
+  service_type?: string
+  languages?: string
+  availability?: string
+  base_city?: string
+  travel_radius?: string
+  rate_structure?: string
+  booking_lead_time?: string
+  specialisation?: string
+  certifications?: string
+  experience_years?: string
+  group_size?: string
+  equipment_provided?: string
 }

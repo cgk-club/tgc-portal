@@ -20,6 +20,7 @@ import WineEstateFieldsEditor from '@/components/admin/template-fields/WineEstat
 import WellnessFieldsEditor from '@/components/admin/template-fields/WellnessFields'
 import EventsSportFieldsEditor from '@/components/admin/template-fields/EventsSportFields'
 import ArtsCultureFieldsEditor from '@/components/admin/template-fields/ArtsCultureFields'
+import PersonalServicesFieldsEditor from '@/components/admin/template-fields/PersonalServicesFields'
 import { FicheTemplate, getTemplate, TEMPLATE_LABELS } from '@/lib/ficheTemplates'
 
 interface FicheEditorProps {
@@ -262,6 +263,12 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
           )}
           {templateType === 'arts_culture' && (
             <ArtsCultureFieldsEditor
+              fields={templateFields as Record<string, unknown>}
+              onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
+            />
+          )}
+          {templateType === 'personal_services' && (
+            <PersonalServicesFieldsEditor
               fields={templateFields as Record<string, unknown>}
               onChange={(f) => setTemplateFields(f as Record<string, unknown>)}
             />
