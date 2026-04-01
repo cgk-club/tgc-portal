@@ -22,6 +22,9 @@ interface TGCEvent {
   ticket_url: string | null;
   ticket_provider: string | null;
   ticket_commission_rate: number | null;
+  brochure_url: string | null;
+  gallery_images: string[] | null;
+  stats: Record<string, string> | null;
 }
 
 export default function ClientEventsPage() {
@@ -31,7 +34,6 @@ export default function ClientEventsPage() {
   const [loading, setLoading] = useState(true);
   const [showBespokeChat, setShowBespokeChat] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<TGCEvent | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -78,39 +80,70 @@ export default function ClientEventsPage() {
           <p className="text-sm text-gray-500 font-body mb-6">Events we can arrange access and hospitality for.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {displayedEvents.map((ev) => (
-              <button
+              <Link
                 key={ev.id}
-                onClick={() => setSelectedEvent(ev)}
-                className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow text-left"
+                href={`/events/${ev.id}`}
+                className="group relative rounded-lg overflow-hidden h-64 sm:h-72 block"
               >
-                <div className="h-36 bg-green-muted flex items-center justify-center relative overflow-hidden">
-                  {ev.image_url ? (
-                    <img src={ev.image_url} alt={ev.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-green/20 text-xs font-body">{ev.category}</span>
-                  )}
+                {/* Image background */}
+                {ev.image_url ? (
+                  <img
+                    src={ev.image_url}
+                    alt={ev.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-green" />
+                )}
+
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+
+                {/* Badges */}
+                <div className="absolute top-3 left-3 flex gap-2">
                   {ev.featured && (
-                    <span className="absolute top-2 right-2 bg-gold/90 text-white text-[9px] tracking-[1px] uppercase px-2 py-0.5 rounded-sm font-body">
+                    <span className="bg-gold/90 text-white text-[9px] tracking-[1px] uppercase px-2 py-0.5 rounded-sm font-body">
                       Featured
                     </span>
                   )}
+                  {ev.ticket_url && (
+                    <span className="bg-white/20 backdrop-blur-sm text-white text-[9px] tracking-[1px] uppercase px-2 py-0.5 rounded-sm font-body">
+                      Tickets
+                    </span>
+                  )}
                 </div>
-                <div className="p-4">
-                  <p className="text-[10px] text-green/50 font-body uppercase tracking-wide mb-1">{ev.category}</p>
-                  <h3 className="font-heading text-sm font-semibold text-gray-800 mb-1">{ev.title}</h3>
-                  <p className="text-xs text-gray-500 font-body">{ev.date_display}</p>
-                  <p className="text-xs text-gray-400 font-body mb-2">{ev.location}</p>
-                  <p className="text-xs text-gray-400 font-body line-clamp-2">{ev.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-xs text-green font-body">View details &#8594;</span>
-                    {ev.ticket_url && (
-                      <span className="text-[9px] text-gold bg-gold/10 px-1.5 py-0.5 rounded font-body">
-                        Tickets available
-                      </span>
+
+                {/* Price badge */}
+                {ev.price && ev.price !== "On application" && (
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-gold text-white text-xs font-body font-medium px-2.5 py-1 rounded">
+                      {ev.price}
+                    </span>
+                  </div>
+                )}
+
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-5">
+                  <p className="text-[10px] tracking-[1.5px] text-gold uppercase font-body mb-1">
+                    {ev.category}
+                  </p>
+                  <h3 className="font-heading text-base font-semibold text-white leading-snug mb-1.5">
+                    {ev.title}
+                  </h3>
+                  <div className="flex items-center gap-3 text-white/70">
+                    <p className="text-xs font-body">{ev.date_display}</p>
+                    {ev.location && (
+                      <p className="text-xs font-body flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {ev.location}
+                      </p>
                     )}
                   </div>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
 
@@ -174,131 +207,6 @@ export default function ClientEventsPage() {
         </div>
       </div>
 
-      {/* Event Detail Modal */}
-      {selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedEvent(null)}>
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div
-            className="relative bg-pearl rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Hero */}
-            {selectedEvent.image_url && (
-              <div className="h-56 sm:h-64 overflow-hidden rounded-t-lg">
-                <img src={selectedEvent.image_url} alt={selectedEvent.title} className="w-full h-full object-cover" />
-              </div>
-            )}
-
-            {/* Close button */}
-            <button
-              onClick={() => setSelectedEvent(null)}
-              className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors shadow"
-            >
-              &#10005;
-            </button>
-
-            <div className="p-6 sm:p-8">
-              {/* Category + Date */}
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-[10px] tracking-[1.5px] text-green/60 uppercase font-body">{selectedEvent.category}</span>
-                {selectedEvent.featured && (
-                  <span className="text-[9px] tracking-[1px] text-gold bg-gold/10 px-2 py-0.5 rounded uppercase font-body">Featured</span>
-                )}
-              </div>
-
-              <h2 className="font-heading text-xl sm:text-2xl font-semibold text-green mb-1">{selectedEvent.title}</h2>
-              <p className="text-sm text-gray-500 font-body mb-1">{selectedEvent.date_display}</p>
-              <p className="text-sm text-gray-400 font-body mb-4">{selectedEvent.location}</p>
-
-              {selectedEvent.price && (
-                <p className="text-sm text-gold font-body font-medium mb-4">{selectedEvent.price}</p>
-              )}
-
-              {/* Description */}
-              <p className="text-sm text-gray-600 font-body leading-relaxed mb-6">{selectedEvent.description}</p>
-
-              {/* Highlights */}
-              {selectedEvent.highlights && selectedEvent.highlights.trim() && (
-                <div className="mb-6">
-                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">Highlights</h3>
-                  <ul className="space-y-1.5">
-                    {selectedEvent.highlights.split("\n").filter(Boolean).map((line, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600 font-body">
-                        <span className="text-gold mt-0.5">&#8226;</span>
-                        {line.replace(/^[-•]\s*/, "")}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Itinerary */}
-              {selectedEvent.itinerary && selectedEvent.itinerary.trim() && (
-                <div className="mb-6">
-                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">Itinerary</h3>
-                  <p className="text-sm text-gray-600 font-body leading-relaxed whitespace-pre-line">{selectedEvent.itinerary}</p>
-                </div>
-              )}
-
-              {/* What is Included */}
-              {selectedEvent.includes && selectedEvent.includes.trim() && (
-                <div className="mb-6">
-                  <h3 className="text-xs font-medium text-green uppercase tracking-wider mb-3 font-body">What is Included</h3>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                    {selectedEvent.includes.split("\n").filter(Boolean).map((line, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600 font-body">
-                        <span className="text-green mt-0.5">&#10003;</span>
-                        {line.replace(/^[-•]\s*/, "")}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Ticket Booking */}
-              {selectedEvent.ticket_url && (
-                <div className="mt-8 pt-6 border-t border-green/10">
-                  <div className="flex flex-col items-center gap-1.5">
-                    <a
-                      href={selectedEvent.ticket_url}
-                      target="_blank"
-                      rel="noopener"
-                      onClick={() => console.log(`[TGC] Ticket click: ${selectedEvent.title}`, { provider: selectedEvent.ticket_provider, url: selectedEvent.ticket_url })}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-white text-sm font-medium rounded-md hover:bg-[#b89a3f] transition-colors font-body shadow-sm"
-                    >
-                      Book Tickets
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                    {selectedEvent.ticket_provider && (
-                      <span className="text-[10px] text-gray-400 font-body">
-                        via {selectedEvent.ticket_provider}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-green/10">
-                <a
-                  href={`/events/enquiry?event=${encodeURIComponent(selectedEvent.title)}&type=enquiry`}
-                  className="flex-1 text-center px-5 py-3 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body"
-                >
-                  Enquire About This Event
-                </a>
-                <a
-                  href={`/events/enquiry?event=${encodeURIComponent(selectedEvent.title)}&type=logistics`}
-                  className="flex-1 text-center px-5 py-3 border border-green/20 text-green text-sm font-medium rounded-md hover:bg-green/5 transition-colors font-body"
-                >
-                  Get Event Logistics Support
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

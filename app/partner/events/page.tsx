@@ -1,9 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ImageUpload from "@/components/partner/ImageUpload";
+
+interface EventStats {
+  duration?: string;
+  group_size?: string;
+  distance?: string;
+  countries?: string;
+  start_point?: string;
+  end_point?: string;
+}
 
 interface PricingTier {
   name: string;
@@ -26,6 +35,9 @@ interface PartnerEvent {
   image_url: string | null;
   is_free: boolean;
   pricing_tiers: PricingTier[];
+  brochure_url: string | null;
+  gallery_images: string[] | null;
+  stats: EventStats | null;
   status: string;
   enquiry_count: number;
   created_at: string;
@@ -78,6 +90,56 @@ export default function PartnerEventsPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([]);
+  const [brochureUrl, setBrochureUrl] = useState("");
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [stats, setStats] = useState<EventStats>({});
+  const [uploadingBrochure, setUploadingBrochure] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const brochureInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadPartnerFile = useCallback(async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/partner/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const { url } = await res.json();
+      return url;
+    }
+    return null;
+  }, []);
+
+  async function handleBrochureUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBrochure(true);
+    const url = await uploadPartnerFile(file);
+    if (url) setBrochureUrl(url);
+    setUploadingBrochure(false);
+    if (brochureInputRef.current) brochureInputRef.current.value = "";
+  }
+
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingGallery(true);
+    const newUrls: string[] = [...galleryImages];
+    for (let i = 0; i < files.length; i++) {
+      const url = await uploadPartnerFile(files[i]);
+      if (url) newUrls.push(url);
+    }
+    setGalleryImages(newUrls);
+    setUploadingGallery(false);
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+  }
+
+  function removeGalleryImage(index: number) {
+    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateStat(key: keyof EventStats, value: string) {
+    setStats((prev) => ({ ...prev, [key]: value || undefined }));
+  }
 
   useEffect(() => {
     async function load() {
@@ -113,6 +175,9 @@ export default function PartnerEventsPage() {
     setImageUrl("");
     setIsFree(false);
     setPricingTiers([]);
+    setBrochureUrl("");
+    setGalleryImages([]);
+    setStats({});
     setEditingId(null);
     setEditingWasActive(false);
     setError("");
@@ -136,6 +201,9 @@ export default function PartnerEventsPage() {
         ? event.pricing_tiers
         : []
     );
+    setBrochureUrl(event.brochure_url || "");
+    setGalleryImages(event.gallery_images || []);
+    setStats(event.stats || {});
     setEditingId(event.id);
     setEditingWasActive(event.status === "approved");
     setShowForm(true);
@@ -213,6 +281,9 @@ export default function PartnerEventsPage() {
       image_url: imageUrl.trim() || null,
       is_free: isFree,
       pricing_tiers: isFree ? [] : pricingTiers.filter((t) => t.name.trim()),
+      brochure_url: brochureUrl.trim() || null,
+      gallery_images: galleryImages.length > 0 ? galleryImages : null,
+      stats: Object.values(stats).some(Boolean) ? Object.fromEntries(Object.entries(stats).filter(([, v]) => v)) : null,
     };
 
     const url = editingId
@@ -537,6 +608,147 @@ export default function PartnerEventsPage() {
               onChange={(url) => setImageUrl(url || "")}
               label="Event Image"
             />
+
+            {/* Enhanced Presentation */}
+            <div className="border-t border-green/10 pt-4 mt-2">
+              <h3 className="text-xs font-medium text-green uppercase tracking-wider font-body mb-3">
+                Enhanced Presentation (optional)
+              </h3>
+            </div>
+
+            {/* Brochure PDF */}
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                Brochure / Itinerary PDF
+              </label>
+              {brochureUrl ? (
+                <div className="flex items-center gap-3 bg-pearl border border-green/10 rounded-md p-3">
+                  <svg className="w-5 h-5 text-green flex-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-xs text-gray-600 font-body truncate flex-1">
+                    {brochureUrl.split("/").pop()}
+                  </span>
+                  <button type="button" onClick={() => setBrochureUrl("")} className="text-xs text-red-400 hover:text-red-600 font-body">Remove</button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => brochureInputRef.current?.click()}
+                  disabled={uploadingBrochure}
+                  className="w-full border-2 border-dashed border-green/20 rounded-md p-4 text-center hover:border-green/40 transition-colors"
+                >
+                  <p className="text-xs text-gray-500 font-body">
+                    {uploadingBrochure ? "Uploading..." : "Upload brochure PDF"}
+                  </p>
+                </button>
+              )}
+              <input ref={brochureInputRef} type="file" accept=".pdf,application/pdf" onChange={handleBrochureUpload} className="hidden" />
+            </div>
+
+            {/* Gallery Images */}
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                Gallery Images
+              </label>
+              {galleryImages.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {galleryImages.map((url, i) => (
+                    <div key={i} className="relative rounded-md overflow-hidden aspect-square group">
+                      <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(i)}
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        &#10005;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => galleryInputRef.current?.click()}
+                disabled={uploadingGallery}
+                className="text-xs text-green hover:text-green-light font-body flex items-center gap-1 transition-colors"
+              >
+                <span className="text-sm">+</span> {uploadingGallery ? "Uploading..." : "Add gallery images"}
+              </button>
+              <p className="text-[10px] text-gray-400 font-body mt-1">
+                Images pair with your highlights in order.
+              </p>
+              <input ref={galleryInputRef} type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="hidden" />
+            </div>
+
+            {/* Stats */}
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-2">
+                Event Stats
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Duration</label>
+                  <input
+                    type="text"
+                    value={stats.duration || ""}
+                    onChange={(e) => updateStat("duration", e.target.value)}
+                    placeholder="e.g. 5 Days"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Group Size</label>
+                  <input
+                    type="text"
+                    value={stats.group_size || ""}
+                    onChange={(e) => updateStat("group_size", e.target.value)}
+                    placeholder="e.g. Max 20"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Total Distance</label>
+                  <input
+                    type="text"
+                    value={stats.distance || ""}
+                    onChange={(e) => updateStat("distance", e.target.value)}
+                    placeholder="e.g. 1,200 km"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Countries</label>
+                  <input
+                    type="text"
+                    value={stats.countries || ""}
+                    onChange={(e) => updateStat("countries", e.target.value)}
+                    placeholder="e.g. 3"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Starting Point</label>
+                  <input
+                    type="text"
+                    value={stats.start_point || ""}
+                    onChange={(e) => updateStat("start_point", e.target.value)}
+                    placeholder="e.g. Monaco"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">End Point</label>
+                  <input
+                    type="text"
+                    value={stats.end_point || ""}
+                    onChange={(e) => updateStat("end_point", e.target.value)}
+                    placeholder="e.g. Milan"
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+              </div>
+            </div>
 
             {error && <p className="text-sm text-red-500 font-body">{error}</p>}
 

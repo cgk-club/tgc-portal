@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
       image_url: body.image_url || null,
       is_free: body.is_free || false,
       pricing_tiers: body.pricing_tiers || [],
+      brochure_url: body.brochure_url || null,
+      gallery_images: body.gallery_images || null,
+      stats: body.stats || null,
       status: "pending",
     })
     .select()

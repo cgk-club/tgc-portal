@@ -30,7 +30,7 @@ export async function PATCH(
   const allowedFields = [
     "title", "category", "date_display", "date_start", "date_end",
     "location", "capacity", "price", "description", "highlights", "image_url",
-    "is_free", "pricing_tiers",
+    "is_free", "pricing_tiers", "brochure_url", "gallery_images", "stats",
   ];
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };

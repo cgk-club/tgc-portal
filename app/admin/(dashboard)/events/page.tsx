@@ -1,6 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+interface EventStats {
+  duration?: string;
+  group_size?: string;
+  distance?: string;
+  countries?: string;
+  start_point?: string;
+  end_point?: string;
+}
 
 interface AffiliateLink {
   id: string;
@@ -34,6 +43,9 @@ interface TGCEvent {
   ticket_url: string | null;
   ticket_provider: string | null;
   ticket_commission_rate: number | null;
+  brochure_url: string | null;
+  gallery_images: string[] | null;
+  stats: EventStats | null;
 }
 
 const CATEGORIES = [
@@ -70,6 +82,9 @@ const EMPTY_EVENT: Omit<TGCEvent, "id"> = {
   ticket_url: null,
   ticket_provider: null,
   ticket_commission_rate: null,
+  brochure_url: null,
+  gallery_images: null,
+  stats: null,
 };
 
 export default function AdminEventsPage() {
@@ -80,6 +95,60 @@ export default function AdminEventsPage() {
   const [form, setForm] = useState<Omit<TGCEvent, "id">>(EMPTY_EVENT);
   const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>([]);
   const [showAffiliatePicker, setShowAffiliatePicker] = useState(false);
+  const [uploadingBrochure, setUploadingBrochure] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const brochureInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  async function uploadFile(file: File): Promise<string | null> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const { url } = await res.json();
+      return url;
+    }
+    return null;
+  }
+
+  async function handleBrochureUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBrochure(true);
+    const url = await uploadFile(file);
+    if (url) setForm((prev) => ({ ...prev, brochure_url: url }));
+    setUploadingBrochure(false);
+    if (brochureInputRef.current) brochureInputRef.current.value = "";
+  }
+
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingGallery(true);
+    const existing = form.gallery_images || [];
+    const newUrls: string[] = [...existing];
+    for (let i = 0; i < files.length; i++) {
+      const url = await uploadFile(files[i]);
+      if (url) newUrls.push(url);
+    }
+    setForm((prev) => ({ ...prev, gallery_images: newUrls }));
+    setUploadingGallery(false);
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+  }
+
+  function removeGalleryImage(index: number) {
+    const images = [...(form.gallery_images || [])];
+    images.splice(index, 1);
+    setForm((prev) => ({ ...prev, gallery_images: images.length > 0 ? images : null }));
+  }
+
+  function updateStat(key: string, value: string) {
+    const current = form.stats || {};
+    const updated = { ...current, [key]: value || undefined };
+    // Remove empty keys
+    const cleaned = Object.fromEntries(Object.entries(updated).filter(([, v]) => v)) as EventStats;
+    setForm((prev) => ({ ...prev, stats: Object.keys(cleaned).length > 0 ? cleaned : null }));
+  }
 
   async function loadEvents() {
     const res = await fetch("/api/admin/events");
@@ -136,6 +205,9 @@ export default function AdminEventsPage() {
       ticket_url: ev.ticket_url || null,
       ticket_provider: ev.ticket_provider || null,
       ticket_commission_rate: ev.ticket_commission_rate || null,
+      brochure_url: ev.brochure_url || null,
+      gallery_images: ev.gallery_images || null,
+      stats: ev.stats || null,
     });
   }
 
@@ -326,6 +398,120 @@ export default function AdminEventsPage() {
               <label className="block text-xs text-gray-500 font-body mb-1">Commission Rate (%)</label>
               <input type="number" step="0.1" value={form.ticket_commission_rate || ""} onChange={(e) => setForm({ ...form, ticket_commission_rate: e.target.value ? parseFloat(e.target.value) : null })} placeholder="e.g. 2.5" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
             </div>
+            {/* Enhanced Presentation Fields */}
+            <div className="sm:col-span-2 border-t border-green/10 pt-4 mt-2">
+              <h3 className="text-xs font-medium text-green uppercase tracking-wider font-body mb-3">Enhanced Presentation</h3>
+            </div>
+
+            {/* Brochure PDF Upload */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-500 font-body mb-1">Brochure PDF</label>
+              {form.brochure_url ? (
+                <div className="flex items-center gap-3 bg-pearl border border-green/10 rounded-md p-3">
+                  <svg className="w-5 h-5 text-green flex-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <a href={form.brochure_url} target="_blank" rel="noopener" className="text-xs text-green hover:underline font-body truncate flex-1">
+                    {form.brochure_url.split("/").pop()}
+                  </a>
+                  <button type="button" onClick={() => setForm({ ...form, brochure_url: null })} className="text-xs text-red-400 hover:text-red-600 font-body">Remove</button>
+                  <button type="button" onClick={() => brochureInputRef.current?.click()} className="text-xs text-green hover:underline font-body">Replace</button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => brochureInputRef.current?.click()}
+                  disabled={uploadingBrochure}
+                  className="w-full border-2 border-dashed border-green/20 rounded-md p-4 text-center hover:border-green/40 transition-colors"
+                >
+                  <p className="text-xs text-gray-500 font-body">
+                    {uploadingBrochure ? "Uploading..." : "Click to upload brochure PDF"}
+                  </p>
+                </button>
+              )}
+              <input ref={brochureInputRef} type="file" accept=".pdf,application/pdf" onChange={handleBrochureUpload} className="hidden" />
+            </div>
+
+            {/* Gallery Images */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-500 font-body mb-1">Gallery Images</label>
+              {(form.gallery_images || []).length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-3">
+                  {(form.gallery_images || []).map((url, i) => (
+                    <div key={i} className="relative rounded-md overflow-hidden aspect-square group">
+                      <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(i)}
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        &#10005;
+                      </button>
+                      <span className="absolute bottom-1 left-1 text-[9px] bg-black/50 text-white px-1 rounded font-body">{i + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => galleryInputRef.current?.click()}
+                disabled={uploadingGallery}
+                className="text-xs text-green hover:text-green-light font-body flex items-center gap-1 transition-colors"
+              >
+                <span className="text-sm">+</span> {uploadingGallery ? "Uploading..." : "Add gallery images"}
+              </button>
+              <p className="text-[10px] text-gray-400 font-body mt-1">Images map to highlight cards in order. First 6 pair with highlights grid.</p>
+              <input ref={galleryInputRef} type="file" accept="image/*" multiple onChange={handleGalleryUpload} className="hidden" />
+            </div>
+
+            {/* Stats Fields */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-500 font-body mb-2">Stats Bar</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Duration</label>
+                  <input value={form.stats?.duration || ""} onChange={(e) => updateStat("duration", e.target.value)} placeholder="e.g. 5 Days" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Group Size</label>
+                  <input value={form.stats?.group_size || ""} onChange={(e) => updateStat("group_size", e.target.value)} placeholder="e.g. Max 20" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Total Distance</label>
+                  <input value={form.stats?.distance || ""} onChange={(e) => updateStat("distance", e.target.value)} placeholder="e.g. 1,200 km" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Countries</label>
+                  <input value={form.stats?.countries || ""} onChange={(e) => updateStat("countries", e.target.value)} placeholder="e.g. 3" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Starting Point</label>
+                  <input value={form.stats?.start_point || ""} onChange={(e) => updateStat("start_point", e.target.value)} placeholder="e.g. Monaco" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">End Point</label>
+                  <input value={form.stats?.end_point || ""} onChange={(e) => updateStat("end_point", e.target.value)} placeholder="e.g. Milan" className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Link */}
+            {editing && (
+              <div className="sm:col-span-2">
+                <a
+                  href={`/events/${editing.id}`}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-xs text-green hover:underline font-body inline-flex items-center gap-1"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Preview event page
+                </a>
+              </div>
+            )}
+
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-2 text-sm font-body">
                 <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
@@ -389,9 +575,20 @@ export default function AdminEventsPage() {
                         Tickets
                       </span>
                     )}
+                    {ev.brochure_url && (
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">
+                        PDF
+                      </span>
+                    )}
+                    {ev.gallery_images && ev.gallery_images.length > 0 && (
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">
+                        {ev.gallery_images.length} img
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-right">
+                  <a href={`/events/${ev.id}`} target="_blank" rel="noopener" className="text-xs text-gold hover:underline font-body mr-3">Preview</a>
                   <button onClick={() => startEdit(ev)} className="text-xs text-green hover:underline font-body mr-3">Edit</button>
                   <button onClick={() => handleDelete(ev.id)} className="text-xs text-red-400 hover:text-red-600 font-body">Delete</button>
                 </td>

@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
       ticket_url: body.ticket_url || null,
       ticket_provider: body.ticket_provider || null,
       ticket_commission_rate: body.ticket_commission_rate || null,
+      brochure_url: body.brochure_url || null,
+      gallery_images: body.gallery_images || null,
+      stats: body.stats || null,
     })
     .select()
     .single();
