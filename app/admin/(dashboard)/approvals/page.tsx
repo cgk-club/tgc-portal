@@ -118,7 +118,7 @@ export default function ApprovalsPage() {
       })
 
       if (res.ok) {
-        // Optimistically update the local state immediately
+        // Optimistically update local state for instant feedback
         const newStatus = action === 'approve' ? 'approved' : 'rejected'
         if (endpoint === 'fiche-edits') {
           setFicheEdits(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e))
@@ -131,6 +131,8 @@ export default function ApprovalsPage() {
         }
         setActionNote('')
         setShowNoteFor(null)
+        // Refetch to ensure server state is synced
+        fetchAll()
       }
     } finally {
       setProcessing(null)
