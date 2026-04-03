@@ -7,6 +7,7 @@ import FicheStatement from '@/components/fiche/FicheStatement'
 import FicheSplitSection from '@/components/fiche/FicheSplitSection'
 import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
 import FicheGallery from '@/components/fiche/FicheGallery'
+import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
 import ScrollReveal from '@/components/fiche/ScrollReveal'
@@ -73,6 +74,21 @@ export default function HospitalityFiche({
     }))
     .filter(card => card.imageUrl)
 
+  // ── Amenities (luxury icon grid) ────────────────────────────
+  const amenities: { label: string; value: string }[] = []
+  if (tf.room_count) amenities.push({ label: 'Rooms', value: `${tf.room_count} rooms` })
+  if (tf.restaurants_onsite) amenities.push({ label: 'Restaurant', value: `${tf.restaurants_onsite} on-site` })
+  if (tf.has_spa) amenities.push({ label: 'Spa', value: 'Yes' })
+  if (tf.pool && tf.pool !== 'none') amenities.push({ label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
+  if (tf.pet_policy) amenities.push({ label: 'Pets', value: tf.pet_policy })
+  // Add from manual highlights that aren't already covered
+  for (const h of highlights) {
+    const lbl = h.label.toLowerCase()
+    if (!amenities.some(a => a.label.toLowerCase() === lbl)) {
+      amenities.push({ label: h.label, value: h.value })
+    }
+  }
+
   // ── Stay details ──────────────────────────────────────────────
   const hasStayDetails = tf.checkin_time || tf.checkout_time || tf.minimum_stay || tf.pet_policy || (fiche.show_price && fiche.price_display)
 
@@ -138,14 +154,21 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 6. Editorial Highlights */}
+      {/* 6. Amenities (luxury icon grid) */}
+      {amenities.length > 0 && (
+        <ScrollReveal>
+          <FicheAmenityIcons amenities={amenities} title="Amenities & Services" />
+        </ScrollReveal>
+      )}
+
+      {/* 7. Editorial Highlights */}
       {highlightCards.length > 0 && (
         <ScrollReveal>
           <FicheHighlightsEditorial cards={highlightCards} />
         </ScrollReveal>
       )}
 
-      {/* 7. Stay Details */}
+      {/* 8. Stay Details */}
       {hasStayDetails && (
         <ScrollReveal>
           <div className="py-8 px-8 md:px-12 lg:px-16">
