@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ImageUpload from "@/components/partner/ImageUpload";
+import { getGuidance } from "@/lib/ficheGuidance";
 
 interface HighlightItem {
   icon?: string;
@@ -38,10 +39,12 @@ interface EditRequest {
 
 export default function PartnerFichePage() {
   const router = useRouter();
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [fiches, setFiches] = useState<Fiche[]>([]);
   const [selectedFicheId, setSelectedFicheId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [editRequests, setEditRequests] = useState<
     Record<string, EditRequest | null>
   >({});
@@ -54,7 +57,6 @@ export default function PartnerFichePage() {
   const [newHighlight, setNewHighlight] = useState("");
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
-  const [newGalleryUrl, setNewGalleryUrl] = useState("");
   const [priceDisplay, setPriceDisplay] = useState("");
   const [templateFields, setTemplateFields] = useState<
     Record<string, string>
@@ -86,7 +88,6 @@ export default function PartnerFichePage() {
   function populateFields(fiche: Fiche) {
     setHeadline(fiche.headline || "");
     setDescription(fiche.description || "");
-    // highlights is JSONB array of {icon, label, value} objects
     if (fiche.highlights && Array.isArray(fiche.highlights)) {
       setHighlights(fiche.highlights.map((h) =>
         typeof h === 'string' ? h : `${h.label}: ${h.value}`
@@ -118,15 +119,27 @@ export default function PartnerFichePage() {
     setHighlights(highlights.filter((_, i) => i !== index));
   }
 
-  function addGalleryUrl() {
-    if (newGalleryUrl.trim()) {
-      setGalleryUrls([...galleryUrls, newGalleryUrl.trim()]);
-      setNewGalleryUrl("");
-    }
-  }
-
   function removeGalleryUrl(index: number) {
     setGalleryUrls(galleryUrls.filter((_, i) => i !== index));
+  }
+
+  async function handleGalleryUpload(files: FileList) {
+    setUploading(true);
+    const newUrls: string[] = [];
+    for (const file of Array.from(files)) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/partner/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) newUrls.push(data.url);
+      }
+    }
+    setGalleryUrls([...galleryUrls, ...newUrls]);
+    setUploading(false);
   }
 
   function updateTemplateField(key: string, value: string) {
@@ -169,6 +182,7 @@ export default function PartnerFichePage() {
 
   const selectedFiche = fiches.find((f) => f.id === selectedFicheId);
   const pendingRequest = editRequests[selectedFicheId];
+  const guidance = selectedFiche ? getGuidance(selectedFiche.template_type) : getGuidance('default');
 
   // Calculate enrichment score
   function getEnrichmentScore(fiche: Fiche): number {
@@ -177,7 +191,8 @@ export default function PartnerFichePage() {
     if (fiche.description && fiche.description.length > 50) score += 20;
     if (fiche.highlights && Array.isArray(fiche.highlights) && fiche.highlights.length > 0) score += 15;
     if (fiche.hero_image_url) score += 20;
-    if (fiche.gallery_urls && fiche.gallery_urls.length > 0) score += 15;
+    if (fiche.gallery_urls && fiche.gallery_urls.length >= 4) score += 15;
+    else if (fiche.gallery_urls && fiche.gallery_urls.length > 0) score += 7;
     if (fiche.price_display) score += 10;
     if (
       fiche.template_fields &&
@@ -221,9 +236,12 @@ export default function PartnerFichePage() {
       <PartnerNav active="fiche" />
 
       <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14">
-        <h1 className="font-heading text-xl font-semibold text-green mb-6">
+        <h1 className="font-heading text-xl font-semibold text-green mb-2">
           My Fiche
         </h1>
+        <p className="text-sm text-gray-500 font-body mb-6">
+          {guidance.completionTip}
+        </p>
 
         {/* Fiche selector (if multiple) */}
         {fiches.length > 1 && (
@@ -273,13 +291,16 @@ export default function PartnerFichePage() {
                 onChange={(url) => setHeroImageUrl(url)}
                 label="Hero Image"
               />
+              <p className="text-[11px] text-gray-400 font-body mt-2 italic">
+                {guidance.heroHint}
+              </p>
             </div>
 
             {/* Enrichment Score */}
             <div className="bg-white border border-green/10 rounded-lg p-5">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
-                  Enrichment Score
+                  Fiche Completeness
                 </h2>
                 <span className="text-sm font-medium text-green font-body">
                   {enrichmentScore}%
@@ -299,7 +320,17 @@ export default function PartnerFichePage() {
               </div>
               {enrichmentScore < 80 && (
                 <p className="text-[11px] text-gray-400 font-body mt-2">
-                  Add more details to improve your fiche visibility.
+                  A complete fiche helps us market you to the right clients. Add images, a headline, and detailed descriptions to reach 100%.
+                </p>
+              )}
+              {enrichmentScore >= 80 && enrichmentScore < 100 && (
+                <p className="text-[11px] text-green font-body mt-2">
+                  Looking great. A few more details will bring your fiche to its full potential.
+                </p>
+              )}
+              {enrichmentScore >= 100 && (
+                <p className="text-[11px] text-green font-body mt-2">
+                  Your fiche is fully complete. Thank you for providing such rich content.
                 </p>
               )}
             </div>
@@ -344,7 +375,7 @@ export default function PartnerFichePage() {
               {selectedFiche.tgc_note && (
                 <div className="mt-4 pt-4 border-t border-green/5">
                   <p className="text-[10px] text-gray-400 uppercase tracking-wider font-body mb-1">
-                    TGC Note
+                    Note from TGC
                   </p>
                   <p className="text-xs text-gray-500 font-body">
                     {selectedFiche.tgc_note}
@@ -368,11 +399,15 @@ export default function PartnerFichePage() {
                   type="text"
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
+                  placeholder="A single, evocative sentence that captures your essence"
                   className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
                 />
+                <p className="text-[11px] text-gray-400 font-body mt-1 italic">
+                  This appears as a pull quote on your fiche page. Make it count.
+                </p>
               </div>
 
-              {/* Description */}
+              {/* Description with writing prompts */}
               <div>
                 <label className="block text-xs text-gray-500 font-body mb-1">
                   Description
@@ -380,15 +415,19 @@ export default function PartnerFichePage() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows={5}
+                  rows={8}
+                  placeholder={guidance.descriptionPrompt}
                   className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
                 />
+                <p className="text-[11px] text-gray-400 font-body mt-1 italic">
+                  Separate paragraphs with a blank line. Each paragraph is paired with an image in the editorial layout.
+                </p>
               </div>
 
-              {/* Highlights */}
+              {/* Highlights with suggested tags */}
               <div>
                 <label className="block text-xs text-gray-500 font-body mb-1">
-                  Highlights
+                  Highlights & Amenities
                 </label>
                 <div className="space-y-2 mb-2">
                   {highlights.map((h, i) => (
@@ -414,7 +453,7 @@ export default function PartnerFichePage() {
                     type="text"
                     value={newHighlight}
                     onChange={(e) => setNewHighlight(e.target.value)}
-                    placeholder="Add a highlight"
+                    placeholder="e.g. Pool: Heated outdoor infinity pool"
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addHighlight())}
                     className="flex-1 rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
                   />
@@ -425,47 +464,114 @@ export default function PartnerFichePage() {
                     Add
                   </button>
                 </div>
+                {/* Suggested highlights */}
+                {guidance.suggestedHighlights.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-[11px] text-gray-400 font-body mb-2">Suggested for your category:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {guidance.suggestedHighlights
+                        .filter(s => !highlights.some(h => h.toLowerCase().startsWith(s.toLowerCase())))
+                        .map(s => (
+                          <button
+                            key={s}
+                            onClick={() => { setNewHighlight(`${s}: `); }}
+                            className="text-[11px] px-2 py-1 rounded-full border border-green/15 text-green/60 hover:bg-green/5 hover:text-green transition-colors font-body"
+                          >
+                            + {s}
+                          </button>
+                        ))
+                      }
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Gallery URLs */}
+              {/* Gallery Images — file upload with labeled slots */}
               <div>
                 <label className="block text-xs text-gray-500 font-body mb-1">
                   Gallery Images
                 </label>
-                <div className="space-y-2 mb-2">
-                  {galleryUrls.map((url, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 bg-green/5 rounded-md px-3 py-2"
-                    >
-                      <span className="text-sm text-gray-700 font-body flex-1 truncate">
-                        {url}
-                      </span>
+                <p className="text-[11px] text-gray-400 font-body mb-3 italic">
+                  Upload at least 4 images. Each image is used in a specific section of your editorial fiche. The order matters.
+                </p>
+
+                {/* Image slots with guidance */}
+                <div className="space-y-3 mb-4">
+                  {guidance.imageSlots.map((slot, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green/[0.02] border border-green/10 rounded-md p-3">
+                      <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100">
+                        {galleryUrls[i] ? (
+                          <img src={galleryUrls[i]} alt={slot.label} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91M3.75 21h16.5a1.5 1.5 0 001.5-1.5V5.25a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v14.25a1.5 1.5 0 001.5 1.5z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-700 font-body">
+                          {i + 1}. {slot.label}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-body">{slot.hint}</p>
+                      </div>
+                      {galleryUrls[i] && (
+                        <button
+                          onClick={() => removeGalleryUrl(i)}
+                          className="text-gray-400 hover:text-red-400 text-xs flex-shrink-0"
+                          title="Remove"
+                        >
+                          &#10005;
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Extra images beyond the slots */}
+                  {galleryUrls.slice(guidance.imageSlots.length).map((url, i) => (
+                    <div key={`extra-${i}`} className="flex items-center gap-3 bg-green/[0.02] border border-green/10 rounded-md p-3">
+                      <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100">
+                        <img src={url} alt={`Extra ${i + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-700 font-body">
+                          {guidance.imageSlots.length + i + 1}. Additional image
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-body">Extra gallery image</p>
+                      </div>
                       <button
-                        onClick={() => removeGalleryUrl(i)}
-                        className="text-gray-400 hover:text-red-400 text-xs flex-none"
+                        onClick={() => removeGalleryUrl(guidance.imageSlots.length + i)}
+                        className="text-gray-400 hover:text-red-400 text-xs flex-shrink-0"
+                        title="Remove"
                       >
                         &#10005;
                       </button>
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={newGalleryUrl}
-                    onChange={(e) => setNewGalleryUrl(e.target.value)}
-                    placeholder="Image URL"
-                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addGalleryUrl())}
-                    className="flex-1 rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
-                  />
-                  <button
-                    onClick={addGalleryUrl}
-                    className="px-3 py-2 text-xs bg-green/5 text-green rounded-md hover:bg-green/10 transition-colors font-body"
-                  >
-                    Add
-                  </button>
-                </div>
+
+                {/* Upload button */}
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => e.target.files && handleGalleryUpload(e.target.files)}
+                />
+                <button
+                  onClick={() => galleryInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full py-3 border-2 border-dashed border-green/20 rounded-md text-sm text-green/60 hover:border-green/40 hover:text-green hover:bg-green/[0.02] transition-colors font-body disabled:opacity-50"
+                >
+                  {uploading ? "Uploading..." : `Upload images (${galleryUrls.length} of ${Math.max(guidance.imageSlots.length, 4)} recommended)`}
+                </button>
+                {galleryUrls.length < 4 && (
+                  <p className="text-[11px] text-amber-600 font-body mt-2">
+                    At least 4 images are required for your fiche to go live.
+                  </p>
+                )}
               </div>
 
               {/* Price Display */}
@@ -480,15 +586,21 @@ export default function PartnerFichePage() {
                   placeholder="e.g. From EUR 250 per night"
                   className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
                 />
+                <p className="text-[11px] text-gray-400 font-body mt-1 italic">
+                  Optional. Displayed on your fiche if enabled.
+                </p>
               </div>
 
               {/* Template-Specific Fields */}
               {selectedFiche.template_fields &&
                 Object.keys(selectedFiche.template_fields).length > 0 && (
                   <div>
-                    <label className="block text-xs text-gray-500 font-body mb-2">
+                    <label className="block text-xs text-gray-500 font-body mb-1">
                       Additional Details
                     </label>
+                    <p className="text-[11px] text-gray-400 font-body mb-3 italic">
+                      These fields are specific to your category. The more you fill in, the richer your fiche presentation.
+                    </p>
                     <div className="space-y-3">
                       {Object.entries(
                         selectedFiche.template_fields
