@@ -2,9 +2,15 @@ import { Fiche, Highlight } from '@/types'
 import { AirtableOrg } from '@/types'
 import { RealEstateFields } from '@/lib/ficheTemplates'
 import FicheHero from '@/components/fiche/FicheHero'
+import FicheStatsRibbon from '@/components/fiche/FicheStatsRibbon'
+import FicheStatement from '@/components/fiche/FicheStatement'
+import FicheSplitSection from '@/components/fiche/FicheSplitSection'
+import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
 import FicheGallery from '@/components/fiche/FicheGallery'
+import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
+import ScrollReveal from '@/components/fiche/ScrollReveal'
 
 interface Props {
   fiche: Fiche
@@ -39,143 +45,195 @@ export default function RealEstateFiche({
 }: Props) {
   const tf = (fiche.template_fields || {}) as RealEstateFields
 
-  const totalSleeps = (tf.sleeps_adults || 0) + (tf.sleeps_children || 0)
+  // ── Stats ribbon ──────────────────────────────────────────────
+  const stats: { label: string; value: string }[] = []
+  if (tf.bedrooms) stats.push({ label: 'Bedrooms', value: String(tf.bedrooms) })
+  if (tf.bathrooms) stats.push({ label: 'Bathrooms', value: String(tf.bathrooms) })
+  if (tf.sleeps_adults) stats.push({ label: 'Sleeps', value: String(tf.sleeps_adults + (tf.sleeps_children || 0)) })
+  if (tf.pool && tf.pool !== 'none') stats.push({ label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
+  if (fiche.show_price && fiche.price_display) stats.push({ label: 'From', value: fiche.price_display })
+
+  // ── Description splitting ─────────────────────────────────────
+  const paragraphs = (fiche.description || '').split('\n\n').filter(Boolean)
+  const splitParagraph1 = paragraphs[0] || ''
+  const splitParagraph2 = paragraphs[1] || ''
+
+  // ── Image allocation ──────────────────────────────────────────
+  const statementImage = galleryUrls[0] || null
+  const splitImage1 = galleryUrls[1] || null
+  const splitImage2 = galleryUrls[2] || null
+  const highlightImages = galleryUrls.slice(3, 9)
+  const galleryImages = galleryUrls.slice(Math.min(9, galleryUrls.length))
+
+  // ── Highlights for editorial cards ────────────────────────────
   const autoHighlights: Highlight[] = []
-  if (totalSleeps > 0) autoHighlights.push({ icon: '\u{1F465}', label: 'Sleeps', value: String(totalSleeps) })
-  if (tf.bedrooms) autoHighlights.push({ icon: '\u{1F6CF}', label: 'Bedrooms', value: String(tf.bedrooms) })
-  if (tf.pool && tf.pool !== 'none') autoHighlights.push({ icon: '\u{1F3CA}', label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
-  if (tf.nearest_airport) {
-    const airportLabel = tf.transfer_time ? `${tf.nearest_airport}, ${tf.transfer_time}` : tf.nearest_airport
-    autoHighlights.push({ icon: '\u2708', label: 'Airport', value: airportLabel })
-  }
+  if (tf.bedrooms) autoHighlights.push({ icon: '', label: 'Bedrooms', value: `${tf.bedrooms} bedroom${tf.bedrooms > 1 ? 's' : ''}` })
+  if (tf.bathrooms) autoHighlights.push({ icon: '', label: 'Bathrooms', value: `${tf.bathrooms} bathroom${tf.bathrooms > 1 ? 's' : ''}` })
+  if (tf.pool && tf.pool !== 'none') autoHighlights.push({ icon: '', label: 'Pool', value: `${tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1)}${tf.pool_size ? `, ${tf.pool_size}` : ''}` })
+  if (tf.nearest_airport) autoHighlights.push({ icon: '', label: 'Airport', value: tf.transfer_time ? `${tf.nearest_airport}, ${tf.transfer_time}` : tf.nearest_airport })
+  if (tf.catering) autoHighlights.push({ icon: '', label: 'Catering', value: CATERING_LABELS[tf.catering] || tf.catering })
+  if (tf.exclusive_hire) autoHighlights.push({ icon: '', label: 'Exclusive Hire', value: 'Yes' })
 
   const displayHighlights = highlights.length > 0 ? highlights : autoHighlights
 
-  const hasDetails = tf.sleeps_adults || tf.bedrooms || tf.bathrooms || tf.pool || tf.nearest_airport ||
-    tf.catering || tf.events_permitted || tf.minimum_stay || (fiche.show_price && fiche.price_display)
+  const highlightCards = displayHighlights
+    .slice(0, 6)
+    .map((h, i) => ({
+      imageUrl: highlightImages[i] || galleryUrls[i % Math.max(galleryUrls.length, 1)] || '',
+      heading: h.label,
+      description: h.value,
+    }))
+    .filter(card => card.imageUrl)
+
+  // ── Amenities (luxury icon grid) ────────────────────────────
+  const amenities: { label: string; value: string }[] = []
+  if (tf.bedrooms) amenities.push({ label: 'Rooms', value: `${tf.bedrooms} bedrooms` })
+  if (tf.bathrooms) amenities.push({ label: 'Bathrooms', value: `${tf.bathrooms}` })
+  if (tf.pool && tf.pool !== 'none') amenities.push({ label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
+  if (tf.catering) amenities.push({ label: 'Catering', value: CATERING_LABELS[tf.catering] || tf.catering })
+  if (tf.exclusive_hire) amenities.push({ label: 'Exclusive Hire', value: 'Yes' })
+  for (const h of highlights) {
+    const lbl = h.label.toLowerCase()
+    if (!amenities.some(a => a.label.toLowerCase() === lbl)) {
+      amenities.push({ label: h.label, value: h.value })
+    }
+  }
+
+  // ── Property details ──────────────────────────────────────────
+  const hasDetails = tf.sleeps_adults || tf.nearest_airport || tf.transfer_time ||
+    tf.events_permitted || tf.minimum_stay || (fiche.show_price && fiche.price_display)
 
   return (
     <>
+      {/* 1. Cinematic Hero */}
       <FicheHero
         name={name}
-        headline={fiche.headline}
         category={org?.category || ''}
         categorySub={org?.categorySub || ''}
         location={location}
         heroImageUrl={fiche.hero_image_url}
+        variant="cinematic"
       />
 
-      {displayHighlights.length > 0 && (
-        <div className="bg-green-muted py-8 px-8 md:px-12 lg:px-16">
-          <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {displayHighlights.map((h, i) => (
-              <div key={i} className="text-center">
-                <div className="text-2xl mb-1">{h.icon}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide font-body">{h.label}</div>
-                <div className="text-sm font-medium text-green font-body mt-0.5">{h.value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {fiche.description && (
-        <div className="py-10 px-8 md:px-12 lg:px-16">
-          <div className="max-w-3xl mx-auto">
-            <div className="prose prose-lg font-body text-gray-700 leading-relaxed whitespace-pre-line max-w-[65ch]">
-              {fiche.description}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 2. Stats Ribbon + Property Details */}
+      {stats.length > 0 && <FicheStatsRibbon stats={stats} />}
 
       {hasDetails && (
-        <div className="py-8 px-8 md:px-12 lg:px-16">
+        <div className="py-6 px-8 md:px-12 lg:px-16">
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white rounded-[8px] border border-gray-200 p-6">
-              <h3 className="font-heading text-lg font-semibold text-green mb-4">Property Details</h3>
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm font-body">
-                {tf.sleeps_adults && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Sleeps</dt>
-                    <dd className="text-gray-900 font-medium">
-                      {tf.sleeps_adults} adults{tf.sleeps_children ? `, ${tf.sleeps_children} children` : ''}
-                    </dd>
-                  </div>
-                )}
-                {tf.bedrooms && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Bedrooms</dt>
-                    <dd className="text-gray-900 font-medium">{tf.bedrooms}</dd>
-                  </div>
-                )}
-                {tf.bathrooms && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Bathrooms</dt>
-                    <dd className="text-gray-900 font-medium">{tf.bathrooms}</dd>
-                  </div>
-                )}
-                {tf.pool && tf.pool !== 'none' && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Pool</dt>
-                    <dd className="text-gray-900 font-medium">
-                      {tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1)}{tf.pool_size ? `, ${tf.pool_size}` : ''}
-                    </dd>
-                  </div>
-                )}
-                {tf.nearest_airport && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Nearest airport</dt>
-                    <dd className="text-gray-900 font-medium">{tf.nearest_airport}</dd>
-                  </div>
-                )}
-                {tf.transfer_time && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Transfer</dt>
-                    <dd className="text-gray-900 font-medium">{tf.transfer_time}</dd>
-                  </div>
-                )}
-                {tf.catering && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Catering</dt>
-                    <dd className="text-gray-900 font-medium">{CATERING_LABELS[tf.catering] || tf.catering}</dd>
-                  </div>
-                )}
-                {tf.events_permitted && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Events</dt>
-                    <dd className="text-gray-900 font-medium">{EVENTS_LABELS[tf.events_permitted] || tf.events_permitted}</dd>
-                  </div>
-                )}
-                {tf.exclusive_hire && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Hire</dt>
-                    <dd className="text-gray-900 font-medium">Exclusive hire only</dd>
-                  </div>
-                )}
-                {tf.minimum_stay && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Minimum stay</dt>
-                    <dd className="text-gray-900 font-medium">{tf.minimum_stay}</dd>
-                  </div>
-                )}
-                {fiche.show_price && fiche.price_display && (
-                  <div className="flex justify-between sm:block">
-                    <dt className="text-gray-400">Rate</dt>
-                    <dd className="text-gray-900 font-medium">{fiche.price_display}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
+            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-3 text-sm font-body text-center">
+              {tf.sleeps_adults && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Sleeps</dt>
+                  <dd className="text-gray-800 font-medium">
+                    {tf.sleeps_adults} adults{tf.sleeps_children ? `, ${tf.sleeps_children} children` : ''}
+                  </dd>
+                </div>
+              )}
+              {tf.nearest_airport && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Airport</dt>
+                  <dd className="text-gray-800 font-medium">{tf.nearest_airport}</dd>
+                </div>
+              )}
+              {tf.transfer_time && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Transfer</dt>
+                  <dd className="text-gray-800 font-medium">{tf.transfer_time}</dd>
+                </div>
+              )}
+              {tf.events_permitted && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Events</dt>
+                  <dd className="text-gray-800 font-medium">{EVENTS_LABELS[tf.events_permitted] || tf.events_permitted}</dd>
+                </div>
+              )}
+              {tf.minimum_stay && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Minimum stay</dt>
+                  <dd className="text-gray-800 font-medium">{tf.minimum_stay}</dd>
+                </div>
+              )}
+              {fiche.show_price && fiche.price_display && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Rate</dt>
+                  <dd className="text-gray-800 font-medium">{fiche.price_display}</dd>
+                </div>
+              )}
+            </dl>
           </div>
         </div>
       )}
 
-      <FicheGallery images={galleryUrls} name={name} />
+      {/* 3. Pull Quote / Tagline Statement */}
+      {fiche.headline && (
+        <ScrollReveal>
+          <FicheStatement
+            statement={fiche.headline}
+            backgroundImageUrl={statementImage}
+            variant={statementImage ? 'image' : 'dark'}
+          />
+        </ScrollReveal>
+      )}
 
+      {/* 4. Amenities & Services */}
+      {amenities.length > 0 && (
+        <ScrollReveal>
+          <FicheAmenityIcons amenities={amenities} title="Property Features" />
+        </ScrollReveal>
+      )}
+
+      {/* 5. Split Section — paragraph 1 */}
+      {splitParagraph1 && splitImage1 ? (
+        <ScrollReveal>
+          <FicheSplitSection
+            imageUrl={splitImage1}
+            imageAlt={`${name} — The Property`}
+            label="The Property"
+            content={splitParagraph1}
+            imagePosition="right"
+          />
+        </ScrollReveal>
+      ) : splitParagraph1 && !splitImage1 ? (
+        <ScrollReveal>
+          <div className="py-10 px-8 md:px-12 lg:px-16">
+            <div className="max-w-3xl mx-auto">
+              <div className="prose prose-lg font-body text-gray-700 leading-relaxed whitespace-pre-line max-w-[65ch]">
+                {fiche.description}
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      ) : null}
+
+      {/* 6. Split Section — paragraph 2 */}
+      {splitParagraph2 && splitImage2 && (
+        <ScrollReveal>
+          <FicheSplitSection
+            imageUrl={splitImage2}
+            imageAlt={`${name} — The Living`}
+            label="The Living"
+            content={splitParagraph2}
+            imagePosition="left"
+          />
+        </ScrollReveal>
+      )}
+
+      {/* 7. Editorial Highlights */}
+      {highlightCards.length > 0 && (
+        <ScrollReveal>
+          <FicheHighlightsEditorial cards={highlightCards} />
+        </ScrollReveal>
+      )}
+
+      {/* 8. Gallery */}
+      {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
+
+      {/* 9. Tags */}
       <FicheTags tags={tags} />
 
-      <FicheContact name={name} />
+      {/* 10. CTA */}
+      <FicheContact name={name} variant="editorial" />
     </>
   )
 }

@@ -2,9 +2,15 @@ import { Fiche, Highlight } from '@/types'
 import { AirtableOrg } from '@/types'
 import { WineEstateFields } from '@/lib/ficheTemplates'
 import FicheHero from '@/components/fiche/FicheHero'
+import FicheStatsRibbon from '@/components/fiche/FicheStatsRibbon'
+import FicheStatement from '@/components/fiche/FicheStatement'
+import FicheSplitSection from '@/components/fiche/FicheSplitSection'
+import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
 import FicheGallery from '@/components/fiche/FicheGallery'
+import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
+import ScrollReveal from '@/components/fiche/ScrollReveal'
 
 interface Props {
   fiche: Fiche
@@ -27,165 +33,199 @@ export default function WineEstateFiche({
 }: Props) {
   const tf = (fiche.template_fields || {}) as WineEstateFields
 
+  // ── Stats ribbon ──────────────────────────────────────────────
+  const stats: { label: string; value: string }[] = []
+  if (tf.appellation) stats.push({ label: 'Appellation', value: tf.appellation })
+  if (tf.hectares) stats.push({ label: 'Hectares', value: `${tf.hectares}ha` })
+  if (tf.established) stats.push({ label: 'Established', value: String(tf.established) })
+  if (tf.accommodation) stats.push({ label: 'Accommodation', value: tf.room_count ? `${tf.room_count} rooms` : 'Yes' })
+  if (fiche.show_price && fiche.price_display) stats.push({ label: 'From', value: fiche.price_display })
+
+  // ── Description splitting ─────────────────────────────────────
+  const paragraphs = (fiche.description || '').split('\n\n').filter(Boolean)
+  const splitParagraph1 = paragraphs[0] || ''
+  const splitParagraph2 = paragraphs[1] || ''
+
+  // ── Image allocation ──────────────────────────────────────────
+  const statementImage = galleryUrls[0] || null
+  const splitImage1 = galleryUrls[1] || null
+  const splitImage2 = galleryUrls[2] || null
+  const highlightImages = galleryUrls.slice(3, 9)
+  const galleryImages = galleryUrls.slice(Math.min(9, galleryUrls.length))
+
+  // ── Highlights for editorial cards ────────────────────────────
   const autoHighlights: Highlight[] = []
-  if (tf.appellation) autoHighlights.push({ icon: '\u{1F347}', label: 'Appellation', value: tf.appellation })
-  if (tf.certifications) autoHighlights.push({ icon: '\u{1F33F}', label: 'Certification', value: tf.certifications })
-  if (tf.established) autoHighlights.push({ icon: '\u{1F4C5}', label: 'Established', value: String(tf.established) })
-  autoHighlights.push({ icon: '\u{1F3E0}', label: 'Accommodation', value: tf.accommodation ? 'Yes' : 'No' })
+  if (tf.appellation) autoHighlights.push({ icon: '', label: 'Appellation', value: tf.appellation })
+  if (tf.grape_varieties) autoHighlights.push({ icon: '', label: 'Varieties', value: tf.grape_varieties })
+  if (tf.winemaker) autoHighlights.push({ icon: '', label: 'Winemaker', value: tf.winemaker })
+  if (tf.certifications) autoHighlights.push({ icon: '', label: 'Certification', value: tf.certifications })
+  if (tf.cellar_visits) autoHighlights.push({ icon: '', label: 'Cellar Visits', value: tf.cellar_visits })
+  if (tf.tasting_format) autoHighlights.push({ icon: '', label: 'Tasting', value: tf.tasting_format })
 
   const displayHighlights = highlights.length > 0 ? highlights : autoHighlights
 
-  const hasWineDetails = tf.appellation || tf.hectares || tf.grape_varieties ||
-    tf.annual_production || tf.winemaker
+  const highlightCards = displayHighlights
+    .slice(0, 6)
+    .map((h, i) => ({
+      imageUrl: highlightImages[i] || galleryUrls[i % Math.max(galleryUrls.length, 1)] || '',
+      heading: h.label,
+      description: h.value,
+    }))
+    .filter(card => card.imageUrl)
 
-  const hasVisitDetails = tf.cellar_visits || tf.tasting_format ||
-    tf.restaurant_bistro !== undefined || tf.accommodation !== undefined ||
+  // ── Amenities (luxury icon grid) ────────────────────────────
+  const amenities: { label: string; value: string }[] = []
+  if (tf.appellation) amenities.push({ label: 'Appellation', value: tf.appellation })
+  if (tf.hectares) amenities.push({ label: 'Vineyard', value: `${tf.hectares}ha` })
+  if (tf.grape_varieties) amenities.push({ label: 'Varieties', value: tf.grape_varieties })
+  if (tf.cellar_visits) amenities.push({ label: 'Cellar Visits', value: tf.cellar_visits })
+  if (tf.tasting_format) amenities.push({ label: 'Tasting', value: tf.tasting_format })
+  if (tf.restaurant_bistro) amenities.push({ label: 'Restaurant', value: 'On-site' })
+  if (tf.accommodation) amenities.push({ label: 'Accommodation', value: tf.accommodation_details || 'Available' })
+  if (tf.shipping) amenities.push({ label: 'Shipping', value: tf.shipping })
+  for (const h of highlights) {
+    const lbl = h.label.toLowerCase()
+    if (!amenities.some(a => a.label.toLowerCase() === lbl)) {
+      amenities.push({ label: h.label, value: h.value })
+    }
+  }
+
+  // ── Wine & visiting details ───────────────────────────────────
+  const hasDetails = tf.annual_production || tf.winemaker || tf.certifications ||
+    (tf.accommodation && (tf.checkin_time || tf.checkout_time)) ||
     tf.shipping || (fiche.show_price && fiche.price_display)
-
-  const mailtoSubject = encodeURIComponent(`Visit Enquiry: ${name}`)
 
   return (
     <>
+      {/* 1. Cinematic Hero */}
       <FicheHero
         name={name}
-        headline={fiche.headline}
         category={org?.category || ''}
         categorySub="Wine Estate"
         location={location}
         heroImageUrl={fiche.hero_image_url}
+        variant="cinematic"
       />
 
-      {displayHighlights.length > 0 && (
-        <div className="bg-green-muted py-8 px-8 md:px-12 lg:px-16">
-          <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {displayHighlights.map((h, i) => (
-              <div key={i} className="text-center">
-                <div className="text-2xl mb-1">{h.icon}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide font-body">{h.label}</div>
-                <div className="text-sm font-medium text-green font-body mt-0.5">{h.value}</div>
-              </div>
-            ))}
+      {/* 2. Stats Ribbon + Details */}
+      {stats.length > 0 && <FicheStatsRibbon stats={stats} />}
+
+      {hasDetails && (
+        <div className="py-6 px-8 md:px-12 lg:px-16">
+          <div className="max-w-3xl mx-auto">
+            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-3 text-sm font-body text-center">
+              {tf.annual_production && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Production</dt>
+                  <dd className="text-gray-800 font-medium">{tf.annual_production}</dd>
+                </div>
+              )}
+              {tf.winemaker && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Winemaker</dt>
+                  <dd className="text-gray-800 font-medium">{tf.winemaker}</dd>
+                </div>
+              )}
+              {tf.certifications && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Certification</dt>
+                  <dd className="text-gray-800 font-medium">{tf.certifications}</dd>
+                </div>
+              )}
+              {tf.accommodation && (tf.checkin_time || tf.checkout_time) && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Check-in / out</dt>
+                  <dd className="text-gray-800 font-medium">
+                    {[tf.checkin_time, tf.checkout_time].filter(Boolean).join(' / ')}
+                  </dd>
+                </div>
+              )}
+              {tf.shipping && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Shipping</dt>
+                  <dd className="text-gray-800 font-medium">{tf.shipping}</dd>
+                </div>
+              )}
+              {fiche.show_price && fiche.price_display && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Rate</dt>
+                  <dd className="text-gray-800 font-medium">{fiche.price_display}</dd>
+                </div>
+              )}
+            </dl>
           </div>
         </div>
       )}
 
-      {fiche.description && (
-        <div className="py-10 px-8 md:px-12 lg:px-16">
-          <div className="max-w-3xl mx-auto">
-            <div className="prose prose-lg font-body text-gray-700 leading-relaxed whitespace-pre-line max-w-[65ch]">
-              {fiche.description}
+      {/* 3. Pull Quote / Tagline Statement */}
+      {fiche.headline && (
+        <ScrollReveal>
+          <FicheStatement
+            statement={fiche.headline}
+            backgroundImageUrl={statementImage}
+            variant={statementImage ? 'image' : 'dark'}
+          />
+        </ScrollReveal>
+      )}
+
+      {/* 4. Amenities & Services */}
+      {amenities.length > 0 && (
+        <ScrollReveal>
+          <FicheAmenityIcons amenities={amenities} title="The Estate" />
+        </ScrollReveal>
+      )}
+
+      {/* 5. Split Section — paragraph 1 */}
+      {splitParagraph1 && splitImage1 ? (
+        <ScrollReveal>
+          <FicheSplitSection
+            imageUrl={splitImage1}
+            imageAlt={`${name} — The Terroir`}
+            label="The Terroir"
+            content={splitParagraph1}
+            imagePosition="right"
+          />
+        </ScrollReveal>
+      ) : splitParagraph1 && !splitImage1 ? (
+        <ScrollReveal>
+          <div className="py-10 px-8 md:px-12 lg:px-16">
+            <div className="max-w-3xl mx-auto">
+              <div className="prose prose-lg font-body text-gray-700 leading-relaxed whitespace-pre-line max-w-[65ch]">
+                {fiche.description}
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
+      ) : null}
+
+      {/* 6. Split Section — paragraph 2 */}
+      {splitParagraph2 && splitImage2 && (
+        <ScrollReveal>
+          <FicheSplitSection
+            imageUrl={splitImage2}
+            imageAlt={`${name} — The Wines`}
+            label="The Wines"
+            content={splitParagraph2}
+            imagePosition="left"
+          />
+        </ScrollReveal>
       )}
 
-      {(hasWineDetails || hasVisitDetails) && (
-        <div className="py-8 px-8 md:px-12 lg:px-16">
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-            {hasWineDetails && (
-              <div className="bg-white rounded-[8px] border border-gray-200 p-6">
-                <h3 className="font-heading text-lg font-semibold text-green mb-4">The Wines</h3>
-                <dl className="space-y-3 text-sm font-body">
-                  {tf.appellation && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Appellation</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.appellation}</dd>
-                    </div>
-                  )}
-                  {tf.hectares && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Hectares</dt>
-                      <dd className="text-gray-900 font-medium">{tf.hectares}ha</dd>
-                    </div>
-                  )}
-                  {tf.grape_varieties && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Varieties</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.grape_varieties}</dd>
-                    </div>
-                  )}
-                  {tf.annual_production && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Production</dt>
-                      <dd className="text-gray-900 font-medium">{tf.annual_production}</dd>
-                    </div>
-                  )}
-                  {tf.winemaker && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Winemaker</dt>
-                      <dd className="text-gray-900 font-medium">{tf.winemaker}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            )}
-
-            {hasVisitDetails && (
-              <div className="bg-white rounded-[8px] border border-gray-200 p-6">
-                <h3 className="font-heading text-lg font-semibold text-green mb-4">Visiting</h3>
-                <dl className="space-y-3 text-sm font-body">
-                  {tf.cellar_visits && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Cellar visits</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.cellar_visits}</dd>
-                    </div>
-                  )}
-                  {tf.tasting_format && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Tasting</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.tasting_format}</dd>
-                    </div>
-                  )}
-                  {tf.restaurant_bistro !== undefined && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Restaurant</dt>
-                      <dd className="text-gray-900 font-medium">{tf.restaurant_bistro ? 'Yes' : 'No'}</dd>
-                    </div>
-                  )}
-                  {tf.accommodation && tf.accommodation_details && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Accommodation</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.accommodation_details}</dd>
-                    </div>
-                  )}
-                  {tf.accommodation && tf.room_count && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Rooms</dt>
-                      <dd className="text-gray-900 font-medium">{tf.room_count}</dd>
-                    </div>
-                  )}
-                  {tf.accommodation && (tf.checkin_time || tf.checkout_time) && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Check-in / out</dt>
-                      <dd className="text-gray-900 font-medium">
-                        {[tf.checkin_time, tf.checkout_time].filter(Boolean).join(' / ')}
-                      </dd>
-                    </div>
-                  )}
-                  {tf.shipping && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Shipping</dt>
-                      <dd className="text-gray-900 font-medium text-right">{tf.shipping}</dd>
-                    </div>
-                  )}
-                  {fiche.show_price && fiche.price_display && (
-                    <div className="flex justify-between">
-                      <dt className="text-gray-400">Rate</dt>
-                      <dd className="text-gray-900 font-medium">{fiche.price_display}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* 7. Editorial Highlights */}
+      {highlightCards.length > 0 && (
+        <ScrollReveal>
+          <FicheHighlightsEditorial cards={highlightCards} />
+        </ScrollReveal>
       )}
 
-      <FicheGallery images={galleryUrls} name={name} />
+      {/* 8. Gallery */}
+      {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
 
+      {/* 9. Tags */}
       <FicheTags tags={tags} />
 
-      <FicheContact name={name} />
+      {/* 10. CTA */}
+      <FicheContact name={name} variant="editorial" />
     </>
   )
 }
