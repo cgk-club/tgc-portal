@@ -520,10 +520,22 @@ export default function AdminPaymentsPage() {
                           {doc.title}
                         </a>
                         {doc.requires_signature && (
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${doc.signature_status === "signed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                            {doc.signature_status === "signed" ? "Signed" : "Awaiting signature"}
-                            {doc.signatures?.[0]?.signed_at && ` ${formatDate(doc.signatures[0].signed_at)}`}
-                          </span>
+                          <>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${doc.signature_status === "signed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                              {doc.signature_status === "signed" ? "Signed" : "Awaiting signature"}
+                              {doc.signatures?.[0]?.signed_at && ` ${formatDate(doc.signatures[0].signed_at)}`}
+                            </span>
+                            {doc.signature_status === "signed" && (
+                              <a
+                                href={`/api/admin/documents/${doc.id}/signature-page`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-green-600 hover:text-green-800 font-medium"
+                              >
+                                Download Signature
+                              </a>
+                            )}
+                          </>
                         )}
                         <span className="text-gray-300 text-[10px]">{formatDate(doc.created_at)}</span>
                         <button onClick={() => handleDocDelete(p.id, doc.id)} className="text-red-400 hover:text-red-600 text-[10px]">Delete</button>
