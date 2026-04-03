@@ -322,8 +322,13 @@ export default function AdminPaymentsPage() {
             <input placeholder="Payment URL" value={form.cc_payment_url} onChange={e => setForm({ ...form, cc_payment_url: e.target.value })} className="text-sm border rounded px-3 py-2 w-full" />
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input placeholder="Internal notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="text-sm border rounded px-3 py-2" />
-            <input placeholder="Client-visible notes" value={form.client_notes} onChange={e => setForm({ ...form, client_notes: e.target.value })} className="text-sm border rounded px-3 py-2" />
+            <input placeholder="Internal notes (commission, contacts — never shown to client)" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="text-sm border rounded px-3 py-2" />
+            <div>
+              <input placeholder="Client-visible notes (NO commission info)" value={form.client_notes} onChange={e => setForm({ ...form, client_notes: e.target.value })} className={`text-sm border rounded px-3 py-2 w-full ${/\b(commission|margin|markup|net rate|our fee|tgc fee)\b/i.test(form.client_notes) ? 'border-red-500 bg-red-50' : ''}`} />
+              {/\b(commission|margin|markup|net rate|our fee|tgc fee)\b/i.test(form.client_notes) && (
+                <p className="text-[11px] text-red-600 mt-1">Commission/margin info must go in Internal notes, not here. Clients can see this field.</p>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
             <button type="submit" disabled={saving} className="text-xs bg-green text-white px-4 py-2 rounded hover:bg-green/90">{saving ? "Saving..." : "Save"}</button>

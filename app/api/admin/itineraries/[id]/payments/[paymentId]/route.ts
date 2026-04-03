@@ -14,6 +14,17 @@ export async function PUT(
 
     const updates: Record<string, unknown> = { ...body, updated_at: new Date().toISOString() };
 
+    // SAFEGUARD: Strip commission/margin keywords from client_notes
+    if (typeof updates.client_notes === 'string') {
+      const forbidden = /\b(commission|margin|markup|net rate|our fee|tgc fee|our cut)\b/i;
+      if (forbidden.test(updates.client_notes)) {
+        return NextResponse.json(
+          { error: 'Client notes must not contain commission or margin information. Use the internal Notes field instead.' },
+          { status: 422 }
+        );
+      }
+    }
+
     // Auto-set payment date fields on status change
     if (body.payment_status) {
       const { data: current } = await supabase
