@@ -15,6 +15,7 @@ import FeedbackQueue from '@/components/admin/dashboard/FeedbackQueue'
 import UpcomingDeadlines, { UpcomingDeadlineItem } from '@/components/admin/dashboard/UpcomingDeadlines'
 import ClientProjects from '@/components/admin/dashboard/ClientProjects'
 import NotificationPanel from '@/components/admin/NotificationPanel'
+import DashboardRefresh from '@/components/admin/dashboard/DashboardRefresh'
 
 export const dynamic = 'force-dynamic'
 
@@ -488,6 +489,7 @@ export default async function AdminDashboard() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      <DashboardRefresh />
       <h1 className="font-heading text-2xl font-semibold text-green mb-6">Dashboard</h1>
 
       {/* Deadlines strip */}

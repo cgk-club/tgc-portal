@@ -2,6 +2,11 @@
 const nextConfig = {
   output: 'standalone',
   serverExternalPackages: ['bcryptjs'],
+  experimental: {
+    staleTimes: {
+      dynamic: 0,
+    },
+  },
   images: {
     remotePatterns: [
       {
