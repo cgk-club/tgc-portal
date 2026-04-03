@@ -22,6 +22,7 @@ const config: Config = {
       fontFamily: {
         heading: ['Poppins', 'sans-serif'],
         body: ['Lato', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
       },
     },
   },

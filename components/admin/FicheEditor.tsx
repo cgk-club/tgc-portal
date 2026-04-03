@@ -462,6 +462,11 @@ export default function FicheEditor({ fiche: initial }: FicheEditorProps) {
             <option value="live">Live</option>
             <option value="archived">Archived</option>
           </select>
+          {status === 'live' && galleryUrls.length < 4 && (
+            <div className="mt-2 p-3 rounded-[4px] bg-amber-50 border border-amber-200 text-sm text-amber-800 font-body">
+              <strong>Gallery:</strong> At least 4 images are required for the editorial layout. This fiche currently has {galleryUrls.length}.
+            </div>
+          )}
         </div>
 
         {/* Featured */}

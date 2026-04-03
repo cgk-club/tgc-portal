@@ -54,6 +54,24 @@ export async function PATCH(
     }
   }
 
+  // Enforce minimum 4 gallery images for live status
+  if (updates.status === 'live') {
+    let galleryCount = 0
+    if ('gallery_urls' in updates && Array.isArray(updates.gallery_urls)) {
+      galleryCount = updates.gallery_urls.length
+    } else {
+      const sb2 = getSupabaseAdmin()
+      const { data: current } = await sb2.from('fiches').select('gallery_urls').eq('id', id).single()
+      galleryCount = Array.isArray(current?.gallery_urls) ? current.gallery_urls.length : 0
+    }
+    if (galleryCount < 4) {
+      return NextResponse.json(
+        { error: 'At least 4 gallery images are required to publish a fiche.' },
+        { status: 422 }
+      )
+    }
+  }
+
   const sb = getSupabaseAdmin()
   const { data: fiche, error } = await sb
     .from('fiches')
