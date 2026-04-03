@@ -37,20 +37,21 @@ export default function FicheHero({
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.3)_100%)]" />
 
-        <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 lg:p-16 pb-24">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
           {displayCategory && (
-            <span className="inline-flex items-center w-fit rounded-full bg-white/15 backdrop-blur-sm border border-white/10 px-3 py-1 text-xs font-medium text-white tracking-wider uppercase mb-6">
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/10 px-3 py-1 text-xs font-medium text-white tracking-wider uppercase mb-6">
               {displayCategory}
             </span>
           )}
           <h1 className="text-white font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 max-w-4xl">
             {name}
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center gap-3">
             <div className="w-8 h-px bg-gold" />
             <p className="text-white/60 font-body text-sm md:text-base tracking-wide">
               {location}
             </p>
+            <div className="w-8 h-px bg-gold" />
           </div>
         </div>
 

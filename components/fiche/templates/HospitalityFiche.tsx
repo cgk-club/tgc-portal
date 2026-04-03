@@ -94,7 +94,7 @@ export default function HospitalityFiche({
 
   return (
     <>
-      {/* 1. Cinematic Hero */}
+      {/* 1. Cinematic Hero (centered title) */}
       <FicheHero
         name={name}
         category={org?.category || ''}
@@ -104,10 +104,49 @@ export default function HospitalityFiche({
         variant="cinematic"
       />
 
-      {/* 2. Stats Ribbon */}
+      {/* 2. Stats Ribbon + Stay Details (together, right after hero) */}
       {stats.length > 0 && <FicheStatsRibbon stats={stats} />}
 
-      {/* 3. Pull Quote Statement */}
+      {hasStayDetails && (
+        <div className="py-6 px-8 md:px-12 lg:px-16">
+          <div className="max-w-3xl mx-auto">
+            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-3 text-sm font-body text-center">
+              {tf.checkin_time && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Check-in</dt>
+                  <dd className="text-gray-800 font-medium">{tf.checkin_time}</dd>
+                </div>
+              )}
+              {tf.checkout_time && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Check-out</dt>
+                  <dd className="text-gray-800 font-medium">{tf.checkout_time}</dd>
+                </div>
+              )}
+              {tf.minimum_stay && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Minimum stay</dt>
+                  <dd className="text-gray-800 font-medium">{tf.minimum_stay}</dd>
+                </div>
+              )}
+              {tf.pet_policy && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Pets</dt>
+                  <dd className="text-gray-800 font-medium">{tf.pet_policy}</dd>
+                </div>
+              )}
+              {fiche.show_price && fiche.price_display && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 uppercase tracking-widest mb-1">Rate</dt>
+                  <dd className="text-gray-800 font-medium">{fiche.price_display}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Pull Quote / Tagline Statement */}
       {fiche.headline && (
         <ScrollReveal>
           <FicheStatement
@@ -118,7 +157,14 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 4. Split Section — paragraph 1 */}
+      {/* 4. Amenities & Services (after tagline, before splits) */}
+      {amenities.length > 0 && (
+        <ScrollReveal>
+          <FicheAmenityIcons amenities={amenities} title="Amenities & Services" />
+        </ScrollReveal>
+      )}
+
+      {/* 5. Split Section — paragraph 1 */}
       {splitParagraph1 && splitImage1 ? (
         <ScrollReveal>
           <FicheSplitSection
@@ -141,7 +187,7 @@ export default function HospitalityFiche({
         </ScrollReveal>
       ) : null}
 
-      {/* 5. Split Section — paragraph 2 */}
+      {/* 6. Split Section — paragraph 2 */}
       {splitParagraph2 && splitImage2 && (
         <ScrollReveal>
           <FicheSplitSection
@@ -154,13 +200,6 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 6. Amenities (luxury icon grid) */}
-      {amenities.length > 0 && (
-        <ScrollReveal>
-          <FicheAmenityIcons amenities={amenities} title="Amenities & Services" />
-        </ScrollReveal>
-      )}
-
       {/* 7. Editorial Highlights */}
       {highlightCards.length > 0 && (
         <ScrollReveal>
@@ -168,52 +207,7 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 8. Stay Details */}
-      {hasStayDetails && (
-        <ScrollReveal>
-          <div className="py-8 px-8 md:px-12 lg:px-16">
-            <div className="max-w-3xl mx-auto">
-              <div className="bg-white rounded-[8px] border border-gray-200 p-6">
-                <h3 className="font-heading text-lg font-semibold text-green mb-4">Stay Details</h3>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm font-body">
-                  {tf.checkin_time && (
-                    <div className="flex justify-between sm:block">
-                      <dt className="text-gray-400">Check-in</dt>
-                      <dd className="text-gray-900 font-medium">{tf.checkin_time}</dd>
-                    </div>
-                  )}
-                  {tf.checkout_time && (
-                    <div className="flex justify-between sm:block">
-                      <dt className="text-gray-400">Check-out</dt>
-                      <dd className="text-gray-900 font-medium">{tf.checkout_time}</dd>
-                    </div>
-                  )}
-                  {tf.minimum_stay && (
-                    <div className="flex justify-between sm:block">
-                      <dt className="text-gray-400">Minimum stay</dt>
-                      <dd className="text-gray-900 font-medium">{tf.minimum_stay}</dd>
-                    </div>
-                  )}
-                  {tf.pet_policy && (
-                    <div className="flex justify-between sm:block">
-                      <dt className="text-gray-400">Pets</dt>
-                      <dd className="text-gray-900 font-medium">{tf.pet_policy}</dd>
-                    </div>
-                  )}
-                  {fiche.show_price && fiche.price_display && (
-                    <div className="flex justify-between sm:block">
-                      <dt className="text-gray-400">Rate</dt>
-                      <dd className="text-gray-900 font-medium">{fiche.price_display}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
-      )}
-
-      {/* 8. Gallery (remaining images) */}
+      {/* 8. Gallery */}
       {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
 
       {/* 9. Tags */}
