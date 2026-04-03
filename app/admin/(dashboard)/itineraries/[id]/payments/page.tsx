@@ -119,6 +119,16 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Auto-load documents for all payments so signature status is visible at a glance
+  useEffect(() => {
+    if (payments.length > 0) {
+      payments.forEach(p => {
+        if (!docs[p.id]) loadDocs(p.id);
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payments]);
+
   async function loadDocs(paymentId: string) {
     const res = await fetch(`/api/admin/itineraries/${itineraryId}/payments/${paymentId}/documents`);
     if (res.ok) {
@@ -357,6 +367,13 @@ export default function AdminPaymentsPage() {
                   />
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  {/* Signature status badges (at a glance) */}
+                  {docs[p.id]?.some(d => d.requires_signature && d.signature_status === 'signed') && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-green-100 text-green-700">Signed</span>
+                  )}
+                  {docs[p.id]?.some(d => d.requires_signature && d.signature_status !== 'signed') && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-amber-100 text-amber-700">Awaiting sig.</span>
+                  )}
                   <select
                     value={p.payment_status}
                     onChange={(e) => handleFieldUpdate(p.id, { payment_status: e.target.value })}
