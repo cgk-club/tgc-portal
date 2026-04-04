@@ -7,6 +7,18 @@ const nextConfig = {
       dynamic: 0,
     },
   },
+  async headers() {
+    return [
+      {
+        source: '/api/admin/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+          { key: 'Expires', value: '0' },
+        ],
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {

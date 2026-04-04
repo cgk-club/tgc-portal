@@ -39,5 +39,7 @@ export async function GET() {
     fiche: fichesMap.get(r.fiche_id) || null,
   }))
 
-  return NextResponse.json(result)
+  const response = NextResponse.json(result)
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+  return response
 }
