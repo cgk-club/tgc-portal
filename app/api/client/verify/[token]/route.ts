@@ -32,8 +32,10 @@ export async function GET(
   // Create session
   const sessionToken = await createClientSession(magicToken.client_id, magicToken.client.email)
 
+  // Redirect to password setup if no password set yet
+  const needsPassword = !magicToken.client.password_hash
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || ''
-  const response = NextResponse.redirect(new URL('/client', appUrl || request.url))
+  const response = NextResponse.redirect(new URL(needsPassword ? '/client/setup-password' : '/client', appUrl || request.url))
   response.cookies.set(CLIENT_COOKIE_NAME, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
