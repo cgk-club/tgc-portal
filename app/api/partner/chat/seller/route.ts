@@ -195,6 +195,32 @@ Collect the following, in conversational order:
 In the JSON output, include these in category_fields:
 aircraft_type, registration, total_airframe_hours, engine_hours_smoh, avionics, useful_load, range_nm, seats, fuel_type, fuel_capacity, paint_condition, interior_condition, maintenance_program, hangar_location, ads_compliance, logbooks_complete, damage_history`;
 
+const WINES_SPIRITS_PROMPT = `${BASE_PROMPT}
+
+CATEGORY: WINES & SPIRITS
+
+Collect the following, in conversational order:
+1. Type (whisky, wine, cognac, rum, champagne, etc.) (required)
+2. Distillery, producer, or chateau name (required)
+3. Expression or cuvee name
+4. Region or appellation (e.g. Speyside, Bordeaux, Islay, Cognac)
+5. Vintage year or distillation year (if applicable)
+6. Age statement (e.g. 25 Year Old, NAS)
+7. ABV / alcohol content
+8. Bottle size (standard 70cl/75cl, magnum, etc.)
+9. Cask number and/or bottle number (if limited edition)
+10. Limited edition or special release details (edition size, release year)
+11. Original packaging (box, tube, presentation case, wooden crate)
+12. Condition of bottle and label (fill level for wine, any damage, label condition)
+13. Storage history (cellar conditions, professional storage, temperature controlled)
+14. Provenance (where and when acquired)
+15. Why are they selling? (helps TGC write the story)
+16. Asking price or pricing preference (fixed price / price on request / offers invited)
+17. Where the bottle is located
+
+In the JSON output, include these in category_fields:
+spirit_type, distillery_producer, region_appellation, vintage_year, age_statement, abv, bottle_size, cask_number, bottle_number, limited_edition, edition_size, original_packaging, storage_conditions, provenance`;
+
 const PROMPTS: Record<string, string> = {
   horology: HOROLOGY_PROMPT,
   art: ART_PROMPT,
@@ -203,6 +229,7 @@ const PROMPTS: Record<string, string> = {
   artisan_products: ARTISAN_PROMPT,
   the_marina: MARINA_PROMPT,
   the_hangar: HANGAR_PROMPT,
+  wines_spirits: WINES_SPIRITS_PROMPT,
 };
 
 function getSellerPrompt(category: string): string {
