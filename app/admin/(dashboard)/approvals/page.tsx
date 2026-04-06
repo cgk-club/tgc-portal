@@ -133,6 +133,8 @@ export default function ApprovalsPage() {
         setShowNoteFor(null)
         // Refetch to ensure server state is synced
         fetchAll()
+        // Tell sidebar to refresh badge counts immediately
+        window.dispatchEvent(new Event('badge-refresh'))
       }
     } finally {
       setProcessing(null)

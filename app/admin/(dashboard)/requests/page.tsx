@@ -29,11 +29,14 @@ interface EventEnquiry {
   created_at: string;
 }
 
+const STATUSES = ["new", "contacted", "quoted", "confirmed", "closed"] as const;
+
 export default function AdminRequestsPage() {
   const [requests, setRequests] = useState<ClientRequest[]>([]);
   const [eventEnquiries, setEventEnquiries] = useState<EventEnquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"requests" | "events">("requests");
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -48,6 +51,27 @@ export default function AdminRequestsPage() {
     load();
   }, []);
 
+  async function updateStatus(id: string, table: "client_requests" | "event_enquiries", newStatus: string) {
+    setUpdating(id);
+    try {
+      const res = await fetch(`/api/admin/requests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus, table }),
+      });
+      if (res.ok) {
+        if (table === "client_requests") {
+          setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+        } else {
+          setEventEnquiries(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
+        }
+        window.dispatchEvent(new Event("badge-refresh"));
+      }
+    } finally {
+      setUpdating(null);
+    }
+  }
+
   if (loading) return <div className="p-4 sm:p-6 lg:p-8"><p className="text-gray-500 font-body">Loading...</p></div>;
 
   const statusColor = (s: string) => {
@@ -55,14 +79,38 @@ export default function AdminRequestsPage() {
     if (s === "contacted") return "bg-blue-50 text-blue-600";
     if (s === "quoted") return "bg-green/10 text-green";
     if (s === "confirmed") return "bg-green/20 text-green";
+    if (s === "closed") return "bg-gray-100 text-gray-500";
     return "bg-gray-100 text-gray-500";
   };
+
+  function StatusButtons({ id, currentStatus, table }: { id: string; currentStatus: string; table: "client_requests" | "event_enquiries" }) {
+    const nextStatuses = STATUSES.filter(s => s !== currentStatus);
+    return (
+      <div className="flex gap-1 mt-3">
+        {nextStatuses.map(s => (
+          <button
+            key={s}
+            onClick={() => updateStatus(id, table, s)}
+            disabled={updating === id}
+            className={`text-[10px] px-2 py-1 rounded font-body transition-colors ${
+              s === "contacted" ? "bg-blue-50 text-blue-600 hover:bg-blue-100" :
+              s === "quoted" ? "bg-green/10 text-green hover:bg-green/20" :
+              s === "confirmed" ? "bg-green/20 text-green hover:bg-green/30" :
+              s === "closed" ? "bg-gray-100 text-gray-500 hover:bg-gray-200" :
+              "bg-gold/10 text-gold hover:bg-gold/20"
+            } disabled:opacity-50`}
+          >
+            {s === "new" ? "Reopen" : s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 sm:p-8">
       <h1 className="font-heading text-2xl font-semibold text-green mb-6">Requests & Enquiries</h1>
 
-      {/* Tabs */}
       <div className="flex gap-1 mb-6">
         <button
           onClick={() => setTab("requests")}
@@ -78,11 +126,10 @@ export default function AdminRequestsPage() {
         </button>
       </div>
 
-      {/* Client Requests */}
       {tab === "requests" && (
         requests.length === 0 ? (
           <div className="bg-white rounded-lg border border-green/10 p-12 text-center">
-            <p className="text-gray-400 font-body">No client requests yet. When clients use the conversation chat, their requests will appear here.</p>
+            <p className="text-gray-400 font-body">No client requests yet.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -106,13 +153,13 @@ export default function AdminRequestsPage() {
                     <pre className="mt-2 text-xs text-gray-500 bg-pearl p-3 rounded overflow-x-auto">{JSON.stringify(req.raw_chat_json, null, 2)}</pre>
                   </details>
                 )}
+                <StatusButtons id={req.id} currentStatus={req.status} table="client_requests" />
               </div>
             ))}
           </div>
         )
       )}
 
-      {/* Event Enquiries */}
       {tab === "events" && (
         eventEnquiries.length === 0 ? (
           <div className="bg-white rounded-lg border border-green/10 p-12 text-center">
@@ -124,9 +171,7 @@ export default function AdminRequestsPage() {
               <div key={eq.id} className="bg-white rounded-lg border border-green/10 p-5">
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-green/60 uppercase tracking-wide font-body">{eq.is_bespoke ? 'Bespoke Event' : 'Event Enquiry'}</span>
-                    </div>
+                    <span className="text-xs text-green/60 uppercase tracking-wide font-body">{eq.is_bespoke ? 'Bespoke Event' : 'Event Enquiry'}</span>
                     <h3 className="font-heading text-sm font-semibold text-gray-800">{eq.event_name}</h3>
                     <p className="text-xs text-gray-500 font-body">{eq.name} / {eq.email}{eq.phone ? ` / ${eq.phone}` : ''}</p>
                   </div>
@@ -140,6 +185,7 @@ export default function AdminRequestsPage() {
                   {eq.group_size && <div className="text-xs font-body"><span className="text-gray-400">Group:</span> <span className="text-gray-700">{eq.group_size}</span></div>}
                   {eq.budget_range && <div className="text-xs font-body"><span className="text-gray-400">Budget:</span> <span className="text-gray-700">{eq.budget_range}</span></div>}
                 </div>
+                <StatusButtons id={eq.id} currentStatus={eq.status} table="event_enquiries" />
               </div>
             ))}
           </div>

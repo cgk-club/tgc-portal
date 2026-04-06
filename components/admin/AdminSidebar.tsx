@@ -56,9 +56,14 @@ export default function AdminSidebar() {
     fetchCounts()
     const interval = setInterval(fetchCounts, 60000)
 
+    // Listen for immediate refresh from other pages (approvals, requests, etc.)
+    function onBadgeRefresh() { fetchCounts() }
+    window.addEventListener('badge-refresh', onBadgeRefresh)
+
     return () => {
       cancelled = true
       clearInterval(interval)
+      window.removeEventListener('badge-refresh', onBadgeRefresh)
     }
   }, [])
 
