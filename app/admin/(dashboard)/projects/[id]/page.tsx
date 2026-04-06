@@ -51,6 +51,26 @@ interface Financial {
   created_at: string
 }
 
+interface VisibilitySettings {
+  financials: 'hidden' | 'read_only' | 'full_access'
+  tasks: 'own_only' | 'all'
+  documents: 'own_only' | 'all'
+  activity: 'filtered' | 'all'
+  guests: 'hidden' | 'view'
+  sponsors: 'hidden' | 'view'
+  budget: 'hidden' | 'view'
+}
+
+const DEFAULT_VISIBILITY: VisibilitySettings = {
+  financials: 'hidden',
+  tasks: 'own_only',
+  documents: 'own_only',
+  activity: 'filtered',
+  guests: 'hidden',
+  sponsors: 'hidden',
+  budget: 'hidden',
+}
+
 interface PartnerLink {
   id: string
   project_id: string
@@ -59,6 +79,7 @@ interface PartnerLink {
   role: string
   status: string | null
   notes: string | null
+  visibility_settings: VisibilitySettings | null
   created_at: string
 }
 
@@ -230,11 +251,25 @@ function OverviewDashboard({
   onSetTab,
   onCompleteMilestone,
   onCompleteTask,
+  editingNotes,
+  notesValue,
+  savingNotes,
+  onStartEditNotes,
+  onCancelEditNotes,
+  onChangeNotes,
+  onSaveNotes,
 }: {
   project: ProjectDetail
   onSetTab: (tab: TabKey) => void
   onCompleteMilestone: (mid: string) => void
   onCompleteTask: (taskId: string, status: string) => void
+  editingNotes: boolean
+  notesValue: string
+  savingNotes: boolean
+  onStartEditNotes: () => void
+  onCancelEditNotes: () => void
+  onChangeNotes: (val: string) => void
+  onSaveNotes: () => void
 }) {
   const pd = project.property_details as Record<string, unknown>
   const isEvent = !!pd?.event_type
@@ -517,12 +552,43 @@ function OverviewDashboard({
         </div>
 
         {/* Row 4: Notes */}
-        {project.notes && (
-          <div className="bg-white rounded-lg border border-green/10 p-5">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Notes</h3>
-            <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Notes</h3>
+            {!editingNotes && (
+              <button onClick={onStartEditNotes} className="text-[11px] text-green hover:underline font-body">Edit</button>
+            )}
           </div>
-        )}
+          {editingNotes ? (
+            <div>
+              <textarea
+                rows={4}
+                value={notesValue}
+                onChange={(e) => onChangeNotes(e.target.value)}
+                className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+              />
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={onSaveNotes}
+                  disabled={savingNotes}
+                  className="text-xs px-3 py-1.5 bg-green text-white rounded hover:bg-green-light font-body disabled:opacity-50 transition-colors"
+                >
+                  {savingNotes ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={onCancelEditNotes}
+                  className="text-xs px-3 py-1.5 border border-green/20 text-gray-500 rounded hover:bg-gray-50 font-body transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            project.notes
+              ? <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+              : <p className="text-sm text-gray-400 font-body">No notes yet. Click Edit to add notes.</p>
+          )}
+        </div>
       </div>
     )
   }
@@ -744,12 +810,43 @@ function OverviewDashboard({
       </div>
 
       {/* Notes */}
-      {project.notes && (
-        <div className="bg-white rounded-lg border border-green/10 p-5">
-          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Notes</h3>
-          <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+      <div className="bg-white rounded-lg border border-green/10 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Notes</h3>
+          {!editingNotes && (
+            <button onClick={onStartEditNotes} className="text-[11px] text-green hover:underline font-body">Edit</button>
+          )}
         </div>
-      )}
+        {editingNotes ? (
+          <div>
+            <textarea
+              rows={4}
+              value={notesValue}
+              onChange={(e) => onChangeNotes(e.target.value)}
+              className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={onSaveNotes}
+                disabled={savingNotes}
+                className="text-xs px-3 py-1.5 bg-green text-white rounded hover:bg-green-light font-body disabled:opacity-50 transition-colors"
+              >
+                {savingNotes ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={onCancelEditNotes}
+                className="text-xs px-3 py-1.5 border border-green/20 text-gray-500 rounded hover:bg-gray-50 font-body transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          project.notes
+            ? <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+            : <p className="text-sm text-gray-400 font-body">No notes yet. Click Edit to add notes.</p>
+        )}
+      </div>
     </div>
   )
 }
@@ -919,6 +1016,12 @@ export default function ProjectDetailPage() {
   const [partnerResults, setPartnerResults] = useState<Array<{ id: string; org_name: string | null; email: string }>>([])
   const [selectedPartnerId, setSelectedPartnerId] = useState('')
   const [partnerRole, setPartnerRole] = useState('')
+  const [expandedPartnerId, setExpandedPartnerId] = useState<string | null>(null)
+
+  // Inline notes editing state
+  const [editingNotes, setEditingNotes] = useState(false)
+  const [notesValue, setNotesValue] = useState('')
+  const [savingNotes, setSavingNotes] = useState(false)
 
   // Task state
   const [showAddTask, setShowAddTask] = useState(false)
@@ -943,6 +1046,7 @@ export default function ProjectDetailPage() {
 
   function startEditing() {
     if (!project) return
+    const pd = project.property_details as Record<string, unknown> || {}
     setEditForm({
       title: project.title,
       type: project.type,
@@ -957,6 +1061,7 @@ export default function ProjectDetailPage() {
       start_date: project.start_date || '',
       target_date: project.target_date || '',
       notes: project.notes || '',
+      show_sponsors_to_clients: pd.show_sponsors_to_clients ? 'true' : 'false',
     })
     setEditing(true)
   }
@@ -964,6 +1069,13 @@ export default function ProjectDetailPage() {
   async function saveOverview() {
     setSaving(true)
     setError('')
+
+    // Merge show_sponsors_to_clients into property_details
+    const existingPd = (project?.property_details as Record<string, unknown>) || {}
+    const updatedPd = {
+      ...existingPd,
+      show_sponsors_to_clients: editForm.show_sponsors_to_clients === 'true',
+    }
 
     const payload: Record<string, unknown> = {
       title: editForm.title,
@@ -979,6 +1091,7 @@ export default function ProjectDetailPage() {
       start_date: editForm.start_date || null,
       target_date: editForm.target_date || null,
       notes: editForm.notes || null,
+      property_details: updatedPd,
     }
 
     const res = await fetch(`/api/admin/projects/${id}`, {
@@ -1268,6 +1381,33 @@ export default function ProjectDetailPage() {
     fetchProject()
   }
 
+  async function updatePartnerVisibility(pid: string, key: keyof VisibilitySettings, value: string) {
+    const partner = project?.partners.find(p => p.id === pid)
+    if (!partner) return
+    const current: VisibilitySettings = { ...DEFAULT_VISIBILITY, ...(partner.visibility_settings || {}) }
+    const updated = { ...current, [key]: value }
+    await fetch(`/api/admin/projects/${id}/partners/${pid}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visibility_settings: updated }),
+    })
+    fetchProject()
+  }
+
+  async function saveInlineNotes() {
+    setSavingNotes(true)
+    const res = await fetch(`/api/admin/projects/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: notesValue || null }),
+    })
+    if (res.ok) {
+      setEditingNotes(false)
+      fetchProject()
+    }
+    setSavingNotes(false)
+  }
+
   // ── Task actions ────────────────────────────────���────────────
 
   async function addTask(e: React.FormEvent) {
@@ -1461,6 +1601,13 @@ export default function ProjectDetailPage() {
                 onSetTab={setActiveTab}
                 onCompleteMilestone={(mid) => updateMilestoneStatus(mid, 'completed')}
                 onCompleteTask={updateTaskStatus}
+                editingNotes={editingNotes}
+                notesValue={notesValue}
+                savingNotes={savingNotes}
+                onStartEditNotes={() => { setNotesValue(project.notes || ''); setEditingNotes(true) }}
+                onCancelEditNotes={() => setEditingNotes(false)}
+                onChangeNotes={setNotesValue}
+                onSaveNotes={saveInlineNotes}
               />
 
               {/* Danger zone */}
@@ -1605,6 +1752,20 @@ export default function ProjectDetailPage() {
                     onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
                     className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
                   />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editForm.show_sponsors_to_clients === 'true'}
+                      onChange={(e) => setEditForm({ ...editForm, show_sponsors_to_clients: e.target.checked ? 'true' : 'false' })}
+                      className="w-4 h-4 rounded border-gray-300 text-green focus:ring-green"
+                    />
+                    <span className="text-sm text-gray-700 font-body">Show sponsors to clients</span>
+                  </label>
+                  <p className="text-[11px] text-gray-400 font-body mt-1 ml-6">
+                    When enabled, clients will be able to see sponsor logos and names on their project view.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3 mt-4">
@@ -2109,54 +2270,145 @@ export default function ProjectDetailPage() {
               <p className="text-gray-500 font-body text-sm">No partners linked to this project.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-green/10 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-green/10">
-                    <th className="text-left px-4 py-2 text-xs text-gray-400 font-body">Partner</th>
-                    <th className="text-left px-4 py-2 text-xs text-gray-400 font-body">Role</th>
-                    <th className="text-center px-4 py-2 text-xs text-gray-400 font-body">Status</th>
-                    <th className="text-right px-4 py-2 text-xs text-gray-400 font-body"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {project.partners.map((pp) => (
-                    <tr key={pp.id} className="border-b border-green/5 last:border-0">
-                      <td className="px-4 py-2 text-gray-800 font-body font-medium">
-                        {pp.partner?.org_name || pp.partner?.email || '-'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-600 font-body">{pp.role}</td>
-                      <td className="px-4 py-2 text-center">
-                        <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
-                          pp.status === 'completed' ? 'bg-green-muted text-green'
-                            : pp.status === 'active' ? 'bg-blue-50 text-blue-600'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {pp.status || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {pp.status === 'active' && (
-                            <button
-                              onClick={() => completePartner(pp.id)}
-                              className="text-xs text-green hover:text-green-light font-medium"
-                            >
-                              Complete
-                            </button>
-                          )}
+            <div className="space-y-2">
+              {project.partners.map((pp) => {
+                const vis: VisibilitySettings = { ...DEFAULT_VISIBILITY, ...(pp.visibility_settings || {}) }
+                const isExpanded = expandedPartnerId === pp.id
+                return (
+                  <div key={pp.id} className="bg-white rounded-lg border border-green/10 overflow-hidden">
+                    <div className="flex items-center gap-4 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-800 font-body font-medium">
+                          {pp.partner?.org_name || pp.partner?.email || '-'}
+                        </p>
+                        <p className="text-xs text-gray-500 font-body">{pp.role}</p>
+                      </div>
+                      <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                        pp.status === 'completed' ? 'bg-green-muted text-green'
+                          : pp.status === 'active' ? 'bg-blue-50 text-blue-600'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {pp.status || '-'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setExpandedPartnerId(isExpanded ? null : pp.id)}
+                          className={`text-[11px] px-2.5 py-1 rounded font-body transition-colors ${
+                            isExpanded ? 'bg-green/10 text-green' : 'bg-gray-50 text-gray-500 hover:bg-green/5 hover:text-green'
+                          }`}
+                        >
+                          Permissions
+                        </button>
+                        {pp.status === 'active' && (
                           <button
-                            onClick={() => removePartner(pp.id)}
-                            className="text-xs text-gray-400 hover:text-red-500"
+                            onClick={() => completePartner(pp.id)}
+                            className="text-xs text-green hover:text-green-light font-medium"
                           >
-                            Remove
+                            Complete
                           </button>
+                        )}
+                        <button
+                          onClick={() => removePartner(pp.id)}
+                          className="text-xs text-gray-400 hover:text-red-500"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="border-t border-green/10 px-4 py-4 bg-pearl/30">
+                        <h4 className="text-[10px] font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                          Visibility Controls
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Financials</label>
+                            <select
+                              value={vis.financials}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'financials', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="read_only">Read Only</option>
+                              <option value="full_access">Full Access</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Tasks</label>
+                            <select
+                              value={vis.tasks}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'tasks', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="own_only">Own Only</option>
+                              <option value="all">All Tasks</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Documents</label>
+                            <select
+                              value={vis.documents}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'documents', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="own_only">Own Only</option>
+                              <option value="all">All Documents</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Activity</label>
+                            <select
+                              value={vis.activity}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'activity', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="filtered">Filtered (Admin + Own)</option>
+                              <option value="all">All Activity</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Guests</label>
+                            <select
+                              value={vis.guests}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'guests', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Sponsors</label>
+                            <select
+                              value={vis.sponsors}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'sponsors', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Budget</label>
+                            <select
+                              value={vis.budget}
+                              onChange={(e) => updatePartnerVisibility(pp.id, 'budget', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <p className="text-[10px] text-gray-400 font-body mt-3">
+                          Changes save automatically. Default: all restricted.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
 

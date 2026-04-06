@@ -51,6 +51,35 @@ interface OtherPartner {
   status: string;
 }
 
+interface VisibilitySettings {
+  financials: "hidden" | "read_only" | "full_access";
+  tasks: "own_only" | "all";
+  documents: "own_only" | "all";
+  activity: "filtered" | "all";
+  guests: "hidden" | "view";
+  sponsors: "hidden" | "view";
+  budget: "hidden" | "view";
+}
+
+interface PartnerFinancial {
+  id: string;
+  type: string;
+  description: string;
+  amount: number;
+  currency: string;
+  date: string | null;
+  status: string | null;
+  document_url?: string | null;
+  notes?: string | null;
+}
+
+interface PartnerGuest {
+  id: string;
+  name: string;
+  company: string | null;
+  status: string;
+}
+
 interface ProjectDetail {
   project: {
     id: string;
@@ -63,6 +92,9 @@ interface ProjectDetail {
     status: string;
     start_date: string | null;
     target_date: string | null;
+    budget?: number | null;
+    actual_spend?: number | null;
+    currency?: string;
   };
   client_first_name: string;
   assignment: {
@@ -70,11 +102,15 @@ interface ProjectDetail {
     status: string;
     notes: string | null;
   };
+  visibility_settings: VisibilitySettings;
   milestones: Milestone[];
   documents: Document[];
   updates: Update[];
   other_partners: OtherPartner[];
   tasks: PartnerTask[];
+  financials?: PartnerFinancial[];
+  guests?: PartnerGuest[];
+  sponsors?: string[];
 }
 
 const TYPE_STYLES: Record<string, { bg: string; text: string }> = {
@@ -149,9 +185,7 @@ export default function PartnerProjectDetailPage() {
 
   const [data, setData] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "milestones" | "tasks" | "documents" | "activity"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<string>("overview");
 
   // Update form
   const [updateMessage, setUpdateMessage] = useState("");
@@ -286,8 +320,8 @@ export default function PartnerProjectDetailPage() {
     );
   }
 
-  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, tasks } =
-    data;
+  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, tasks,
+    visibility_settings: vis, financials, guests, sponsors } = data;
 
   const typeStyle = TYPE_STYLES[project.type] || {
     bg: "bg-gray-50",
@@ -301,12 +335,21 @@ export default function PartnerProjectDetailPage() {
       ? Math.round((completedMilestones / milestones.length) * 100)
       : 0;
 
-  const TABS = [
-    { key: "overview" as const, label: "Overview" },
-    { key: "milestones" as const, label: `Milestones (${milestones.length})` },
-    ...(tasks && tasks.length > 0 ? [{ key: "tasks" as const, label: `Tasks (${tasks.length})` }] : []),
-    { key: "documents" as const, label: `Documents (${documents.length})` },
-    { key: "activity" as const, label: `Activity (${updates.length})` },
+  const formatCurrency = (amount: number, currency: string = "EUR") =>
+    new Intl.NumberFormat("en-GB", {
+      style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0,
+    }).format(amount);
+
+  const TABS: { key: string; label: string }[] = [
+    { key: "overview", label: "Overview" },
+    { key: "milestones", label: `Milestones (${milestones.length})` },
+    ...(tasks && tasks.length > 0 ? [{ key: "tasks", label: `Tasks (${tasks.length})` }] : []),
+    { key: "documents", label: `Documents (${documents.length})` },
+    ...(vis?.financials && vis.financials !== "hidden" && financials && financials.length > 0
+      ? [{ key: "financials", label: `Financials (${financials.length})` }] : []),
+    ...(vis?.guests === "view" && guests && guests.length > 0
+      ? [{ key: "guests", label: `Guests (${guests.length})` }] : []),
+    { key: "activity", label: `Activity (${updates.length})` },
   ];
 
   return (
@@ -502,7 +545,7 @@ export default function PartnerProjectDetailPage() {
               </div>
               <div className="bg-white border border-green/10 rounded-lg p-4">
                 <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
-                  Your Tasks
+                  {vis?.tasks === "all" ? "All Tasks" : "Your Tasks"}
                 </p>
                 <p className="text-2xl font-heading font-semibold text-green">
                   {tasks.filter((t) => t.status !== "completed").length}
@@ -519,15 +562,50 @@ export default function PartnerProjectDetailPage() {
                   {documents.length}
                 </p>
               </div>
-              <div className="bg-white border border-green/10 rounded-lg p-4">
-                <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
-                  Updates
-                </p>
-                <p className="text-2xl font-heading font-semibold text-green">
-                  {updates.length}
-                </p>
-              </div>
+              {vis?.budget === "view" && project.budget ? (
+                <div className="bg-white border border-green/10 rounded-lg p-4">
+                  <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
+                    Budget
+                  </p>
+                  <p className="text-2xl font-heading font-semibold text-green">
+                    {formatCurrency(project.budget, project.currency || "EUR")}
+                  </p>
+                  {project.actual_spend != null && project.actual_spend > 0 && (
+                    <p className="text-[10px] text-gray-400 font-body mt-0.5">
+                      {formatCurrency(project.actual_spend, project.currency || "EUR")} spent
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white border border-green/10 rounded-lg p-4">
+                  <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
+                    Updates
+                  </p>
+                  <p className="text-2xl font-heading font-semibold text-green">
+                    {updates.length}
+                  </p>
+                </div>
+              )}
             </div>
+
+            {/* Sponsors section (if visible) */}
+            {vis?.sponsors === "view" && sponsors && sponsors.length > 0 && (
+              <div className="bg-white border border-green/10 rounded-lg p-5">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                  Sponsors
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {sponsors.map((name, i) => (
+                    <span
+                      key={i}
+                      className="text-xs px-3 py-1.5 bg-gold/10 text-gold rounded-full font-body font-medium"
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Milestone progress */}
             {milestones.length > 0 && (
@@ -1187,6 +1265,105 @@ export default function PartnerProjectDetailPage() {
                 <p className="text-sm text-gray-400 font-body">
                   No tasks assigned to you yet.
                 </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "financials" && vis?.financials !== "hidden" && financials && (
+          <div className="bg-white border border-green/10 rounded-lg p-5">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">
+              Financials
+            </h3>
+            {financials.length === 0 ? (
+              <p className="text-sm text-gray-400 font-body text-center py-4">
+                No financial records yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-green/10">
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Type</th>
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Description</th>
+                      <th className="text-right px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Amount</th>
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Date</th>
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Status</th>
+                      {vis.financials === "full_access" && (
+                        <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Notes</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {financials.map((f) => (
+                      <tr key={f.id} className="border-b border-green/5 last:border-0">
+                        <td className="px-3 py-2 text-gray-600 font-body capitalize">{f.type.replace(/_/g, " ")}</td>
+                        <td className="px-3 py-2 text-gray-800 font-body">{f.description}</td>
+                        <td className="px-3 py-2 text-right font-body font-medium text-green">
+                          {formatCurrency(f.amount, f.currency)}
+                        </td>
+                        <td className="px-3 py-2 text-gray-500 font-body">{f.date ? formatDate(f.date) : "-"}</td>
+                        <td className="px-3 py-2">
+                          {f.status && (
+                            <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                              f.status === "paid" ? "bg-green/10 text-green"
+                                : f.status === "pending" ? "bg-gold/15 text-gold"
+                                : "bg-gray-100 text-gray-500"
+                            }`}>
+                              {f.status}
+                            </span>
+                          )}
+                        </td>
+                        {vis.financials === "full_access" && (
+                          <td className="px-3 py-2 text-xs text-gray-400 font-body">{f.notes || "-"}</td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "guests" && vis?.guests === "view" && guests && (
+          <div className="bg-white border border-green/10 rounded-lg p-5">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">
+              Guest List
+            </h3>
+            {guests.length === 0 ? (
+              <p className="text-sm text-gray-400 font-body text-center py-4">
+                No guests registered yet.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-green/10">
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Name</th>
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Company</th>
+                      <th className="text-left px-3 py-2 text-[10px] text-gray-400 font-body uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {guests.map((g) => (
+                      <tr key={g.id} className="border-b border-green/5 last:border-0">
+                        <td className="px-3 py-2 text-gray-800 font-body font-medium">{g.name}</td>
+                        <td className="px-3 py-2 text-gray-500 font-body">{g.company || "-"}</td>
+                        <td className="px-3 py-2">
+                          <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                            g.status === "confirmed" ? "bg-green/10 text-green"
+                              : g.status === "invited" ? "bg-blue-50 text-blue-600"
+                              : g.status === "declined" ? "bg-red-50 text-red-500"
+                              : "bg-gray-100 text-gray-500"
+                          }`}>
+                            {g.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

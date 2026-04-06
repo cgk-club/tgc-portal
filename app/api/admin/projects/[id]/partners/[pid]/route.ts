@@ -11,7 +11,7 @@ export async function PATCH(
   const body = await request.json()
   const sb = getSupabaseAdmin()
 
-  const allowed = ['role', 'status', 'notes']
+  const allowed = ['role', 'status', 'notes', 'visibility_settings']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) {
