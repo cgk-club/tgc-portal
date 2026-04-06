@@ -72,6 +72,23 @@ interface Update {
   created_at: string
 }
 
+interface Task {
+  id: string
+  project_id: string
+  title: string
+  description: string | null
+  assigned_to: string[]
+  assigned_partner_names: string[]
+  priority: string
+  status: string
+  due_date: string | null
+  completed_date: string | null
+  created_by: string
+  created_by_type: string
+  notes: string | null
+  created_at: string
+}
+
 interface ProjectDetail {
   id: string
   client_id: string | null
@@ -100,16 +117,18 @@ interface ProjectDetail {
   financials: Financial[]
   partners: PartnerLink[]
   updates: Update[]
+  tasks: Task[]
   progress: number
 }
 
 // ── Constants ──────────────────────────────────────────────────
 
-type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'partners' | 'activity'
+type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'partners' | 'tasks' | 'activity'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
   { key: 'milestones', label: 'Milestones' },
+  { key: 'tasks', label: 'Tasks' },
   { key: 'documents', label: 'Documents' },
   { key: 'financials', label: 'Financials' },
   { key: 'partners', label: 'Partners' },
@@ -204,6 +223,128 @@ function relativeTime(d: string) {
   return formatDateShort(d)
 }
 
+// ── Event Hero Component ──────────────────────────────────────
+
+function EventProjectHero({ project }: { project: ProjectDetail }) {
+  const pd = project.property_details as Record<string, unknown>
+  const completedMs = project.milestones.filter(m => m.status === 'completed').length
+  const totalMs = project.milestones.length
+  const msPercent = totalMs > 0 ? Math.round((completedMs / totalMs) * 100) : 0
+  const location = [project.property_city, project.property_country].filter(Boolean).join(', ')
+  const dates = (pd.dates as string) || (project.start_date && project.target_date
+    ? `${formatDateShort(project.start_date)} - ${formatDateShort(project.target_date)}`
+    : project.start_date ? `From ${formatDateShort(project.start_date)}` : '')
+  const capacity = (pd.capacity as string) || ''
+  const revenueSplit = (pd.revenue_split as string) || ''
+  const packages = pd.packages as Record<string, { individual?: string | number; couple?: string | number }> | undefined
+  const partnerNames = project.partners
+    .map(p => p.partner?.org_name || p.partner?.email || p.role)
+    .filter(Boolean)
+
+  return (
+    <div className="mb-6">
+      {/* Hero banner */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'linear-gradient(135deg, #0e4f51 0%, #0a3a3c 60%, #0e4f51 100%)' }}>
+        <div className="relative px-6 py-8 sm:px-8 sm:py-10">
+          {/* Subtle gold accent line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #c8aa4a, transparent)' }} />
+
+          <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-white mb-2">{project.title}</h2>
+          <div className="w-16 h-[2px] bg-gold mb-6" />
+
+          {/* Key stats row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            {location && (
+              <div>
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider mb-0.5">Location</p>
+                <p className="text-sm text-white font-body font-medium">{location}</p>
+              </div>
+            )}
+            {dates && (
+              <div>
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider mb-0.5">Dates</p>
+                <p className="text-sm text-white font-body font-medium">{dates}</p>
+              </div>
+            )}
+            {capacity && (
+              <div>
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider mb-0.5">Capacity</p>
+                <p className="text-sm text-white font-body font-medium">{capacity}</p>
+              </div>
+            )}
+            {project.budget && (
+              <div>
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider mb-0.5">Budget</p>
+                <p className="text-sm text-white font-body font-medium">{formatCurrency(project.budget, project.currency)}</p>
+              </div>
+            )}
+            {revenueSplit && (
+              <div>
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider mb-0.5">Revenue Split</p>
+                <p className="text-sm text-white font-body font-medium">{revenueSplit}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Milestone progress bar */}
+          {totalMs > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] text-white/50 font-body uppercase tracking-wider">Milestones</p>
+                <span className="text-xs text-white/70 font-body">{completedMs} of {totalMs} complete</span>
+              </div>
+              <div className="h-2 bg-white/15 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${msPercent}%`, backgroundColor: '#c8aa4a' }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Partner names */}
+          {partnerNames.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              <span className="text-[10px] text-white/40 font-body uppercase tracking-wider">Partners:</span>
+              {partnerNames.map((name, i) => (
+                <span key={i} className="text-[11px] px-2 py-0.5 rounded bg-white/10 text-white/80 font-body">{name}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Package cards */}
+      {packages && Object.keys(packages).length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          {Object.entries(packages).slice(0, 3).map(([name, pkg]) => (
+            <div key={name} className="bg-white rounded-lg border border-green/10 p-5 text-center">
+              <h4 className="font-heading text-sm font-semibold text-green mb-3">{name}</h4>
+              <div className="w-8 h-[1px] bg-gold mx-auto mb-3" />
+              {pkg.individual && (
+                <div className="mb-1">
+                  <span className="text-xs text-gray-400 font-body">Individual: </span>
+                  <span className="text-sm font-heading font-semibold text-green">
+                    {typeof pkg.individual === 'number' ? formatCurrency(pkg.individual, project.currency) : pkg.individual}
+                  </span>
+                </div>
+              )}
+              {pkg.couple && (
+                <div>
+                  <span className="text-xs text-gray-400 font-body">Couple: </span>
+                  <span className="text-sm font-heading font-semibold text-green">
+                    {typeof pkg.couple === 'number' ? formatCurrency(pkg.couple, project.currency) : pkg.couple}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Component ──────────────────────────────────────────────────
 
 export default function ProjectDetailPage() {
@@ -247,6 +388,10 @@ export default function ProjectDetailPage() {
   const [partnerResults, setPartnerResults] = useState<Array<{ id: string; org_name: string | null; email: string }>>([])
   const [selectedPartnerId, setSelectedPartnerId] = useState('')
   const [partnerRole, setPartnerRole] = useState('')
+
+  // Task state
+  const [showAddTask, setShowAddTask] = useState(false)
+  const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', due_date: '', assigned_to: [] as string[] })
 
   // Activity state
   const [newMessage, setNewMessage] = useState('')
@@ -592,7 +737,49 @@ export default function ProjectDetailPage() {
     fetchProject()
   }
 
-  // ── Activity actions ─────────────────────────────────────────
+  // ── Task actions ────────────────────────────────���────────────
+
+  async function addTask(e: React.FormEvent) {
+    e.preventDefault()
+    if (!taskForm.title.trim()) return
+    setSaving(true)
+
+    const res = await fetch(`/api/admin/projects/${id}/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: taskForm.title.trim(),
+        description: taskForm.description.trim() || null,
+        priority: taskForm.priority,
+        due_date: taskForm.due_date || null,
+        assigned_to: taskForm.assigned_to,
+      }),
+    })
+
+    if (res.ok) {
+      setShowAddTask(false)
+      setTaskForm({ title: '', description: '', priority: 'medium', due_date: '', assigned_to: [] })
+      fetchProject()
+    }
+    setSaving(false)
+  }
+
+  async function updateTaskStatus(taskId: string, status: string) {
+    await fetch(`/api/admin/projects/${id}/tasks/${taskId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    fetchProject()
+  }
+
+  async function deleteTask(taskId: string) {
+    if (!confirm('Delete this task?')) return
+    await fetch(`/api/admin/projects/${id}/tasks/${taskId}`, { method: 'DELETE' })
+    fetchProject()
+  }
+
+  // ── Activity actions ─────────���───────────────────────────────
 
   async function postUpdate(e: React.FormEvent) {
     e.preventDefault()
@@ -705,6 +892,9 @@ export default function ProjectDetailPage() {
             {tab.key === 'financials' && project.financials.length > 0 && (
               <span className="ml-1.5 text-xs text-gray-400">({project.financials.length})</span>
             )}
+            {tab.key === 'tasks' && project.tasks && project.tasks.length > 0 && (
+              <span className="ml-1.5 text-xs text-gray-400">({project.tasks.length})</span>
+            )}
           </button>
         ))}
       </div>
@@ -712,6 +902,11 @@ export default function ProjectDetailPage() {
       {/* ═══════════════════ OVERVIEW TAB ═══════════════════ */}
       {activeTab === 'overview' && (
         <div>
+          {/* Event Project Hero */}
+          {project.property_details && !!(project.property_details as Record<string, unknown>).event_type && (
+            <EventProjectHero project={project} />
+          )}
+
           {!editing ? (
             <div>
               <div className="flex justify-end mb-4 gap-2">
@@ -1584,6 +1779,261 @@ export default function ProjectDetailPage() {
                     <Button variant="ghost" type="button" onClick={() => setShowAddPartner(false)}>Cancel</Button>
                     <Button type="submit" disabled={saving || !selectedPartnerId || !partnerRole.trim()}>
                       {saving ? 'Linking...' : 'Link Partner'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════════════ TASKS TAB ═══════════════════ */}
+      {activeTab === 'tasks' && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+              Tasks ({(project.tasks || []).filter(t => t.status !== 'completed').length} active)
+            </h2>
+            <Button size="sm" onClick={() => setShowAddTask(true)}>Add Task</Button>
+          </div>
+
+          {(!project.tasks || project.tasks.length === 0) ? (
+            <div className="bg-white rounded-lg border border-green/10 p-8 text-center">
+              <p className="text-gray-500 font-body text-sm">No tasks yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* In Progress */}
+              {project.tasks.filter(t => t.status === 'in_progress').length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-gold uppercase tracking-wider font-body mb-3">In Progress</h3>
+                  <div className="space-y-2">
+                    {project.tasks.filter(t => t.status === 'in_progress').map(task => (
+                      <div key={task.id} className="bg-white rounded-lg border border-green/10 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="text-sm font-body font-medium text-gray-800">{task.title}</p>
+                              <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                                task.priority === 'urgent' ? 'bg-red-50 text-red-600'
+                                  : task.priority === 'high' ? 'bg-amber-50 text-amber-600'
+                                  : task.priority === 'medium' ? 'bg-blue-50 text-blue-600'
+                                  : 'bg-gray-100 text-gray-500'
+                              }`}>
+                                {task.priority}
+                              </span>
+                            </div>
+                            {task.description && <p className="text-xs text-gray-500 font-body mb-1">{task.description}</p>}
+                            <div className="flex items-center gap-3 flex-wrap">
+                              {task.due_date && (
+                                <span className="text-xs text-gray-400 font-body">Due: {formatDateShort(task.due_date)}</span>
+                              )}
+                              {task.assigned_partner_names && task.assigned_partner_names.length > 0 && (
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  {task.assigned_partner_names.map((name, i) => (
+                                    <span key={i} className="text-[10px] px-1.5 py-0.5 bg-green/5 text-green/70 rounded font-body">{name}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => updateTaskStatus(task.id, 'completed')}
+                              className="text-xs text-green hover:text-green-light font-medium font-body"
+                            >
+                              Complete
+                            </button>
+                            <button
+                              onClick={() => updateTaskStatus(task.id, 'pending')}
+                              className="text-xs text-gray-400 hover:text-gray-600 font-body ml-2"
+                            >
+                              Pause
+                            </button>
+                            <button onClick={() => deleteTask(task.id)} className="text-xs text-gray-300 hover:text-red-500 ml-2">&times;</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pending */}
+              {project.tasks.filter(t => t.status === 'pending').length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Pending</h3>
+                  <div className="space-y-2">
+                    {project.tasks.filter(t => t.status === 'pending').map(task => (
+                      <div key={task.id} className="bg-white rounded-lg border border-green/10 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="text-sm font-body font-medium text-gray-800">{task.title}</p>
+                              <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                                task.priority === 'urgent' ? 'bg-red-50 text-red-600'
+                                  : task.priority === 'high' ? 'bg-amber-50 text-amber-600'
+                                  : task.priority === 'medium' ? 'bg-blue-50 text-blue-600'
+                                  : 'bg-gray-100 text-gray-500'
+                              }`}>
+                                {task.priority}
+                              </span>
+                            </div>
+                            {task.description && <p className="text-xs text-gray-500 font-body mb-1">{task.description}</p>}
+                            <div className="flex items-center gap-3 flex-wrap">
+                              {task.due_date && (
+                                <span className="text-xs text-gray-400 font-body">Due: {formatDateShort(task.due_date)}</span>
+                              )}
+                              {task.assigned_partner_names && task.assigned_partner_names.length > 0 && (
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  {task.assigned_partner_names.map((name, i) => (
+                                    <span key={i} className="text-[10px] px-1.5 py-0.5 bg-green/5 text-green/70 rounded font-body">{name}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => updateTaskStatus(task.id, 'in_progress')}
+                              className="text-xs text-gold hover:text-gold/80 font-medium font-body"
+                            >
+                              Start
+                            </button>
+                            <button
+                              onClick={() => updateTaskStatus(task.id, 'completed')}
+                              className="text-xs text-green hover:text-green-light font-medium font-body ml-2"
+                            >
+                              Complete
+                            </button>
+                            <button onClick={() => deleteTask(task.id)} className="text-xs text-gray-300 hover:text-red-500 ml-2">&times;</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Completed */}
+              {project.tasks.filter(t => t.status === 'completed').length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider font-body mb-3">Completed</h3>
+                  <div className="space-y-2">
+                    {project.tasks.filter(t => t.status === 'completed').map(task => (
+                      <div key={task.id} className="bg-white rounded-lg border border-green/10 p-4 opacity-60">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="text-sm font-body font-medium text-gray-400 line-through">{task.title}</p>
+                              <span className="inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium bg-green-muted text-green">done</span>
+                            </div>
+                            {task.completed_date && (
+                              <span className="text-xs text-gray-400 font-body">Completed: {formatDateShort(task.completed_date)}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => updateTaskStatus(task.id, 'pending')}
+                              className="text-xs text-gray-400 hover:text-gray-600 font-body"
+                            >
+                              Reopen
+                            </button>
+                            <button onClick={() => deleteTask(task.id)} className="text-xs text-gray-300 hover:text-red-500 ml-2">&times;</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Add Task Modal */}
+          {showAddTask && (
+            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-[8px] w-full max-w-md">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-heading text-lg font-semibold text-green">Add Task</h2>
+                    <button onClick={() => setShowAddTask(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                  </div>
+                </div>
+                <form onSubmit={addTask} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Title</label>
+                    <input
+                      required
+                      value={taskForm.title}
+                      onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                      placeholder="e.g. Send deposit invoice"
+                      className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Description</label>
+                    <textarea
+                      rows={2}
+                      value={taskForm.description}
+                      onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                      className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Priority</label>
+                      <select
+                        value={taskForm.priority}
+                        onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
+                        className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Due Date</label>
+                      <input
+                        type="date"
+                        value={taskForm.due_date}
+                        onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
+                        className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                      />
+                    </div>
+                  </div>
+                  {project.partners.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Assign to Partners</label>
+                      <div className="space-y-1.5 max-h-32 overflow-y-auto border border-gray-200 rounded-[4px] p-2">
+                        {project.partners.map((pp) => (
+                          <label key={pp.partner_id} className="flex items-center gap-2 text-sm font-body text-gray-700 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={taskForm.assigned_to.includes(pp.partner_id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setTaskForm({ ...taskForm, assigned_to: [...taskForm.assigned_to, pp.partner_id] })
+                                } else {
+                                  setTaskForm({ ...taskForm, assigned_to: taskForm.assigned_to.filter(id => id !== pp.partner_id) })
+                                }
+                              }}
+                              className="rounded border-gray-300 text-green focus:ring-green"
+                            />
+                            {pp.partner?.org_name || pp.partner?.email || pp.role}
+                            <span className="text-[10px] text-gray-400">({pp.role})</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button variant="ghost" type="button" onClick={() => setShowAddTask(false)}>Cancel</Button>
+                    <Button type="submit" disabled={saving || !taskForm.title.trim()}>
+                      {saving ? 'Adding...' : 'Add Task'}
                     </Button>
                   </div>
                 </form>

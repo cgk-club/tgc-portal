@@ -27,6 +27,7 @@ export async function GET(
     { data: financials },
     { data: partners },
     { data: updates },
+    { data: tasks },
   ] = await Promise.all([
     sb.from('project_milestones')
       .select('*')
@@ -48,7 +49,42 @@ export async function GET(
       .select('*')
       .eq('project_id', id)
       .order('created_at', { ascending: false }),
+    sb.from('project_tasks')
+      .select('*')
+      .eq('project_id', id)
+      .order('created_at', { ascending: false }),
   ])
+
+  // Resolve partner names for task assigned_to IDs
+  const allTaskPartnerIds = new Set<string>()
+  for (const task of tasks || []) {
+    if (task.assigned_to && Array.isArray(task.assigned_to)) {
+      for (const pid of task.assigned_to) {
+        allTaskPartnerIds.add(pid)
+      }
+    }
+  }
+
+  let taskPartnerMap: Record<string, string> = {}
+  if (allTaskPartnerIds.size > 0) {
+    const { data: taskPartners } = await sb
+      .from('partner_accounts')
+      .select('id, org_name, email')
+      .in('id', Array.from(allTaskPartnerIds))
+
+    if (taskPartners) {
+      for (const p of taskPartners) {
+        taskPartnerMap[p.id] = p.org_name || p.email || 'Partner'
+      }
+    }
+  }
+
+  const enrichedTasks = (tasks || []).map((t) => ({
+    ...t,
+    assigned_partner_names: (t.assigned_to || []).map(
+      (pid: string) => taskPartnerMap[pid] || 'Unknown'
+    ),
+  }))
 
   // Calculate progress from milestones
   const allMilestones = milestones || []
@@ -64,6 +100,7 @@ export async function GET(
     financials: financials || [],
     partners: partners || [],
     updates: updates || [],
+    tasks: enrichedTasks,
     progress,
   })
 }

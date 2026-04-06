@@ -91,6 +91,14 @@ export async function GET(
     .neq("partner_id", session.partnerId)
     .in("status", ["active", "completed"]);
 
+  // Get tasks assigned to this partner
+  const { data: tasks } = await sb
+    .from("project_tasks")
+    .select("*")
+    .eq("project_id", projectId)
+    .contains("assigned_to", [session.partnerId])
+    .order("created_at", { ascending: false });
+
   return NextResponse.json({
     project: {
       id: project.id,
@@ -117,5 +125,6 @@ export async function GET(
       role: p.role,
       status: p.status,
     })),
+    tasks: tasks || [],
   });
 }

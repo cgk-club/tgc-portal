@@ -35,6 +35,17 @@ interface Update {
   created_at: string;
 }
 
+interface PartnerTask {
+  id: string;
+  title: string;
+  description: string | null;
+  priority: string;
+  status: string;
+  due_date: string | null;
+  completed_date: string | null;
+  created_at: string;
+}
+
 interface OtherPartner {
   role: string;
   status: string;
@@ -63,6 +74,7 @@ interface ProjectDetail {
   documents: Document[];
   updates: Update[];
   other_partners: OtherPartner[];
+  tasks: PartnerTask[];
 }
 
 const TYPE_STYLES: Record<string, { bg: string; text: string }> = {
@@ -138,7 +150,7 @@ export default function PartnerProjectDetailPage() {
   const [data, setData] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "milestones" | "documents" | "activity"
+    "overview" | "milestones" | "tasks" | "documents" | "activity"
   >("overview");
 
   // Update form
@@ -255,6 +267,17 @@ export default function PartnerProjectDetailPage() {
     setUploading(false);
   }
 
+  async function handleUpdateTaskStatus(taskId: string, status: string) {
+    const res = await fetch(`/api/partner/projects/${projectId}/tasks`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId, status }),
+    });
+    if (res.ok) {
+      await fetchProject();
+    }
+  }
+
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-pearl">
@@ -263,7 +286,7 @@ export default function PartnerProjectDetailPage() {
     );
   }
 
-  const { project, client_first_name, assignment, milestones, documents, updates, other_partners } =
+  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, tasks } =
     data;
 
   const typeStyle = TYPE_STYLES[project.type] || {
@@ -281,6 +304,7 @@ export default function PartnerProjectDetailPage() {
   const TABS = [
     { key: "overview" as const, label: "Overview" },
     { key: "milestones" as const, label: `Milestones (${milestones.length})` },
+    ...(tasks && tasks.length > 0 ? [{ key: "tasks" as const, label: `Tasks (${tasks.length})` }] : []),
     { key: "documents" as const, label: `Documents (${documents.length})` },
     { key: "activity" as const, label: `Activity (${updates.length})` },
   ];
@@ -863,6 +887,175 @@ export default function PartnerProjectDetailPage() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === "tasks" && tasks && tasks.length > 0 && (
+          <div className="space-y-4">
+            {/* In Progress tasks */}
+            {tasks.filter((t) => t.status === "in_progress").length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium text-gold uppercase tracking-wider font-body mb-3">
+                  In Progress
+                </h3>
+                <div className="space-y-2">
+                  {tasks
+                    .filter((t) => t.status === "in_progress")
+                    .map((task) => (
+                      <div
+                        key={task.id}
+                        className="bg-white border border-green/10 rounded-lg p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="text-sm font-body font-medium text-gray-800">
+                                {task.title}
+                              </p>
+                              <span
+                                className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                                  task.priority === "urgent"
+                                    ? "bg-red-50 text-red-600"
+                                    : task.priority === "high"
+                                    ? "bg-amber-50 text-amber-600"
+                                    : task.priority === "medium"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : "bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                {task.priority}
+                              </span>
+                            </div>
+                            {task.description && (
+                              <p className="text-xs text-gray-500 font-body mb-1">
+                                {task.description}
+                              </p>
+                            )}
+                            {task.due_date && (
+                              <span className="text-xs text-gray-400 font-body">
+                                Due: {formatDate(task.due_date)}
+                              </span>
+                            )}
+                          </div>
+                          {assignment.status === "active" && (
+                            <button
+                              onClick={() =>
+                                handleUpdateTaskStatus(task.id, "completed")
+                              }
+                              className="text-xs px-3 py-1.5 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body flex-none"
+                            >
+                              Complete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Pending tasks */}
+            {tasks.filter((t) => t.status === "pending").length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                  Pending
+                </h3>
+                <div className="space-y-2">
+                  {tasks
+                    .filter((t) => t.status === "pending")
+                    .map((task) => (
+                      <div
+                        key={task.id}
+                        className="bg-white border border-green/10 rounded-lg p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <p className="text-sm font-body font-medium text-gray-800">
+                                {task.title}
+                              </p>
+                              <span
+                                className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                                  task.priority === "urgent"
+                                    ? "bg-red-50 text-red-600"
+                                    : task.priority === "high"
+                                    ? "bg-amber-50 text-amber-600"
+                                    : task.priority === "medium"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : "bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                {task.priority}
+                              </span>
+                            </div>
+                            {task.description && (
+                              <p className="text-xs text-gray-500 font-body mb-1">
+                                {task.description}
+                              </p>
+                            )}
+                            {task.due_date && (
+                              <span className="text-xs text-gray-400 font-body">
+                                Due: {formatDate(task.due_date)}
+                              </span>
+                            )}
+                          </div>
+                          {assignment.status === "active" && (
+                            <button
+                              onClick={() =>
+                                handleUpdateTaskStatus(task.id, "in_progress")
+                              }
+                              className="text-xs px-3 py-1.5 border border-green/20 text-green rounded-md hover:bg-green/5 transition-colors font-body flex-none"
+                            >
+                              Start
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed tasks */}
+            {tasks.filter((t) => t.status === "completed").length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider font-body mb-3">
+                  Completed
+                </h3>
+                <div className="space-y-2">
+                  {tasks
+                    .filter((t) => t.status === "completed")
+                    .map((task) => (
+                      <div
+                        key={task.id}
+                        className="bg-white border border-green/10 rounded-lg p-4 opacity-60"
+                      >
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-body text-gray-400 line-through">
+                            {task.title}
+                          </p>
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium bg-green/10 text-green">
+                            done
+                          </span>
+                          {task.completed_date && (
+                            <span className="text-[10px] text-gray-400 font-body ml-auto">
+                              {formatDate(task.completed_date)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {tasks.length === 0 && (
+              <div className="bg-white border border-green/10 rounded-lg p-5 text-center">
+                <p className="text-sm text-gray-400 font-body">
+                  No tasks assigned to you yet.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
