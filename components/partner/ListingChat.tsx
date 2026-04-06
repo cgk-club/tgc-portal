@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useTypingEffect } from "@/lib/useTypingEffect";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -25,10 +26,19 @@ export default function ListingChat({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [parsedData, setParsedData] = useState<Record<string, unknown> | null>(null);
   const [rawInput, setRawInput] = useState("");
+  const [typingText, setTypingText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleTypingDone = useCallback(() => {
+    setIsTyping(false);
+    inputRef.current?.focus();
+  }, []);
+
+  const displayedTyping = useTypingEffect(typingText, isTyping, handleTypingDone);
 
   useEffect(() => {
     // Start the conversation
@@ -50,6 +60,10 @@ export default function ListingChat({
             { role: "assistant", content: data.message },
           ]);
           setRawInput(`I'd like to list something in the ${categoryLabel} category.\n`);
+          setSending(false);
+          setTypingText(data.message);
+          setIsTyping(true);
+          return;
         }
       } catch (err) {
         console.error("Chat init error:", err);
@@ -121,6 +135,9 @@ export default function ListingChat({
         const parsed = checkForCompletion(assistantMsg);
         if (parsed) {
           setParsedData(parsed);
+        } else {
+          setTypingText(assistantMsg);
+          setIsTyping(true);
         }
       }
     } catch (err) {
@@ -137,12 +154,19 @@ export default function ListingChat({
     }
   }
 
-  function getDisplayContent(content: string): string {
+  function getDisplayContent(content: string, idx: number): string {
     const marker = "[INTAKE_COMPLETE]";
-    const idx = content.indexOf(marker);
-    if (idx === -1) return content;
-    return content.slice(0, idx).trim();
+    const markerIdx = content.indexOf(marker);
+    const cleaned = markerIdx === -1 ? content : content.slice(0, markerIdx).trim();
+
+    // Show typing text for the last assistant message while typing
+    if (isTyping && idx === messages.length - 1 && messages[idx]?.role === "assistant") {
+      return displayedTyping;
+    }
+    return cleaned;
   }
+
+  const busy = sending || isTyping;
 
   if (parsedData) {
     return (
@@ -233,7 +257,10 @@ export default function ListingChat({
                   : "bg-white border border-green/10 text-gray-700"
               }`}
             >
-              {getDisplayContent(msg.content)}
+              {getDisplayContent(msg.content, i)}
+              {isTyping && i === messages.length - 1 && msg.role === "assistant" && (
+                <span className="inline-block w-0.5 h-4 bg-gray-400 ml-0.5 animate-pulse align-text-bottom" />
+              )}
             </div>
           </div>
         ))}
@@ -259,14 +286,14 @@ export default function ListingChat({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={sending}
+            disabled={busy}
             placeholder="Type your reply..."
             rows={2}
             className="flex-1 rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body resize-none disabled:opacity-50"
           />
           <button
             onClick={handleSend}
-            disabled={sending || !input.trim()}
+            disabled={busy || !input.trim()}
             className="px-4 py-2 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50 self-end"
           >
             Send

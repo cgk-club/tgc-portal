@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTypingEffect } from '@/lib/useTypingEffect'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -20,10 +21,19 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [typingText, setTypingText] = useState('')
   const [complete, setComplete] = useState(false)
   const [started, setStarted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleTypingDone = useCallback(() => {
+    setIsTyping(false)
+    inputRef.current?.focus()
+  }, [])
+
+  const displayedTyping = useTypingEffect(typingText, isTyping, handleTypingDone)
 
   useEffect(() => {
     if (isOpen && !started) {
@@ -59,6 +69,10 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
       const data = await res.json()
       if (data.text) {
         setMessages([{ role: 'assistant', content: data.text }])
+        setLoading(false)
+        setTypingText(data.text)
+        setIsTyping(true)
+        return
       }
     } catch (err) {
       console.error('Chat start failed:', err)
@@ -67,7 +81,7 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
   }
 
   async function sendMessage() {
-    if (!input.trim() || loading || complete) return
+    if (!input.trim() || loading || isTyping || complete) return
 
     const userMsg: Message = { role: 'user', content: input.trim() }
     const updatedMessages = [...messages, userMsg]
@@ -90,9 +104,12 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
       const data = await res.json()
       if (data.text) {
         setMessages([...updatedMessages, { role: 'assistant', content: data.text }])
-      }
-      if (data.complete || data.enquiryData) {
-        setComplete(true)
+        if (data.complete || data.enquiryData) {
+          setComplete(true)
+        } else {
+          setTypingText(data.text)
+          setIsTyping(true)
+        }
       }
     } catch (err) {
       console.error('Chat error:', err)
@@ -121,19 +138,26 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-gray-50">
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[80%] rounded-[8px] px-4 py-2.5 text-sm leading-relaxed ${
-                  msg.role === 'user'
-                    ? 'bg-green text-white'
-                    : 'bg-white border border-gray-200 text-gray-800'
-                }`}
-              >
-                {msg.content}
+          {messages.map((msg, i) => {
+            const isLastAssistant = isTyping && i === messages.length - 1 && msg.role === 'assistant'
+            const text = isLastAssistant ? displayedTyping : msg.content
+            return (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[80%] rounded-[8px] px-4 py-2.5 text-sm leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'bg-green text-white'
+                      : 'bg-white border border-gray-200 text-gray-800'
+                  }`}
+                >
+                  {text}
+                  {isLastAssistant && (
+                    <span className="inline-block w-0.5 h-4 bg-gray-400 ml-0.5 animate-pulse align-text-bottom" />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
           {loading && (
             <div className="flex justify-start">
               <div className="bg-white border border-gray-200 rounded-[8px] px-4 py-2.5 text-sm text-gray-400">
@@ -163,12 +187,12 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Type your message..."
-                disabled={loading}
+                disabled={loading || isTyping}
                 className="flex-1 rounded-[4px] border border-gray-300 px-3 py-2 text-sm focus:border-green focus:outline-none focus:ring-1 focus:ring-green disabled:opacity-50"
               />
               <button
                 onClick={sendMessage}
-                disabled={loading || !input.trim()}
+                disabled={loading || isTyping || !input.trim()}
                 className="rounded-[4px] bg-green text-white px-4 py-2 text-sm font-medium hover:bg-green/90 transition-colors disabled:opacity-50"
               >
                 Send

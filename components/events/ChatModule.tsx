@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import ChatMessage from "./ChatMessage";
 
 interface Message {
@@ -26,16 +26,28 @@ export default function ChatModule({
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const pendingCompleteRef = useRef<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const handleTypingComplete = useCallback(() => {
+    setIsTyping(false);
+    if (pendingCompleteRef.current) {
+      setIsComplete(true);
+      onComplete?.(pendingCompleteRef.current);
+      pendingCompleteRef.current = null;
+    }
+    inputRef.current?.focus();
+  }, [onComplete]);
+
   async function handleSend() {
-    if (!input.trim() || isLoading || isComplete) return;
+    if (!input.trim() || isLoading || isTyping || isComplete) return;
 
     const userMessage = input.trim();
     setInput("");
@@ -59,10 +71,12 @@ export default function ChatModule({
       const data = await res.json();
       const assistantMessage = data.message;
 
-      // Strip the completion marker and JSON from displayed message
       const displayMessage = assistantMessage
         .replace(/\[REQUEST_COMPLETE\][\s\S]*$/, "")
         .trim();
+
+      setIsLoading(false);
+      setIsTyping(true);
 
       setMessages((prev) => [
         ...prev,
@@ -70,18 +84,17 @@ export default function ChatModule({
       ]);
 
       if (assistantMessage.includes("[REQUEST_COMPLETE]")) {
-        setIsComplete(true);
         const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
-            const parsed = JSON.parse(jsonMatch[0]);
-            onComplete?.(parsed);
+            pendingCompleteRef.current = JSON.parse(jsonMatch[0]);
           } catch {
-            // JSON parse failed, still mark complete
+            pendingCompleteRef.current = {};
           }
         }
       }
     } catch {
+      setIsLoading(false);
       setMessages((prev) => [
         ...prev,
         {
@@ -90,9 +103,6 @@ export default function ChatModule({
             "I apologise, something went wrong. Could you try that again?",
         },
       ]);
-    } finally {
-      setIsLoading(false);
-      inputRef.current?.focus();
     }
   }
 
@@ -103,11 +113,24 @@ export default function ChatModule({
     }
   }
 
+  const lastAssistantIdx = messages.length - 1;
+  const busy = isLoading || isTyping;
+
   return (
     <div className="border border-green/20 rounded-lg overflow-hidden bg-pearl">
       <div className="h-[500px] overflow-y-auto p-4 sm:p-6">
         {messages.map((msg, i) => (
-          <ChatMessage key={i} role={msg.role} content={msg.content} />
+          <ChatMessage
+            key={i}
+            role={msg.role}
+            content={msg.content}
+            typing={isTyping && i === lastAssistantIdx && msg.role === "assistant"}
+            onTypingComplete={
+              isTyping && i === lastAssistantIdx && msg.role === "assistant"
+                ? handleTypingComplete
+                : undefined
+            }
+          />
         ))}
         {isLoading && (
           <div className="flex justify-start mb-4">
@@ -134,11 +157,11 @@ export default function ChatModule({
               placeholder="Type your response..."
               rows={1}
               className="flex-1 px-3 py-2 rounded-md border border-green/20 bg-white text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green resize-none font-body"
-              disabled={isLoading}
+              disabled={busy}
             />
             <button
               onClick={handleSend}
-              disabled={isLoading || !input.trim()}
+              disabled={busy || !input.trim()}
               className="px-4 py-2 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-body"
             >
               Send
