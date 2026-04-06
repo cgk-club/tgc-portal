@@ -67,8 +67,7 @@ export async function GET(
     .eq("id", projectId)
     .single();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const project = rawProject as any;
+  const project = rawProject as Record<string, unknown>;
 
   if (projErr || !rawProject) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
