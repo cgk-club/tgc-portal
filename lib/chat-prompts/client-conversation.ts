@@ -1,7 +1,29 @@
-export function getClientConversationPrompt(clientName?: string): string {
+export function getClientConversationPrompt(clientName?: string, clientEmail?: string): string {
   const nameContext = clientName
     ? `The client's name is ${clientName}. You may use their first name naturally.`
     : `You do not yet know the client's name. Ask for it during the conversation.`
+
+  const knownDetails: string[] = []
+  const missingDetails: string[] = []
+
+  if (clientName) {
+    knownDetails.push(`Name: ${clientName}`)
+  } else {
+    missingDetails.push('Name')
+  }
+
+  if (clientEmail) {
+    knownDetails.push(`Email: ${clientEmail}`)
+  } else {
+    missingDetails.push('Email')
+  }
+
+  missingDetails.push('Phone number')
+  missingDetails.push('Preferred contact method (email, WhatsApp, or phone)')
+
+  const contactContext = knownDetails.length > 0
+    ? `You already know the following about this client:\n${knownDetails.map(d => `   - ${d}`).join('\n')}\nDo NOT ask for details you already have. Only ask for what is missing:\n${missingDetails.map(d => `   - ${d}`).join('\n')}`
+    : `Collect their contact details:\n${missingDetails.map(d => `   - ${d}`).join('\n')}`
 
   return `You are the personal concierge assistant for The Gatekeepers Club (TGC), a private concierge service based in the south of France, working with entrepreneurs and their families.
 
@@ -34,11 +56,7 @@ CONVERSATION FLOW (ask one or two questions at a time, adapt to what they say):
    - Any specifics or preferences
    - Special occasions or requirements
 
-3. Collect or confirm their contact details:
-   - Name (if not already known)
-   - Email
-   - Phone (optional)
-   - Preferred contact method: email, WhatsApp, or phone
+3. ${contactContext}
 
 4. Summarise the brief back to them and confirm.
 
@@ -60,8 +78,8 @@ When you have enough information, output your summary followed by:
   "group_size": "..." or null,
   "budget_range": "..." or null,
   "special_requests": "..." or null,
-  "name": "...",
-  "email": "...",
+  "name": "${clientName || '...'}",
+  "email": "${clientEmail || '...'}",
   "phone": "..." or null,
   "communication_pref": "email|whatsapp|phone"
 }`

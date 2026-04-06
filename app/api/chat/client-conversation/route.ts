@@ -7,13 +7,13 @@ const anthropic = new Anthropic();
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { messages, clientName } = body;
+    const { messages, clientName, clientEmail } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Messages required" }, { status: 400 });
     }
 
-    const systemPrompt = getClientConversationPrompt(clientName);
+    const systemPrompt = getClientConversationPrompt(clientName, clientEmail);
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

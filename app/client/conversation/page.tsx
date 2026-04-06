@@ -8,6 +8,7 @@ import ClientNav from "@/components/client/ClientNav";
 export default function ConversationPage() {
   const router = useRouter();
   const [clientName, setClientName] = useState<string>("");
+  const [clientEmail, setClientEmail] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
@@ -17,6 +18,7 @@ export default function ConversationPage() {
       if (!res.ok) { router.push("/client/login"); return; }
       const { client } = await res.json();
       setClientName(client.name || "");
+      setClientEmail(client.email || "");
       setClientId(client.id || "");
       setLoading(false);
     }
@@ -51,6 +53,7 @@ export default function ConversationPage() {
         <ClientChatModule
           endpoint="/api/chat/client-conversation"
           clientName={firstName}
+          extraBody={{ clientEmail }}
           initialMessage={`Hi${firstName ? ` ${firstName}` : ""}. What can I help you with today? Whether it is travel, dining, sourcing something special, or anything else, I am here to listen.`}
           completionLabel="Request Received"
           completionMessage="Your brief has been passed to our team. We will be in touch shortly via your preferred contact method."
