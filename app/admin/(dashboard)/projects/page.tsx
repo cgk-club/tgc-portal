@@ -89,6 +89,16 @@ export default function AdminProjectsPage() {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
 
+  // Dashboard state
+  const [dashboard, setDashboard] = useState<{
+    active_count: number
+    total_budget: number
+    milestones_due_this_week: number
+    overdue_tasks: number
+    upcoming_milestones: Array<{ id: string; title: string; status: string; due_date: string; project_id: string; project_title: string }>
+    recent_updates: Array<{ id: string; project_id: string; author_type: string; author_name: string | null; message: string; created_at: string; project_title: string }>
+  } | null>(null)
+
   // Create form state
   const [newProject, setNewProject] = useState({
     client_id: '',
@@ -129,8 +139,16 @@ export default function AdminProjectsPage() {
     }
   }, [])
 
+  const fetchDashboard = useCallback(async () => {
+    const res = await fetch('/api/admin/projects/dashboard')
+    if (res.ok) {
+      setDashboard(await res.json())
+    }
+  }, [])
+
   useEffect(() => { fetchProjects() }, [fetchProjects])
   useEffect(() => { fetchClients() }, [fetchClients])
+  useEffect(() => { fetchDashboard() }, [fetchDashboard])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -191,6 +209,103 @@ export default function AdminProjectsPage() {
         <h1 className="font-heading text-2xl font-semibold text-green">Projects</h1>
         <Button onClick={() => setShowCreate(true)}>Create Project</Button>
       </div>
+
+      {/* Dashboard (only when no filters/search active) */}
+      {dashboard && statusFilter === 'all' && typeFilter === 'all' && !clientFilter && !search && (
+        <div className="mb-8 space-y-6">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg border border-green/10 p-4">
+              <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Active Projects</p>
+              <p className="text-2xl font-heading font-semibold text-green">{dashboard.active_count}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-green/10 p-4">
+              <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Total Budget</p>
+              <p className="text-2xl font-heading font-semibold text-green">
+                {dashboard.total_budget > 0 ? formatCurrency(dashboard.total_budget) : '-'}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg border border-green/10 p-4">
+              <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Milestones This Week</p>
+              <p className="text-2xl font-heading font-semibold text-gold">{dashboard.milestones_due_this_week}</p>
+            </div>
+            <div className="bg-white rounded-lg border border-green/10 p-4">
+              <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Overdue Tasks</p>
+              <p className={`text-2xl font-heading font-semibold ${dashboard.overdue_tasks > 0 ? 'text-red-600' : 'text-green'}`}>
+                {dashboard.overdue_tasks}
+              </p>
+            </div>
+          </div>
+
+          {/* Two columns: Upcoming Deadlines + Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Upcoming Deadlines */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Upcoming Deadlines</h3>
+              {dashboard.upcoming_milestones.length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-3">No upcoming milestones.</p>
+              ) : (
+                <div className="space-y-2">
+                  {dashboard.upcoming_milestones.map(m => (
+                    <div
+                      key={m.id}
+                      onClick={() => router.push(`/admin/projects/${m.project_id}`)}
+                      className="flex items-center justify-between gap-2 p-2 rounded hover:bg-pearl/50 cursor-pointer transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-gray-800 font-body truncate">{m.title}</p>
+                        <p className="text-[10px] text-gray-400 font-body">{m.project_title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                          m.status === 'in_progress' ? 'bg-gold/20 text-gold' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {m.status === 'in_progress' ? 'Active' : 'Pending'}
+                        </span>
+                        <span className="text-xs text-gray-400 font-body whitespace-nowrap">
+                          {new Date(m.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Recent Activity</h3>
+              {dashboard.recent_updates.length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-3">No recent activity.</p>
+              ) : (
+                <div className="space-y-3">
+                  {dashboard.recent_updates.map(u => (
+                    <div
+                      key={u.id}
+                      onClick={() => router.push(`/admin/projects/${u.project_id}`)}
+                      className="flex gap-2 p-2 rounded hover:bg-pearl/50 cursor-pointer transition-colors"
+                    >
+                      <span className={`inline-block w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5 ${
+                        u.author_type === 'admin' ? 'bg-green-muted text-green'
+                          : u.author_type === 'partner' ? 'bg-blue-50 text-blue-600'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {u.author_type === 'admin' ? 'A' : u.author_type === 'partner' ? 'P' : 'S'}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-700 font-body line-clamp-1">{u.message}</p>
+                        <p className="text-[10px] text-gray-400 font-body mt-0.5">
+                          {u.project_title} &middot; {new Date(u.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">

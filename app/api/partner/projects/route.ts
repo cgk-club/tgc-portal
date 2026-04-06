@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(PARTNER_COOKIE_NAME)?.value;
   if (!token)
@@ -130,5 +132,7 @@ export async function GET(request: NextRequest) {
     );
   });
 
-  return NextResponse.json(result);
+  const response = NextResponse.json(result);
+  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  return response;
 }

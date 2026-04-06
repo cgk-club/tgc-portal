@@ -488,7 +488,7 @@ export default function PartnerProjectDetailPage() {
         {activeTab === "overview" && (
           <div className="space-y-4">
             {/* Quick summary cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white border border-green/10 rounded-lg p-4">
                 <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
                   Milestones
@@ -497,6 +497,17 @@ export default function PartnerProjectDetailPage() {
                   {completedMilestones}
                   <span className="text-sm text-gray-400 font-body">
                     /{milestones.length}
+                  </span>
+                </p>
+              </div>
+              <div className="bg-white border border-green/10 rounded-lg p-4">
+                <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">
+                  Your Tasks
+                </p>
+                <p className="text-2xl font-heading font-semibold text-green">
+                  {tasks.filter((t) => t.status !== "completed").length}
+                  <span className="text-sm text-gray-400 font-body ml-1">
+                    active
                   </span>
                 </p>
               </div>
@@ -518,8 +529,108 @@ export default function PartnerProjectDetailPage() {
               </div>
             </div>
 
-            {/* Recent updates preview */}
-            {updates.length > 0 && (
+            {/* Milestone progress */}
+            {milestones.length > 0 && (
+              <div className="bg-white border border-green/10 rounded-lg p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                    Project Progress
+                  </h3>
+                  <span className="text-sm font-heading font-semibold text-green">
+                    {milestonePercent}%
+                  </span>
+                </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green rounded-full transition-all duration-500"
+                    style={{ width: `${milestonePercent}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 font-body mt-1.5">
+                  {completedMilestones} of {milestones.length} milestones completed
+                </p>
+              </div>
+            )}
+
+            {/* Two columns: Tasks + Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Your assigned tasks */}
+              <div className="bg-white border border-green/10 rounded-lg p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                    Your Tasks
+                  </h3>
+                  {tasks.length > 0 && (
+                    <button
+                      onClick={() => setActiveTab("tasks")}
+                      className="text-[11px] text-green hover:underline font-body"
+                    >
+                      View all
+                    </button>
+                  )}
+                </div>
+                {tasks.filter((t) => t.status !== "completed").length === 0 ? (
+                  <p className="text-sm text-gray-400 font-body text-center py-3">
+                    No active tasks assigned to you.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {tasks
+                      .filter((t) => t.status !== "completed")
+                      .slice(0, 4)
+                      .map((task) => (
+                        <div
+                          key={task.id}
+                          className="flex items-center justify-between gap-2 p-2 rounded hover:bg-pearl/50"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-gray-800 font-body truncate">
+                              {task.title}
+                            </p>
+                            {task.due_date && (
+                              <p className="text-[10px] text-gray-400 font-body">
+                                Due {formatDate(task.due_date)}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span
+                              className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                                task.status === "in_progress"
+                                  ? "bg-gold/15 text-gold"
+                                  : "bg-gray-100 text-gray-500"
+                              }`}
+                            >
+                              {task.status === "in_progress"
+                                ? "Active"
+                                : "Pending"}
+                            </span>
+                            {assignment.status === "active" &&
+                              task.status !== "completed" && (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateTaskStatus(
+                                      task.id,
+                                      task.status === "pending"
+                                        ? "in_progress"
+                                        : "completed"
+                                    )
+                                  }
+                                  className="text-[10px] px-2 py-0.5 bg-green/5 text-green rounded hover:bg-green/10 font-body"
+                                >
+                                  {task.status === "pending"
+                                    ? "Start"
+                                    : "Done"}
+                                </button>
+                              )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Recent activity preview */}
               <div className="bg-white border border-green/10 rounded-lg p-5">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
@@ -532,38 +643,38 @@ export default function PartnerProjectDetailPage() {
                     View all
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {updates.slice(-3).map((u) => (
-                    <div key={u.id} className="flex gap-3">
-                      <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center flex-none text-[10px] font-bold ${
-                          u.author_type === "partner"
-                            ? "bg-green/10 text-green"
-                            : u.author_type === "client"
-                            ? "bg-blue-50 text-blue-600"
-                            : "bg-gold/10 text-gold"
-                        }`}
-                      >
-                        {u.author_type === "partner"
-                          ? "P"
-                          : u.author_type === "client"
-                          ? "C"
-                          : "T"}
+                {updates.length === 0 ? (
+                  <p className="text-sm text-gray-400 font-body text-center py-3">
+                    No activity yet.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {updates.slice(-4).map((u) => (
+                      <div key={u.id} className="flex gap-2">
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center flex-none text-[9px] font-bold mt-0.5 ${
+                            u.author_type === "partner"
+                              ? "bg-green/10 text-green"
+                              : "bg-gold/10 text-gold"
+                          }`}
+                        >
+                          {u.author_type === "partner" ? "P" : "T"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-gray-700 font-body line-clamp-2">
+                            {u.message}
+                          </p>
+                          <p className="text-[10px] text-gray-400 font-body mt-0.5">
+                            {u.author_name || u.author_type} &middot;{" "}
+                            {formatDateTime(u.created_at)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-gray-700 font-body line-clamp-2">
-                          {u.message}
-                        </p>
-                        <p className="text-[10px] text-gray-400 font-body mt-0.5">
-                          {u.author_name || u.author_type} &middot;{" "}
-                          {formatDateTime(u.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Upcoming milestones preview */}
             {milestones.filter((m) => m.status !== "completed").length > 0 && (
@@ -582,7 +693,7 @@ export default function PartnerProjectDetailPage() {
                 <div className="space-y-2">
                   {milestones
                     .filter((m) => m.status !== "completed")
-                    .slice(0, 3)
+                    .slice(0, 5)
                     .map((m) => {
                       const style =
                         MILESTONE_STYLES[m.status] || MILESTONE_STYLES.pending;
@@ -605,6 +716,28 @@ export default function PartnerProjectDetailPage() {
                         </div>
                       );
                     })}
+                </div>
+              </div>
+            )}
+
+            {/* Other partners on project */}
+            {other_partners.length > 0 && (
+              <div className="bg-white border border-green/10 rounded-lg p-5">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                  Other Specialists
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {other_partners.map((op, i) => (
+                    <span
+                      key={i}
+                      className="text-[11px] px-2.5 py-1 bg-green/5 text-green/70 rounded font-body"
+                    >
+                      {op.role}
+                      {op.status === "completed" && (
+                        <span className="text-gray-400 ml-1">(completed)</span>
+                      )}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}

@@ -223,6 +223,537 @@ function relativeTime(d: string) {
   return formatDateShort(d)
 }
 
+// ── Overview Dashboard Component ──────────────────────────────
+
+function OverviewDashboard({
+  project,
+  onSetTab,
+  onCompleteMilestone,
+  onCompleteTask,
+}: {
+  project: ProjectDetail
+  onSetTab: (tab: TabKey) => void
+  onCompleteMilestone: (mid: string) => void
+  onCompleteTask: (taskId: string, status: string) => void
+}) {
+  const pd = project.property_details as Record<string, unknown>
+  const isEvent = !!pd?.event_type
+  const today = new Date()
+  const todayStr = today.toISOString().split('T')[0]
+
+  // ── Event-specific calculations ──
+  const eventDate = project.target_date || (pd?.dates as string)?.split(' - ')?.[0] || null
+  let daysToGo: number | null = null
+  let eventDateFormatted = ''
+  if (eventDate) {
+    const d = new Date(eventDate)
+    if (!isNaN(d.getTime())) {
+      daysToGo = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      eventDateFormatted = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    }
+  }
+
+  const capacity = pd?.capacity ? String(pd.capacity) : ''
+  const capacityNum = parseInt(capacity) || 0
+
+  // ── Task calculations ──
+  const allTasks = project.tasks || []
+  const pendingTasks = allTasks.filter(t => t.status === 'pending' || t.status === 'in_progress')
+  const overdueTasks = allTasks.filter(t =>
+    t.status !== 'completed' && t.due_date && t.due_date < todayStr
+  )
+
+  // ── Milestone calculations ──
+  const completedMs = project.milestones.filter(m => m.status === 'completed').length
+  const totalMs = project.milestones.length
+  const msPercent = totalMs > 0 ? Math.round((completedMs / totalMs) * 100) : 0
+
+  // Overdue or upcoming milestones (next 14 days)
+  const fourteenDaysOut = new Date(today)
+  fourteenDaysOut.setDate(today.getDate() + 14)
+  const fourteenDaysStr = fourteenDaysOut.toISOString().split('T')[0]
+
+  const urgentMilestones = project.milestones
+    .filter(m => m.status !== 'completed' && m.status !== 'skipped' && m.due_date)
+    .filter(m => m.due_date! <= fourteenDaysStr)
+    .sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''))
+    .slice(0, 5)
+
+  // Task summary by assignee
+  const tasksByPartner: Record<string, { name: string; total: number; overdue: number }> = {}
+  for (const task of allTasks.filter(t => t.status !== 'completed')) {
+    const partnerNames = task.assigned_partner_names || []
+    const partnerIds = task.assigned_to || []
+    const isOverdue = task.due_date && task.due_date < todayStr
+    for (let i = 0; i < partnerIds.length; i++) {
+      const pid = partnerIds[i]
+      const pname = partnerNames[i] || 'Unassigned'
+      if (!tasksByPartner[pid]) tasksByPartner[pid] = { name: pname, total: 0, overdue: 0 }
+      tasksByPartner[pid].total++
+      if (isOverdue) tasksByPartner[pid].overdue++
+    }
+    if (partnerIds.length === 0) {
+      if (!tasksByPartner['_unassigned']) tasksByPartner['_unassigned'] = { name: 'Unassigned', total: 0, overdue: 0 }
+      tasksByPartner['_unassigned'].total++
+      if (isOverdue) tasksByPartner['_unassigned'].overdue++
+    }
+  }
+
+  // Financial summary
+  const expenses = project.financials.filter(f => ['expense', 'invoice', 'payment', 'retainer', 'admin_fee'].includes(f.type))
+  const income = project.financials.filter(f => f.type === 'income')
+  const totalSpent = expenses.reduce((s, f) => s + Number(f.amount), 0)
+  const totalIncome = income.reduce((s, f) => s + Number(f.amount), 0)
+
+  // Recent activity
+  const recentActivityLimit = isEvent ? 8 : 5
+  const recentUpdates = [...project.updates].reverse().slice(0, recentActivityLimit)
+
+  if (isEvent) {
+    // ═══════ EVENT PROJECT DASHBOARD ═══════
+    return (
+      <div className="space-y-6">
+        {/* Row 2: Key Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Countdown */}
+          <div className="bg-white rounded-lg border border-green/10 p-4">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Countdown</p>
+            {daysToGo !== null ? (
+              <>
+                <p className="text-2xl font-heading font-semibold text-green">
+                  {daysToGo > 0 ? daysToGo : daysToGo === 0 ? 'Today' : Math.abs(daysToGo)}
+                  {daysToGo > 0 && <span className="text-sm text-gray-400 font-body ml-1">days to go</span>}
+                  {daysToGo < 0 && <span className="text-sm text-red-400 font-body ml-1">days ago</span>}
+                </p>
+                <p className="text-xs text-gray-400 font-body mt-0.5">{eventDateFormatted}</p>
+              </>
+            ) : (
+              <p className="text-sm text-gray-400 font-body">No date set</p>
+            )}
+          </div>
+
+          {/* Guests */}
+          <div className="bg-white rounded-lg border border-green/10 p-4">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Guests</p>
+            <p className="text-2xl font-heading font-semibold text-green">
+              0<span className="text-sm text-gray-400 font-body"> / {capacityNum || '?'}</span>
+            </p>
+            {capacityNum > 0 ? (
+              <div className="mt-1.5">
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gold rounded-full" style={{ width: '0%' }} />
+                </div>
+              </div>
+            ) : (
+              <p className="text-[10px] text-gray-400 font-body mt-0.5">Set up guest list</p>
+            )}
+          </div>
+
+          {/* Revenue */}
+          <div className="bg-white rounded-lg border border-green/10 p-4">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Revenue</p>
+            <p className="text-2xl font-heading font-semibold text-green">
+              {totalIncome > 0 ? formatCurrency(totalIncome, project.currency) : formatCurrency(0, project.currency)}
+            </p>
+            {project.budget ? (
+              <>
+                <p className="text-xs text-gray-400 font-body mt-0.5">of {formatCurrency(project.budget, project.currency)} target</p>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
+                  <div
+                    className="h-full bg-green rounded-full transition-all"
+                    style={{ width: `${Math.min(100, project.budget > 0 ? (totalIncome / project.budget) * 100 : 0)}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-xs text-gray-400 font-body mt-0.5">No target set</p>
+            )}
+          </div>
+
+          {/* Tasks */}
+          <div className="bg-white rounded-lg border border-green/10 p-4">
+            <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Tasks</p>
+            <p className="text-2xl font-heading font-semibold text-green">
+              {pendingTasks.length}
+              <span className="text-sm text-gray-400 font-body ml-1">pending</span>
+            </p>
+            {overdueTasks.length > 0 && (
+              <p className="text-xs text-red-500 font-body font-medium mt-0.5">{overdueTasks.length} overdue</p>
+            )}
+          </div>
+        </div>
+
+        {/* Row 3: Two columns */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left column */}
+          <div className="space-y-6">
+            {/* Overdue & Upcoming Milestones */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Overdue &amp; Upcoming Milestones</h3>
+                <button onClick={() => onSetTab('milestones')} className="text-[11px] text-green hover:underline font-body">View all</button>
+              </div>
+              {urgentMilestones.length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-3">No milestones due soon.</p>
+              ) : (
+                <div className="space-y-2">
+                  {urgentMilestones.map(m => {
+                    const isOverdue = m.due_date! < todayStr
+                    return (
+                      <div key={m.id} className="flex items-center justify-between gap-2 p-2 rounded hover:bg-pearl/50">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                            isOverdue ? 'bg-red-50 text-red-600' : MILESTONE_STATUS_COLORS[m.status] || 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {isOverdue ? 'Overdue' : m.status === 'in_progress' ? 'In Progress' : 'Pending'}
+                          </span>
+                          <span className="text-sm text-gray-800 font-body truncate">{m.title}</span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`text-xs font-body ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                            {m.due_date ? formatDateShort(m.due_date) : ''}
+                          </span>
+                          <button
+                            onClick={() => onCompleteMilestone(m.id)}
+                            className="text-[10px] px-2 py-0.5 bg-green/5 text-green rounded hover:bg-green/10 font-body"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Task Summary by Assignee */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Tasks by Assignee</h3>
+              {Object.keys(tasksByPartner).length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-3">No active tasks.</p>
+              ) : (
+                <div className="space-y-2">
+                  {Object.values(tasksByPartner).map((p, i) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded hover:bg-pearl/50">
+                      <span className="text-sm text-gray-800 font-body font-medium">{p.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 font-body">{p.total} task{p.total !== 1 ? 's' : ''}</span>
+                        {p.overdue > 0 && (
+                          <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-600 rounded-full font-medium">{p.overdue} overdue</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="space-y-6">
+            {/* Recent Activity */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Recent Activity</h3>
+                <button onClick={() => onSetTab('activity')} className="text-[11px] text-green hover:underline font-body">View all</button>
+              </div>
+              {recentUpdates.length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-3">No activity yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {recentUpdates.map(u => (
+                    <div key={u.id} className="flex gap-2">
+                      <span className={`inline-block w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5 ${
+                        u.author_type === 'admin' ? 'bg-green-muted text-green'
+                          : u.author_type === 'partner' ? 'bg-blue-50 text-blue-600'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {u.author_type === 'admin' ? 'A' : u.author_type === 'partner' ? 'P' : 'S'}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-700 font-body line-clamp-2">{u.message}</p>
+                        <p className="text-[10px] text-gray-400 font-body mt-0.5">
+                          {u.author_name || u.author_type} &middot; {relativeTime(u.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-lg border border-green/10 p-5">
+              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Quick Actions</h3>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => onSetTab('tasks')}
+                  className="text-xs px-3 py-1.5 bg-green/5 text-green rounded hover:bg-green/10 font-body transition-colors"
+                >
+                  Add Task
+                </button>
+                <button
+                  onClick={() => onSetTab('documents')}
+                  className="text-xs px-3 py-1.5 bg-green/5 text-green rounded hover:bg-green/10 font-body transition-colors"
+                >
+                  Upload Document
+                </button>
+                <button
+                  onClick={() => onSetTab('activity')}
+                  className="text-xs px-3 py-1.5 bg-green/5 text-green rounded hover:bg-green/10 font-body transition-colors"
+                >
+                  Post Update
+                </button>
+                <button
+                  onClick={() => onSetTab('milestones')}
+                  className="text-xs px-3 py-1.5 bg-green/5 text-green rounded hover:bg-green/10 font-body transition-colors"
+                >
+                  View Milestones
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 4: Notes */}
+        {project.notes && (
+          <div className="bg-white rounded-lg border border-green/10 p-5">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Notes</h3>
+            <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ═══════ REGULAR PROJECT DASHBOARD ═══════
+  return (
+    <div className="space-y-6">
+      {/* Milestone progress bar */}
+      {totalMs > 0 && (
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Milestone Progress</h3>
+            <span className="text-sm font-heading font-semibold text-green">{msPercent}%</span>
+          </div>
+          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green rounded-full transition-all duration-500"
+              style={{ width: `${msPercent}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 font-body mt-1.5">{completedMs} of {totalMs} milestones completed</p>
+        </div>
+      )}
+
+      {/* Key metric cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-green/10 p-4">
+          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Budget</p>
+          <p className="text-xl font-heading font-semibold text-green">
+            {project.budget ? formatCurrency(project.budget, project.currency) : '-'}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg border border-green/10 p-4">
+          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Spent</p>
+          <p className="text-xl font-heading font-semibold text-red-600">
+            {totalSpent > 0 ? formatCurrency(totalSpent, project.currency) : '-'}
+          </p>
+          {project.budget && totalSpent > 0 && (
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
+              <div
+                className={`h-full rounded-full transition-all ${totalSpent > project.budget ? 'bg-red-500' : 'bg-gold'}`}
+                style={{ width: `${Math.min(100, project.budget > 0 ? (totalSpent / project.budget) * 100 : 0)}%` }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="bg-white rounded-lg border border-green/10 p-4">
+          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Tasks</p>
+          <p className="text-xl font-heading font-semibold text-green">{pendingTasks.length}</p>
+          {overdueTasks.length > 0 && (
+            <p className="text-[10px] text-red-500 font-body font-medium mt-0.5">{overdueTasks.length} overdue</p>
+          )}
+        </div>
+        <div className="bg-white rounded-lg border border-green/10 p-4">
+          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Documents</p>
+          <p className="text-xl font-heading font-semibold text-green">{project.documents.length}</p>
+        </div>
+      </div>
+
+      {/* Overdue milestones */}
+      {urgentMilestones.length > 0 && (
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Overdue &amp; Upcoming Milestones</h3>
+            <button onClick={() => onSetTab('milestones')} className="text-[11px] text-green hover:underline font-body">View all</button>
+          </div>
+          <div className="space-y-2">
+            {urgentMilestones.map(m => {
+              const isOverdue = m.due_date! < todayStr
+              return (
+                <div key={m.id} className="flex items-center justify-between gap-2 p-2 rounded hover:bg-pearl/50">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                      isOverdue ? 'bg-red-50 text-red-600' : MILESTONE_STATUS_COLORS[m.status] || 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {isOverdue ? 'Overdue' : m.status === 'in_progress' ? 'In Progress' : 'Pending'}
+                    </span>
+                    <span className="text-sm text-gray-800 font-body truncate">{m.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs font-body ${isOverdue ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                      {m.due_date ? formatDateShort(m.due_date) : ''}
+                    </span>
+                    <button
+                      onClick={() => onCompleteMilestone(m.id)}
+                      className="text-[10px] px-2 py-0.5 bg-green/5 text-green rounded hover:bg-green/10 font-body"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Two columns: Recent Activity + Task Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Recent Activity</h3>
+            <button onClick={() => onSetTab('activity')} className="text-[11px] text-green hover:underline font-body">View all</button>
+          </div>
+          {recentUpdates.length === 0 ? (
+            <p className="text-sm text-gray-400 font-body text-center py-3">No activity yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {recentUpdates.map(u => (
+                <div key={u.id} className="flex gap-2">
+                  <span className={`inline-block w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5 ${
+                    u.author_type === 'admin' ? 'bg-green-muted text-green'
+                      : u.author_type === 'partner' ? 'bg-blue-50 text-blue-600'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {u.author_type === 'admin' ? 'A' : u.author_type === 'partner' ? 'P' : 'S'}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-gray-700 font-body line-clamp-2">{u.message}</p>
+                    <p className="text-[10px] text-gray-400 font-body mt-0.5">
+                      {u.author_name || u.author_type} &middot; {relativeTime(u.created_at)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Task Summary */}
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Tasks by Assignee</h3>
+            <button onClick={() => onSetTab('tasks')} className="text-[11px] text-green hover:underline font-body">View all</button>
+          </div>
+          {Object.keys(tasksByPartner).length === 0 ? (
+            <p className="text-sm text-gray-400 font-body text-center py-3">No active tasks.</p>
+          ) : (
+            <div className="space-y-2">
+              {Object.values(tasksByPartner).map((p, i) => (
+                <div key={i} className="flex items-center justify-between p-2 rounded hover:bg-pearl/50">
+                  <span className="text-sm text-gray-800 font-body font-medium">{p.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500 font-body">{p.total} task{p.total !== 1 ? 's' : ''}</span>
+                    {p.overdue > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 bg-red-50 text-red-600 rounded-full font-medium">{p.overdue} overdue</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Project Details + Property + Notes (collapsed) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">Project Details</h3>
+          <dl className="space-y-3">
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-500 font-body">Type</dt>
+              <dd className="text-sm text-gray-800 font-body font-medium">{TYPE_LABELS[project.type] || project.type}</dd>
+            </div>
+            {project.client && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">Client</dt>
+                <dd className="text-sm text-gray-800 font-body font-medium">{project.client.name || project.client.email}</dd>
+              </div>
+            )}
+            {project.monthly_retainer && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">Retainer</dt>
+                <dd className="text-sm text-gray-800 font-body font-medium">{formatCurrency(project.monthly_retainer, project.currency)}/mo</dd>
+              </div>
+            )}
+            {project.start_date && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">Start</dt>
+                <dd className="text-sm text-gray-800 font-body">{formatDateShort(project.start_date)}</dd>
+              </div>
+            )}
+            {project.target_date && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">Target</dt>
+                <dd className="text-sm text-gray-800 font-body">{formatDateShort(project.target_date)}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">Property</h3>
+          <dl className="space-y-3">
+            {project.property_address && (
+              <div>
+                <dt className="text-xs text-gray-400 font-body mb-0.5">Address</dt>
+                <dd className="text-sm text-gray-800 font-body">{project.property_address}</dd>
+              </div>
+            )}
+            {project.property_city && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">City</dt>
+                <dd className="text-sm text-gray-800 font-body">{project.property_city}</dd>
+              </div>
+            )}
+            {project.property_country && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-500 font-body">Country</dt>
+                <dd className="text-sm text-gray-800 font-body">{project.property_country}</dd>
+              </div>
+            )}
+            {(!project.property_address && !project.property_city && !project.property_country) && (
+              <p className="text-sm text-gray-400 font-body">No property details set.</p>
+            )}
+          </dl>
+        </div>
+      </div>
+
+      {/* Notes */}
+      {project.notes && (
+        <div className="bg-white rounded-lg border border-green/10 p-5">
+          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Notes</h3>
+          <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Event Hero Component ──────────────────────────────────────
 
 function EventProjectHero({ project }: { project: ProjectDetail }) {
@@ -925,102 +1456,12 @@ export default function ProjectDetailPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Project details */}
-                <div className="bg-white rounded-lg border border-green/10 p-5">
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">Project Details</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500 font-body">Type</dt>
-                      <dd className="text-sm text-gray-800 font-body font-medium">{TYPE_LABELS[project.type] || project.type}</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500 font-body">Status</dt>
-                      <dd className="text-sm text-gray-800 font-body font-medium">
-                        {project.status === 'on_hold' ? 'On Hold' : project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                      </dd>
-                    </div>
-                    {project.client && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Client</dt>
-                        <dd className="text-sm text-gray-800 font-body font-medium">{project.client.name || project.client.email}</dd>
-                      </div>
-                    )}
-                    {project.budget && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Budget</dt>
-                        <dd className="text-sm text-gray-800 font-body font-medium">{formatCurrency(project.budget, project.currency)}</dd>
-                      </div>
-                    )}
-                    {project.monthly_retainer && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Monthly Retainer</dt>
-                        <dd className="text-sm text-gray-800 font-body font-medium">{formatCurrency(project.monthly_retainer, project.currency)}/mo</dd>
-                      </div>
-                    )}
-                    {project.admin_fee && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Admin Fee</dt>
-                        <dd className="text-sm text-gray-800 font-body font-medium">{formatCurrency(project.admin_fee, project.currency)}</dd>
-                      </div>
-                    )}
-                    {project.start_date && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Start Date</dt>
-                        <dd className="text-sm text-gray-800 font-body">{formatDateShort(project.start_date)}</dd>
-                      </div>
-                    )}
-                    {project.target_date && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Target Date</dt>
-                        <dd className="text-sm text-gray-800 font-body">{formatDateShort(project.target_date)}</dd>
-                      </div>
-                    )}
-                    {project.completed_date && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Completed</dt>
-                        <dd className="text-sm text-gray-800 font-body">{formatDateShort(project.completed_date)}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-
-                {/* Property details */}
-                <div className="bg-white rounded-lg border border-green/10 p-5">
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">Property</h3>
-                  <dl className="space-y-3">
-                    {project.property_address && (
-                      <div>
-                        <dt className="text-xs text-gray-400 font-body mb-0.5">Address</dt>
-                        <dd className="text-sm text-gray-800 font-body">{project.property_address}</dd>
-                      </div>
-                    )}
-                    {project.property_city && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">City</dt>
-                        <dd className="text-sm text-gray-800 font-body">{project.property_city}</dd>
-                      </div>
-                    )}
-                    {project.property_country && (
-                      <div className="flex justify-between">
-                        <dt className="text-sm text-gray-500 font-body">Country</dt>
-                        <dd className="text-sm text-gray-800 font-body">{project.property_country}</dd>
-                      </div>
-                    )}
-                    {(!project.property_address && !project.property_city && !project.property_country) && (
-                      <p className="text-sm text-gray-400 font-body">No property details set.</p>
-                    )}
-                  </dl>
-                </div>
-
-                {/* Notes */}
-                {project.notes && (
-                  <div className="bg-white rounded-lg border border-green/10 p-5 lg:col-span-2">
-                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">Notes</h3>
-                    <p className="text-sm text-gray-700 font-body whitespace-pre-wrap">{project.notes}</p>
-                  </div>
-                )}
-              </div>
+              <OverviewDashboard
+                project={project}
+                onSetTab={setActiveTab}
+                onCompleteMilestone={(mid) => updateMilestoneStatus(mid, 'completed')}
+                onCompleteTask={updateTaskStatus}
+              />
 
               {/* Danger zone */}
               <div className="mt-8 pt-6 border-t border-gray-200">

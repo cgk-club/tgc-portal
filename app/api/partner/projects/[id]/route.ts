@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,7 +33,7 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Get project
+  // Get project — NO financials, NO budget, NO actual_spend, NO monthly_retainer, NO admin_fee
   const { data: project, error: projErr } = await sb
     .from("client_projects")
     .select(
@@ -44,7 +46,7 @@ export async function GET(
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
 
-  // Get client first name only (privacy)
+  // Get client first name only (privacy) — NO email, NO phone, NO full name
   let clientFirstName = "Client";
   if (project.client_id) {
     const { data: client } = await sb
@@ -57,15 +59,15 @@ export async function GET(
     }
   }
 
-  // Get milestones
+  // Get milestones (shared view — safe for partners)
   const { data: milestones } = await sb
     .from("project_milestones")
     .select("id, title, description, status, due_date, completed_date, sort_order")
     .eq("project_id", projectId)
     .order("sort_order", { ascending: true });
 
-  // Get documents
-  const { data: documents } = await sb
+  // Get documents — ONLY admin uploads and this partner's own uploads
+  const { data: allDocuments } = await sb
     .from("project_documents")
     .select(
       "id, title, file_url, file_type, uploaded_by, uploaded_by_type, notes, created_at"
@@ -73,8 +75,15 @@ export async function GET(
     .eq("project_id", projectId)
     .order("created_at", { ascending: false });
 
-  // Get recent updates (last 50)
-  const { data: updates } = await sb
+  const filteredDocuments = (allDocuments || []).filter(
+    (doc) =>
+      doc.uploaded_by_type === "admin" ||
+      (doc.uploaded_by_type === "partner" && doc.uploaded_by === session.partnerId)
+  );
+
+  // Get updates — ONLY admin posts and this partner's own posts
+  // Filter out system and client posts (may contain sensitive financial/booking info)
+  const { data: allUpdates } = await sb
     .from("project_updates")
     .select(
       "id, author_type, author_name, message, attachments, created_at"
@@ -82,6 +91,10 @@ export async function GET(
     .eq("project_id", projectId)
     .order("created_at", { ascending: false })
     .limit(50);
+
+  const filteredUpdates = (allUpdates || []).filter(
+    (u) => u.author_type === "admin" || u.author_type === "partner"
+  );
 
   // Get other partners on the project (just roles, no sensitive info)
   const { data: otherPartners } = await sb
@@ -91,15 +104,15 @@ export async function GET(
     .neq("partner_id", session.partnerId)
     .in("status", ["active", "completed"]);
 
-  // Get tasks assigned to this partner
+  // Get tasks assigned to this partner ONLY — strip assigned_to IDs for privacy
   const { data: tasks } = await sb
     .from("project_tasks")
-    .select("*")
+    .select("id, title, description, priority, status, due_date, completed_date, created_at")
     .eq("project_id", projectId)
     .contains("assigned_to", [session.partnerId])
     .order("created_at", { ascending: false });
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     project: {
       id: project.id,
       title: project.title,
@@ -111,6 +124,7 @@ export async function GET(
       status: project.status,
       start_date: project.start_date,
       target_date: project.target_date,
+      // NO budget, actual_spend, monthly_retainer, admin_fee, property_details
     },
     client_first_name: clientFirstName,
     assignment: {
@@ -119,12 +133,15 @@ export async function GET(
       notes: assignment.notes,
     },
     milestones: milestones || [],
-    documents: documents || [],
-    updates: (updates || []).reverse(),
+    documents: filteredDocuments,
+    updates: filteredUpdates.reverse(),
     other_partners: (otherPartners || []).map((p) => ({
       role: p.role,
       status: p.status,
     })),
     tasks: tasks || [],
   });
+
+  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  return response;
 }
