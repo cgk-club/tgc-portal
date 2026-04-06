@@ -212,7 +212,7 @@ git push
 - **Leaflet + SSR:** All map components use `dynamic(() => import(...), { ssr: false })` — never import Leaflet directly in server components
 - **Airtable write-back:** Generally read-only. Exception: outreach emails write a record to the Interactions table
 - **Admin auth:** Simple HTTP-only cookie session, no OAuth. Single operator tool.
-- **Client auth:** Magic link via Resend, 24h token expiry, 30-day session cookie
+- **Client auth:** Magic link via Resend, 7-day token expiry, 30-day session cookie
 - **RLS:** Enabled on ALL 44 tables (security audit 28 Mar 2026). Admin tables use service-role-only access. Public read policies scoped to shared/live/published status. Client/partner INSERT policies enforce user_id = auth.uid().
 
 ---

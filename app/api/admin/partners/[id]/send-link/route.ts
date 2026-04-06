@@ -66,7 +66,7 @@ export async function POST(
 
   for (const user of users) {
     const token = randomBytes(32).toString('hex')
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
     await sb.from('partner_magic_tokens').insert({
       partner_id: partner.id,
