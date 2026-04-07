@@ -23,9 +23,11 @@ export default function ListingChat({
   onComplete,
   onCancel,
 }: ListingChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "assistant", content: `Welcome! I'll walk you through creating a ${categoryLabel} listing. Just a few questions to build something compelling. One moment while I prepare...` },
+  ]);
   const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
+  const [sending, setSending] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [parsedData, setParsedData] = useState<Record<string, unknown> | null>(null);
   const [rawInput, setRawInput] = useState("");
@@ -41,9 +43,7 @@ export default function ListingChat({
   const displayedTyping = useTypingEffect(typingText, isTyping, handleTypingDone);
 
   useEffect(() => {
-    // Start the conversation
     async function init() {
-      setSending(true);
       try {
         const res = await fetch("/api/partner/chat/seller", {
           method: "POST",
@@ -56,7 +56,6 @@ export default function ListingChat({
         if (res.ok) {
           const data = await res.json();
           setMessages([
-            { role: "user", content: `I'd like to list something in the ${categoryLabel} category.` },
             { role: "assistant", content: data.message },
           ]);
           setRawInput(`I'd like to list something in the ${categoryLabel} category.\n`);
@@ -68,6 +67,10 @@ export default function ListingChat({
       } catch (err) {
         console.error("Chat init error:", err);
       }
+      // If API failed, show a helpful first message anyway
+      setMessages([
+        { role: "assistant", content: `Let's create your ${categoryLabel} listing. Tell me about what you'd like to list, and I'll guide you through the details we need.` },
+      ]);
       setSending(false);
     }
     init();

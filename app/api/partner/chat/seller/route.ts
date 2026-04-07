@@ -104,22 +104,37 @@ const REAL_ESTATE_PROMPT = `${BASE_PROMPT}
 
 CATEGORY: REAL ESTATE
 
-Collect the following:
-1. Property type (chateau, farmhouse, villa, townhouse, apartment, land, commercial, etc.)
-2. Property style (heritage/character, modern, contemporary, mixed)
-3. Location (town/village, department/region, country)
-4. Total living area (sqm)
-5. Land area (hectares or sqm)
-6. Number of bedrooms and bathrooms
-7. Year built / period (if known or relevant)
-8. Current condition (turnkey / habitable / renovation needed / ruin)
-9. Notable features (pool, outbuildings, views, historical classification, etc.)
-10. Energy rating (DPE)
+IMPORTANT: Start by asking whether this is a property FOR SALE or FOR RENT (seasonal, long-term, or event rental). This determines which details to collect.
+
+Collect the following for ALL properties:
+1. Listing type: sale or rental (if rental: seasonal, long-term, or event)
+2. Property type (chateau, farmhouse, villa, townhouse, apartment, land, commercial, etc.)
+3. Property style (heritage/character, modern, contemporary, mixed)
+4. Location (town/village, department/region, country)
+5. Total living area (sqm)
+6. Land area (hectares or sqm)
+7. Number of bedrooms and bathrooms
+8. Year built / period (if known or relevant)
+9. Current condition (turnkey / habitable / renovation needed / ruin)
+10. Notable features (pool, outbuildings, views, historical classification, etc.)
 11. The property's story and character
-12. Asking price or pricing preference
+
+FOR SALE only, also collect:
+12. Energy rating (DPE)
+13. Legal status (owned outright / estate sale / co-ownership)
+14. Agent involved? (yes/no; if yes, TGC coordinates, doesn't duplicate)
+15. Asking price or pricing preference
+
+FOR RENTAL only, also collect:
+12. Rental period (available dates, minimum stay)
+13. Rental price (per night, per week, or per month)
+14. What's included (cleaning, linen, pool maintenance, concierge, etc.)
+15. Maximum occupancy
+16. House rules or restrictions (pets, events, smoking)
+17. Owner-managed or property manager?
 
 In the JSON output, include these in category_fields:
-property_type, property_style, living_area_sqm, land_area, bedrooms, bathrooms, period, property_condition, notable_features, dpe_rating`;
+listing_type, property_type, property_style, living_area_sqm, land_area, bedrooms, bathrooms, period, property_condition, notable_features, dpe_rating, rental_period, rental_price, inclusions, max_occupancy, house_rules`;
 
 const ARTISAN_PROMPT = `${BASE_PROMPT}
 
