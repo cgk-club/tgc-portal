@@ -70,10 +70,6 @@ const SPONSOR_TIER_LABELS: Record<string, string> = {
   platinum: "Platinum (EUR 175K)",
   gold: "Gold (EUR 125K)",
   bronze: "Bronze (EUR 50K)",
-  title: "Title (EUR 100K)",
-  premium: "Premium (EUR 75K)",
-  event: "Event (EUR 50K)",
-  associate: "Associate (EUR 25K)",
 };
 
 function fmt(amount: number, currency: string = "EUR"): string {
@@ -633,10 +629,10 @@ export default function EventBudgetTracker({ projectId, isActive, role = "partne
                   <select value={revForm.sponsor_tier} onChange={(e) => setRevForm({ ...revForm, sponsor_tier: e.target.value })}
                     className="rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none font-body bg-white">
                     <option value="">Select tier</option>
-                    <option value="exclusive">Exclusive Solo (EUR 400K)</option>
-                    <option value="platinum">Platinum (EUR 175K)</option>
-                    <option value="gold">Gold (EUR 125K)</option>
-                    <option value="bronze">Bronze (EUR 50K)</option>
+                    <option value="exclusive">Exclusive Solo — EUR 400K</option>
+                    <option value="platinum">Platinum — EUR 175K (10 pax)</option>
+                    <option value="gold">Gold — EUR 125K (5 pax)</option>
+                    <option value="bronze">Bronze — EUR 50K (3 pax)</option>
                   </select>
                   <input type="number" value={revForm.included_pax} onChange={(e) => setRevForm({ ...revForm, included_pax: e.target.value })} placeholder="Included pax"
                     className="rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none font-body" />
