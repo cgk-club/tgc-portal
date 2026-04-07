@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import PartnerNav from "@/components/partner/PartnerNav";
+import EventBudgetTracker from "@/components/partner/EventBudgetTracker";
 
 interface Milestone {
   id: string;
@@ -406,6 +407,8 @@ export default function PartnerProjectDetailPage() {
     { key: "documents", label: `Documents (${documents.length})` },
     ...(vis?.financials && vis.financials !== "hidden" && financials && financials.length > 0
       ? [{ key: "financials", label: `Financials (${financials.length})` }] : []),
+    ...(vis?.budget === "view" || (vis?.financials && vis.financials !== "hidden")
+      ? [{ key: "budget", label: "Budget" }] : []),
     ...(vis?.guests === "view" && guests && guests.length > 0
       ? [{ key: "guests", label: `Guests (${guests.length})` }] : []),
     { key: "activity", label: `Activity (${updates.length})` },
@@ -1605,6 +1608,10 @@ export default function PartnerProjectDetailPage() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === "budget" && (
+          <EventBudgetTracker projectId={projectId} isActive={activeTab === "budget"} />
         )}
 
         {activeTab === "guests" && vis?.guests === "view" && guests && (
