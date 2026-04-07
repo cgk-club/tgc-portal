@@ -149,14 +149,16 @@ export async function GET(
       .order("created_at", { ascending: false });
     tasks = allTasks || [];
   } else {
-    // own_only — only tasks assigned to this partner
-    const { data: ownTasks } = await sb
+    // own_only — tasks assigned to this partner + unassigned tasks
+    const { data: allProjectTasks } = await sb
       .from("project_tasks")
-      .select("id, title, description, priority, status, due_date, completed_date, created_at")
+      .select("id, title, description, priority, status, due_date, completed_date, assigned_to, created_at")
       .eq("project_id", projectId)
-      .contains("assigned_to", [session.partnerId])
       .order("created_at", { ascending: false });
-    tasks = ownTasks || [];
+    tasks = (allProjectTasks || []).filter((t) => {
+      const assignees = t.assigned_to as string[] | null;
+      return !assignees || assignees.length === 0 || assignees.includes(session.partnerId);
+    }).map(({ assigned_to, ...rest }) => rest);
   }
 
   // Build financials based on visibility
