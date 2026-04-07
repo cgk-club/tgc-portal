@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
+import EventBudgetTracker from '@/components/partner/EventBudgetTracker'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -183,7 +184,7 @@ interface ProjectDetail {
 
 // ── Constants ──────────────────────────────────────────────────
 
-type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'partners' | 'clients' | 'tasks' | 'activity'
+type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'budget' | 'partners' | 'clients' | 'tasks' | 'activity'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -191,6 +192,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'tasks', label: 'Tasks' },
   { key: 'documents', label: 'Documents' },
   { key: 'financials', label: 'Financials' },
+  { key: 'budget', label: 'Budget' },
   { key: 'partners', label: 'Partners' },
   { key: 'clients', label: 'Clients' },
   { key: 'activity', label: 'Activity' },
@@ -2431,6 +2433,11 @@ export default function ProjectDetailPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* ═══════════════════ BUDGET TAB ═══════════════════ */}
+      {activeTab === 'budget' && (
+        <EventBudgetTracker projectId={id as string} isActive={activeTab === 'budget'} role="admin" />
       )}
 
       {/* ═══════════════════ PARTNERS TAB ═══════════════════ */}

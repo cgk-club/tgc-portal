@@ -93,9 +93,11 @@ function pct(part: number, whole: number): string {
 interface Props {
   projectId: string;
   isActive: boolean;
+  role?: "admin" | "partner";
 }
 
-export default function EventBudgetTracker({ projectId, isActive }: Props) {
+export default function EventBudgetTracker({ projectId, isActive, role = "partner" }: Props) {
+  const isAdmin = role === "admin";
   const [budget, setBudget] = useState<BudgetItem[]>([]);
   const [revenue, setRevenue] = useState<RevenueItem[]>([]);
   const [canSee, setCanSee] = useState(false);
@@ -130,15 +132,25 @@ export default function EventBudgetTracker({ projectId, isActive }: Props) {
   const [editValues, setEditValues] = useState<Record<string, string>>({});
 
   const fetchData = useCallback(async () => {
-    const res = await fetch(`/api/partner/projects/${projectId}/budget`);
-    if (res.ok) {
-      const data = await res.json();
-      setBudget(data.budget || []);
-      setRevenue(data.revenue || []);
-      setCanSee(data.can_see_budget);
+    if (isAdmin) {
+      const [budgetRes, revenueRes] = await Promise.all([
+        fetch(`/api/admin/projects/${projectId}/budget`),
+        fetch(`/api/admin/projects/${projectId}/revenue`),
+      ]);
+      if (budgetRes.ok) setBudget(await budgetRes.json());
+      if (revenueRes.ok) setRevenue(await revenueRes.json());
+      setCanSee(true);
+    } else {
+      const res = await fetch(`/api/partner/projects/${projectId}/budget`);
+      if (res.ok) {
+        const data = await res.json();
+        setBudget(data.budget || []);
+        setRevenue(data.revenue || []);
+        setCanSee(data.can_see_budget);
+      }
     }
     setLoading(false);
-  }, [projectId]);
+  }, [projectId, isAdmin]);
 
   useEffect(() => {
     if (isActive) fetchData();
@@ -182,7 +194,8 @@ export default function EventBudgetTracker({ projectId, isActive }: Props) {
   async function handleAddRevenue(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await fetch(`/api/partner/projects/${projectId}/revenue`, {
+    const revenueEndpoint = isAdmin ? `/api/admin/projects/${projectId}/revenue` : `/api/partner/projects/${projectId}/revenue`;
+    await fetch(revenueEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -206,7 +219,8 @@ export default function EventBudgetTracker({ projectId, isActive }: Props) {
   async function handleAddExpense(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await fetch(`/api/partner/projects/${projectId}/budget`, {
+    const budgetEndpoint = isAdmin ? `/api/admin/projects/${projectId}/budget` : `/api/partner/projects/${projectId}/budget`;
+    await fetch(budgetEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -223,23 +237,25 @@ export default function EventBudgetTracker({ projectId, isActive }: Props) {
   }
 
   async function handleInlineUpdate(itemId: string, table: "revenue" | "budget") {
+    const base = isAdmin ? `/api/admin/projects/${projectId}` : `/api/partner/projects/${projectId}`;
     const endpoint = table === "revenue"
-      ? `/api/partner/projects/${projectId}/revenue/${itemId}`
-      : `/api/partner/projects/${projectId}/budget`;
+      ? `${base}/revenue/${itemId}`
+      : `${base}/budget/${itemId}`;
 
-    if (table === "revenue") {
-      const updates: Record<string, unknown> = {};
-      if (editValues.confirmed !== undefined) updates.confirmed = parseFloat(editValues.confirmed) || 0;
-      if (editValues.status !== undefined) updates.status = editValues.status;
-      if (editValues.sponsor_name !== undefined) updates.sponsor_name = editValues.sponsor_name;
-      if (editValues.notes !== undefined) updates.notes = editValues.notes;
-
-      await fetch(endpoint, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
+    const updates: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(editValues)) {
+      if (["budgeted", "committed", "paid", "projected", "confirmed", "invoiced", "received", "unit_price", "included_pax", "quantity"].includes(k)) {
+        updates[k] = parseFloat(v) || 0;
+      } else {
+        updates[k] = v || null;
+      }
     }
+
+    await fetch(endpoint, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
 
     setEditingId(null);
     setEditValues({});
@@ -489,30 +505,71 @@ export default function EventBudgetTracker({ projectId, isActive }: Props) {
                 <div className="divide-y divide-green/5">
                   {g.items.map((item) => (
                     <div key={item.id} className="px-4 py-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm text-gray-800 font-body">{item.label}</p>
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-body ${(STATUS_STYLES[item.status] || STATUS_STYLES.planned).bg} ${(STATUS_STYLES[item.status] || STATUS_STYLES.planned).text}`}>
-                              {item.status.replace(/_/g, " ")}
-                            </span>
-                            {item.reimbursable && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 font-body">reimbursable</span>
+                      {editingId === item.id ? (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-gray-400 font-body mb-0.5">Budgeted</label>
+                              <input type="number" value={editValues.budgeted ?? item.budgeted} onChange={(e) => setEditValues({ ...editValues, budgeted: e.target.value })}
+                                className="w-full rounded border border-green/20 px-2 py-1 text-sm font-body focus:border-green focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-gray-400 font-body mb-0.5">Committed</label>
+                              <input type="number" value={editValues.committed ?? item.committed} onChange={(e) => setEditValues({ ...editValues, committed: e.target.value })}
+                                className="w-full rounded border border-green/20 px-2 py-1 text-sm font-body focus:border-green focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-gray-400 font-body mb-0.5">Paid</label>
+                              <input type="number" value={editValues.paid ?? item.paid} onChange={(e) => setEditValues({ ...editValues, paid: e.target.value })}
+                                className="w-full rounded border border-green/20 px-2 py-1 text-sm font-body focus:border-green focus:outline-none" />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <select value={editValues.status ?? item.status} onChange={(e) => setEditValues({ ...editValues, status: e.target.value })}
+                              className="rounded border border-green/20 px-2 py-1 text-xs font-body bg-white focus:border-green focus:outline-none">
+                              <option value="planned">Planned</option>
+                              <option value="committed">Committed</option>
+                              <option value="partial_paid">Partially Paid</option>
+                              <option value="paid">Paid</option>
+                            </select>
+                            <button onClick={() => handleInlineUpdate(item.id, "budget")}
+                              className="text-xs px-3 py-1 bg-green text-white rounded font-body hover:bg-green-light">Save</button>
+                            <button onClick={() => { setEditingId(null); setEditValues({}); }}
+                              className="text-xs px-3 py-1 border border-green/20 text-green rounded font-body">Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm text-gray-800 font-body">{item.label}</p>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded font-body ${(STATUS_STYLES[item.status] || STATUS_STYLES.planned).bg} ${(STATUS_STYLES[item.status] || STATUS_STYLES.planned).text}`}>
+                                {item.status.replace(/_/g, " ")}
+                              </span>
+                              {item.reimbursable && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 font-body">reimbursable</span>
+                              )}
+                            </div>
+                            {item.description && <p className="text-[10px] text-gray-400 font-body mt-0.5">{item.description}</p>}
+                            {item.owner && <p className="text-[10px] text-gray-400 font-body">Owner: {item.owner}</p>}
+                          </div>
+                          <div className="flex items-center gap-2 flex-none">
+                            <div className="text-right">
+                              <p className="text-sm font-body font-medium text-gray-800">{fmt(item.budgeted)}</p>
+                              {Number(item.committed) > 0 && (
+                                <p className="text-[10px] text-blue-600 font-body">{fmt(item.committed)} committed</p>
+                              )}
+                              {Number(item.paid) > 0 && (
+                                <p className="text-[10px] text-green font-body">{fmt(item.paid)} paid</p>
+                              )}
+                            </div>
+                            {isAdmin && (
+                              <button onClick={() => { setEditingId(item.id); setEditValues({}); }}
+                                className="text-[10px] text-gray-400 hover:text-green font-body" title="Edit">&#9998;</button>
                             )}
                           </div>
-                          {item.description && <p className="text-[10px] text-gray-400 font-body mt-0.5">{item.description}</p>}
-                          {item.owner && <p className="text-[10px] text-gray-400 font-body">Owner: {item.owner}</p>}
                         </div>
-                        <div className="text-right flex-none">
-                          <p className="text-sm font-body font-medium text-gray-800">{fmt(item.budgeted)}</p>
-                          {Number(item.committed) > 0 && (
-                            <p className="text-[10px] text-blue-600 font-body">{fmt(item.committed)} committed</p>
-                          )}
-                          {Number(item.paid) > 0 && (
-                            <p className="text-[10px] text-green font-body">{fmt(item.paid)} paid</p>
-                          )}
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
