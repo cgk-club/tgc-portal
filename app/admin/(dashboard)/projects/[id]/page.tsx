@@ -83,6 +83,44 @@ interface PartnerLink {
   created_at: string
 }
 
+interface ClientVisibilitySettings {
+  milestones: 'hidden' | 'view'
+  documents: 'hidden' | 'shared_only' | 'all'
+  activity: 'hidden' | 'filtered' | 'all'
+  financials: 'hidden' | 'own_only'
+  guests: 'hidden' | 'first_name_only' | 'view'
+  schedule: 'hidden' | 'view'
+  budget: 'hidden' | 'view'
+  sponsors: 'hidden' | 'view'
+  tasks: 'hidden' | 'view'
+  partners: 'hidden' | 'view'
+}
+
+const DEFAULT_CLIENT_VISIBILITY: ClientVisibilitySettings = {
+  milestones: 'view',
+  documents: 'shared_only',
+  activity: 'filtered',
+  financials: 'own_only',
+  guests: 'first_name_only',
+  schedule: 'view',
+  budget: 'hidden',
+  sponsors: 'hidden',
+  tasks: 'hidden',
+  partners: 'hidden',
+}
+
+interface ClientLink {
+  id: string
+  project_id: string
+  client_id: string
+  client: { id: string; name: string | null; email: string } | null
+  role: string
+  status: string | null
+  notes: string | null
+  visibility_settings: ClientVisibilitySettings | null
+  created_at: string
+}
+
 interface Update {
   id: string
   project_id: string
@@ -137,6 +175,7 @@ interface ProjectDetail {
   documents: Document[]
   financials: Financial[]
   partners: PartnerLink[]
+  linked_clients: ClientLink[]
   updates: Update[]
   tasks: Task[]
   progress: number
@@ -144,7 +183,7 @@ interface ProjectDetail {
 
 // ── Constants ──────────────────────────────────────────────────
 
-type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'partners' | 'tasks' | 'activity'
+type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'partners' | 'clients' | 'tasks' | 'activity'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -153,6 +192,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'documents', label: 'Documents' },
   { key: 'financials', label: 'Financials' },
   { key: 'partners', label: 'Partners' },
+  { key: 'clients', label: 'Clients' },
   { key: 'activity', label: 'Activity' },
 ]
 
@@ -1018,6 +1058,14 @@ export default function ProjectDetailPage() {
   const [partnerRole, setPartnerRole] = useState('')
   const [expandedPartnerId, setExpandedPartnerId] = useState<string | null>(null)
 
+  // Client state
+  const [showAddClient, setShowAddClient] = useState(false)
+  const [clientSearch, setClientSearch] = useState('')
+  const [clientResults, setClientResults] = useState<Array<{ id: string; name: string | null; email: string }>>([])
+  const [selectedClientId, setSelectedClientId] = useState('')
+  const [clientRole, setClientRole] = useState('attendee')
+  const [expandedClientId, setExpandedClientId] = useState<string | null>(null)
+
   // Inline notes editing state
   const [editingNotes, setEditingNotes] = useState(false)
   const [notesValue, setNotesValue] = useState('')
@@ -1394,6 +1442,66 @@ export default function ProjectDetailPage() {
     fetchProject()
   }
 
+  // ── Client actions ──────────────────────────────────────────
+
+  async function searchClients() {
+    if (!clientSearch.trim()) return
+    const res = await fetch(`/api/admin/clients?search=${encodeURIComponent(clientSearch)}`)
+    if (res.ok) {
+      const data = await res.json()
+      const list = Array.isArray(data) ? data : data.clients || []
+      setClientResults(list.map((c: Record<string, unknown>) => ({
+        id: c.id as string,
+        name: c.name as string | null,
+        email: c.email as string,
+      })))
+    }
+  }
+
+  async function addClient(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedClientId) return
+    setSaving(true)
+
+    const res = await fetch(`/api/admin/projects/${id}/clients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: selectedClientId,
+        role: clientRole.trim() || 'attendee',
+      }),
+    })
+
+    if (res.ok) {
+      setShowAddClient(false)
+      setClientSearch('')
+      setClientResults([])
+      setSelectedClientId('')
+      setClientRole('attendee')
+      fetchProject()
+    }
+    setSaving(false)
+  }
+
+  async function removeClient(cid: string) {
+    if (!confirm('Remove this client from the project?')) return
+    await fetch(`/api/admin/projects/${id}/clients/${cid}`, { method: 'DELETE' })
+    fetchProject()
+  }
+
+  async function updateClientVisibility(cid: string, key: keyof ClientVisibilitySettings, value: string) {
+    const cl = project?.linked_clients.find(c => c.id === cid)
+    if (!cl) return
+    const current: ClientVisibilitySettings = { ...DEFAULT_CLIENT_VISIBILITY, ...(cl.visibility_settings || {}) }
+    const updated = { ...current, [key]: value }
+    await fetch(`/api/admin/projects/${id}/clients/${cid}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visibility_settings: updated }),
+    })
+    fetchProject()
+  }
+
   async function saveInlineNotes() {
     setSavingNotes(true)
     const res = await fetch(`/api/admin/projects/${id}`, {
@@ -1565,6 +1673,9 @@ export default function ProjectDetailPage() {
             )}
             {tab.key === 'tasks' && project.tasks && project.tasks.length > 0 && (
               <span className="ml-1.5 text-xs text-gray-400">({project.tasks.length})</span>
+            )}
+            {tab.key === 'clients' && project.linked_clients && project.linked_clients.length > 0 && (
+              <span className="ml-1.5 text-xs text-gray-400">({project.linked_clients.length})</span>
             )}
           </button>
         ))}
@@ -2472,6 +2583,260 @@ export default function ProjectDetailPage() {
                     <Button variant="ghost" type="button" onClick={() => setShowAddPartner(false)}>Cancel</Button>
                     <Button type="submit" disabled={saving || !selectedPartnerId || !partnerRole.trim()}>
                       {saving ? 'Linking...' : 'Link Partner'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════════════ CLIENTS TAB ═══════════════════ */}
+      {activeTab === 'clients' && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">Linked Clients</h2>
+            <Button size="sm" onClick={() => setShowAddClient(true)}>Add Client</Button>
+          </div>
+
+          {project.linked_clients.length === 0 ? (
+            <div className="bg-white rounded-lg border border-green/10 p-8 text-center">
+              <p className="text-gray-500 font-body text-sm">No clients linked to this project.</p>
+              <p className="text-gray-400 font-body text-xs mt-1">Add clients as they express interest in this event or project.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {project.linked_clients.map((cl) => {
+                const cvis: ClientVisibilitySettings = { ...DEFAULT_CLIENT_VISIBILITY, ...(cl.visibility_settings || {}) }
+                const isExpanded = expandedClientId === cl.id
+                return (
+                  <div key={cl.id} className="bg-white rounded-lg border border-green/10 overflow-hidden">
+                    <div className="flex items-center gap-4 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-800 font-body font-medium">
+                          {cl.client?.name || cl.client?.email || '-'}
+                        </p>
+                        <p className="text-xs text-gray-500 font-body">{cl.role} &middot; {cl.client?.email}</p>
+                      </div>
+                      <span className={`inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium ${
+                        cl.status === 'active' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {cl.status || '-'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setExpandedClientId(isExpanded ? null : cl.id)}
+                          className={`text-[11px] px-2.5 py-1 rounded font-body transition-colors ${
+                            isExpanded ? 'bg-green/10 text-green' : 'bg-gray-50 text-gray-500 hover:bg-green/5 hover:text-green'
+                          }`}
+                        >
+                          Permissions
+                        </button>
+                        <button
+                          onClick={() => removeClient(cl.id)}
+                          className="text-xs text-gray-400 hover:text-red-500"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="border-t border-green/10 px-4 py-4 bg-pearl/30">
+                        <h4 className="text-[10px] font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                          Client Visibility Controls
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Milestones</label>
+                            <select
+                              value={cvis.milestones}
+                              onChange={(e) => updateClientVisibility(cl.id, 'milestones', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Documents</label>
+                            <select
+                              value={cvis.documents}
+                              onChange={(e) => updateClientVisibility(cl.id, 'documents', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="shared_only">Shared Only</option>
+                              <option value="all">All Documents</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Activity</label>
+                            <select
+                              value={cvis.activity}
+                              onChange={(e) => updateClientVisibility(cl.id, 'activity', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="filtered">Admin Only</option>
+                              <option value="all">All Activity</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Financials</label>
+                            <select
+                              value={cvis.financials}
+                              onChange={(e) => updateClientVisibility(cl.id, 'financials', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="own_only">Own Payments Only</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Guest List</label>
+                            <select
+                              value={cvis.guests}
+                              onChange={(e) => updateClientVisibility(cl.id, 'guests', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="first_name_only">First Names Only</option>
+                              <option value="view">Full Names</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Schedule</label>
+                            <select
+                              value={cvis.schedule}
+                              onChange={(e) => updateClientVisibility(cl.id, 'schedule', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Budget</label>
+                            <select
+                              value={cvis.budget}
+                              onChange={(e) => updateClientVisibility(cl.id, 'budget', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Sponsors</label>
+                            <select
+                              value={cvis.sponsors}
+                              onChange={(e) => updateClientVisibility(cl.id, 'sponsors', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Tasks</label>
+                            <select
+                              value={cvis.tasks}
+                              onChange={(e) => updateClientVisibility(cl.id, 'tasks', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[11px] text-gray-500 font-body mb-1">Partners</label>
+                            <select
+                              value={cvis.partners}
+                              onChange={(e) => updateClientVisibility(cl.id, 'partners', e.target.value)}
+                              className="w-full text-xs px-2 py-1.5 border border-green/20 rounded bg-white text-gray-700 font-body focus:border-green focus:outline-none"
+                            >
+                              <option value="hidden">Hidden</option>
+                              <option value="view">View</option>
+                            </select>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-gray-400 font-body mt-3">
+                          Changes save automatically. Default: milestones, schedule, docs (shared) visible. Financials own-only. Guests first-name only.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Add Client Modal */}
+          {showAddClient && (
+            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-[8px] w-full max-w-md">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-heading text-lg font-semibold text-green">Add Client to Project</h2>
+                    <button onClick={() => setShowAddClient(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                  </div>
+                </div>
+                <form onSubmit={addClient} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Search Client</label>
+                    <div className="flex gap-2">
+                      <input
+                        value={clientSearch}
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        placeholder="Name or email..."
+                        className="flex-1 rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                      />
+                      <Button type="button" size="sm" onClick={searchClients}>Search</Button>
+                    </div>
+                    {clientResults.length > 0 && (
+                      <div className="mt-2 border border-gray-200 rounded-[4px] max-h-40 overflow-y-auto">
+                        {clientResults.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedClientId(c.id)
+                              setClientSearch(c.name || c.email)
+                              setClientResults([])
+                            }}
+                            className={`w-full text-left px-3 py-2 text-sm font-body hover:bg-pearl transition-colors ${
+                              selectedClientId === c.id ? 'bg-green-muted text-green' : 'text-gray-700'
+                            }`}
+                          >
+                            {c.name || c.email}
+                            {c.name && <span className="text-gray-400 ml-2 text-xs">{c.email}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {selectedClientId && (
+                      <p className="text-xs text-green font-body mt-1">Client selected</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 font-body">Role</label>
+                    <select
+                      value={clientRole}
+                      onChange={(e) => setClientRole(e.target.value)}
+                      className="w-full rounded-[4px] border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                    >
+                      <option value="attendee">Attendee</option>
+                      <option value="vip">VIP Guest</option>
+                      <option value="sponsor">Sponsor</option>
+                      <option value="observer">Observer</option>
+                    </select>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button variant="ghost" type="button" onClick={() => setShowAddClient(false)}>Cancel</Button>
+                    <Button type="submit" disabled={saving || !selectedClientId}>
+                      {saving ? 'Adding...' : 'Add Client'}
                     </Button>
                   </div>
                 </form>

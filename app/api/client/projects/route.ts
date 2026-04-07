@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
 
   if (!client) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Get projects with milestone counts
-  const { data: projects, error } = await sb
+  // Get projects owned by this client
+  const { data: ownedProjects, error } = await sb
     .from('client_projects')
     .select('*')
     .eq('client_id', client.id)
@@ -28,8 +28,31 @@ export async function GET(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // Get projects linked via project_clients (event attendance etc.)
+  const { data: linkedEntries } = await sb
+    .from('project_clients')
+    .select('project_id')
+    .eq('client_id', client.id)
+    .eq('status', 'active')
+
+  const linkedProjectIds = (linkedEntries || []).map(e => e.project_id)
+  const ownedProjectIds = (ownedProjects || []).map(p => p.id)
+  const additionalIds = linkedProjectIds.filter(id => !ownedProjectIds.includes(id))
+
+  let linkedProjects: typeof ownedProjects = []
+  if (additionalIds.length > 0) {
+    const { data } = await sb
+      .from('client_projects')
+      .select('*')
+      .in('id', additionalIds)
+      .order('updated_at', { ascending: false })
+    linkedProjects = data || []
+  }
+
+  const projects = [...(ownedProjects || []), ...linkedProjects]
+
   // For each project, get milestone counts
-  const projectIds = (projects || []).map(p => p.id)
+  const projectIds = projects.map(p => p.id)
 
   let milestoneCounts: Record<string, { total: number; completed: number }> = {}
   let lastUpdates: Record<string, string | null> = {}

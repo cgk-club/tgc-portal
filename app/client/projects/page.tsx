@@ -133,10 +133,10 @@ export default function ClientProjectsPage() {
             My Projects
           </p>
           <h1 className="font-heading text-xl sm:text-2xl font-semibold text-green mb-2">
-            Property & Real Estate
+            My Projects
           </h1>
           <p className="text-sm text-gray-500 font-body">
-            Track your renovations, acquisitions, and property management projects.
+            Track your projects, events, and experiences.
           </p>
         </div>
 

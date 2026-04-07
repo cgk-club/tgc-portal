@@ -186,16 +186,19 @@ export async function GET(
   }
 
   // Build guests based on visibility
+  // Partners only see first names for client-type guests (privacy rule)
   let guests: unknown[] = [];
   if (visibility.guests === "view") {
     const { data: projectGuests } = await sb
       .from("event_guests")
-      .select("id, name, company, status, created_at")
+      .select("id, name, guest_type, company, status, created_at")
       .eq("project_id", projectId)
       .order("name", { ascending: true });
     guests = (projectGuests || []).map((g) => ({
       id: g.id,
-      name: g.name,
+      name: g.guest_type === "client"
+        ? (g.name?.split(" ")[0] || "Guest")
+        : g.name,
       company: g.company,
       status: g.status,
     }));

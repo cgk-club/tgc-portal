@@ -26,6 +26,7 @@ export async function GET(
     { data: documents },
     { data: financials },
     { data: partners },
+    { data: linkedClients },
     { data: updates },
     { data: tasks },
   ] = await Promise.all([
@@ -43,6 +44,10 @@ export async function GET(
       .order('date', { ascending: false, nullsFirst: false }),
     sb.from('project_partners')
       .select('*, partner:partner_accounts!partner_id(id, org_name, email)')
+      .eq('project_id', id)
+      .order('created_at', { ascending: false }),
+    sb.from('project_clients')
+      .select('*, client:client_accounts!client_id(id, name, email)')
       .eq('project_id', id)
       .order('created_at', { ascending: false }),
     sb.from('project_updates')
@@ -99,6 +104,7 @@ export async function GET(
     documents: documents || [],
     financials: financials || [],
     partners: partners || [],
+    linked_clients: linkedClients || [],
     updates: updates || [],
     tasks: enrichedTasks,
     progress,

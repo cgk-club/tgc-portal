@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const sb = getSupabaseAdmin()
+  const searchParams = request.nextUrl.searchParams
+  const search = searchParams.get('search')
 
-  const { data: clients, error } = await sb
+  let query = sb
     .from('client_accounts')
     .select('*')
     .order('created_at', { ascending: false })
+
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`)
+  }
+
+  const { data: clients, error } = await query
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
