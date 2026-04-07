@@ -289,7 +289,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: assistantMessage });
   } catch (error) {
-    console.error("Partner seller chat error:", error);
-    return NextResponse.json({ error: "Chat failed" }, { status: 500 });
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("Partner seller chat error:", errMsg);
+    // Check common causes
+    if (errMsg.includes("api_key") || errMsg.includes("authentication")) {
+      console.error("ANTHROPIC_API_KEY may be missing or invalid");
+    }
+    return NextResponse.json({ error: "Chat failed", detail: errMsg }, { status: 500 });
   }
 }

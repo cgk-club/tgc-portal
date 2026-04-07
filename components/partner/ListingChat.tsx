@@ -30,6 +30,7 @@ export default function ListingChat({
   const [sending, setSending] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [parsedData, setParsedData] = useState<Record<string, unknown> | null>(null);
+  const [error, setError] = useState("");
   const [rawInput, setRawInput] = useState("");
   const [typingText, setTypingText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -118,6 +119,7 @@ export default function ListingChat({
     setInput("");
     setRawInput((prev) => prev + text + "\n");
     setSending(true);
+    setError("");
 
     try {
       const res = await fetch("/api/partner/chat/seller", {
@@ -142,9 +144,20 @@ export default function ListingChat({
           setTypingText(assistantMsg);
           setIsTyping(true);
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Chat API error:", res.status, errData);
+        if (res.status === 401) {
+          setError("Your session has expired. Please log in again.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+        setMessages([...newMessages, { role: "assistant", content: "I apologise, I wasn't able to process that. Could you try again?" }]);
       }
     } catch (err) {
       console.error("Chat error:", err);
+      setError("Connection issue. Please check your internet and try again.");
+      setMessages([...newMessages, { role: "assistant", content: "I apologise, there seems to be a connection issue. Please try again." }]);
     }
 
     setSending(false);
@@ -276,6 +289,11 @@ export default function ListingChat({
                 <span className="w-2 h-2 bg-green/30 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
+          </div>
+        )}
+        {error && (
+          <div className="flex justify-center">
+            <p className="text-xs text-red-500 font-body bg-red-50 px-3 py-1.5 rounded">{error}</p>
           </div>
         )}
         <div ref={messagesEndRef} />
