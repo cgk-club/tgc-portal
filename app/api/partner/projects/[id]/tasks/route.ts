@@ -48,6 +48,71 @@ export async function GET(
   })
 }
 
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: projectId } = await params
+
+  const token = request.cookies.get(PARTNER_COOKIE_NAME)?.value
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const session = await verifyPartnerSession(token)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const sb = getSupabaseAdmin()
+
+  // Verify partner is active on this project
+  const { data: assignment } = await sb
+    .from('project_partners')
+    .select('id, role')
+    .eq('project_id', projectId)
+    .eq('partner_id', session.partnerId)
+    .eq('status', 'active')
+    .single()
+
+  if (!assignment) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  const body = await request.json()
+
+  if (!body.title || !body.title.trim()) {
+    return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+  }
+
+  // Get partner org name for created_by
+  const { data: partner } = await sb
+    .from('partner_accounts')
+    .select('org_name')
+    .eq('id', session.partnerId)
+    .single()
+
+  const creatorName = partner?.org_name || 'Partner'
+
+  const { data: task, error } = await sb
+    .from('project_tasks')
+    .insert({
+      project_id: projectId,
+      title: body.title.trim(),
+      description: body.description?.trim() || null,
+      priority: body.priority || 'medium',
+      due_date: body.due_date || null,
+      assigned_to: body.assigned_to || [],
+      status: 'pending',
+      created_by: `${creatorName} (${assignment.role})`,
+      created_by_type: 'partner',
+    })
+    .select()
+    .single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(task, { status: 201 })
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -86,7 +151,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
 
-  // Verify the task is assigned to this partner
+  // Verify the task belongs to this project and partner can access it
   const { data: task } = await sb
     .from('project_tasks')
     .select('id, assigned_to')
@@ -94,8 +159,16 @@ export async function PATCH(
     .eq('project_id', projectId)
     .single()
 
-  if (!task || !task.assigned_to?.includes(session.partnerId)) {
-    return NextResponse.json({ error: 'Task not found or not assigned to you' }, { status: 404 })
+  if (!task) {
+    return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+  }
+
+  // Partners can update tasks assigned to them or unassigned tasks
+  const assignees = task.assigned_to as string[] | null
+  const isAssigned = assignees && assignees.includes(session.partnerId)
+  const isUnassigned = !assignees || assignees.length === 0
+  if (!isAssigned && !isUnassigned) {
+    return NextResponse.json({ error: 'Not authorised to update this task' }, { status: 403 })
   }
 
   const updates: Record<string, unknown> = {

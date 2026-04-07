@@ -131,13 +131,16 @@ export async function GET(
   }
   // If "all", return all updates unfiltered
 
-  // Get other partners on the project (just roles, no sensitive info)
-  const { data: otherPartners } = await sb
+  // Get all partners on the project (IDs + roles for task assignment, org names for display)
+  const { data: allProjectPartners } = await sb
     .from("project_partners")
-    .select("role, status")
+    .select("partner_id, role, status, partner:partner_accounts!partner_id(org_name)")
     .eq("project_id", projectId)
-    .neq("partner_id", session.partnerId)
     .in("status", ["active", "completed"]);
+
+  const otherPartners = (allProjectPartners || []).filter(
+    (p) => p.partner_id !== session.partnerId
+  );
 
   // Get tasks based on visibility
   let tasks;
@@ -252,6 +255,14 @@ export async function GET(
       role: p.role,
       status: p.status,
     })),
+    // All active partners for task assignment (id + name + role)
+    assignable_partners: (allProjectPartners || [])
+      .filter((p) => p.status === "active")
+      .map((p) => ({
+        id: p.partner_id,
+        name: (p.partner as unknown as Record<string, unknown>)?.org_name || "Partner",
+        role: p.role,
+      })),
     tasks: tasks,
   };
 

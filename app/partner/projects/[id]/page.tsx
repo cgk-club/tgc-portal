@@ -51,6 +51,12 @@ interface OtherPartner {
   status: string;
 }
 
+interface AssignablePartner {
+  id: string;
+  name: string;
+  role: string;
+}
+
 interface VisibilitySettings {
   financials: "hidden" | "read_only" | "full_access";
   tasks: "own_only" | "all";
@@ -107,6 +113,7 @@ interface ProjectDetail {
   documents: Document[];
   updates: Update[];
   other_partners: OtherPartner[];
+  assignable_partners: AssignablePartner[];
   tasks: PartnerTask[];
   financials?: PartnerFinancial[];
   guests?: PartnerGuest[];
@@ -190,6 +197,16 @@ export default function PartnerProjectDetailPage() {
   // Update form
   const [updateMessage, setUpdateMessage] = useState("");
   const [postingUpdate, setPostingUpdate] = useState(false);
+
+  // Task creation form
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [taskForm, setTaskForm] = useState({ title: "", description: "", priority: "medium", due_date: "", assigned_to: [] as string[] });
+  const [creatingTask, setCreatingTask] = useState(false);
+
+  // Notes editing
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesValue, setNotesValue] = useState("");
+  const [savingNotes, setSavingNotes] = useState(false);
 
   // Document upload form
   const [showUpload, setShowUpload] = useState(false);
@@ -312,6 +329,45 @@ export default function PartnerProjectDetailPage() {
     }
   }
 
+  async function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!taskForm.title.trim()) return;
+    setCreatingTask(true);
+
+    const res = await fetch(`/api/partner/projects/${projectId}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: taskForm.title.trim(),
+        description: taskForm.description.trim() || null,
+        priority: taskForm.priority,
+        due_date: taskForm.due_date || null,
+        assigned_to: taskForm.assigned_to,
+      }),
+    });
+
+    if (res.ok) {
+      setShowAddTask(false);
+      setTaskForm({ title: "", description: "", priority: "medium", due_date: "", assigned_to: [] });
+      await fetchProject();
+    }
+    setCreatingTask(false);
+  }
+
+  async function handleSaveNotes() {
+    setSavingNotes(true);
+    const res = await fetch(`/api/partner/projects/${projectId}/notes`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes: notesValue || null }),
+    });
+    if (res.ok) {
+      setEditingNotes(false);
+      await fetchProject();
+    }
+    setSavingNotes(false);
+  }
+
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-pearl">
@@ -320,7 +376,7 @@ export default function PartnerProjectDetailPage() {
     );
   }
 
-  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, tasks,
+  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, assignable_partners, tasks,
     visibility_settings: vis, financials, guests, sponsors } = data;
 
   const typeStyle = TYPE_STYLES[project.type] || {
@@ -819,6 +875,60 @@ export default function PartnerProjectDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Partner notes */}
+            <div className="bg-white border border-green/10 rounded-lg p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  My Notes
+                </h3>
+                {assignment.status === "active" && !editingNotes && (
+                  <button
+                    onClick={() => {
+                      setNotesValue(assignment.notes || "");
+                      setEditingNotes(true);
+                    }}
+                    className="text-[11px] text-green hover:underline font-body"
+                  >
+                    {assignment.notes ? "Edit" : "Add notes"}
+                  </button>
+                )}
+              </div>
+              {editingNotes ? (
+                <div>
+                  <textarea
+                    value={notesValue}
+                    onChange={(e) => setNotesValue(e.target.value)}
+                    rows={4}
+                    placeholder="Your private notes on this project..."
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body mb-2"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveNotes}
+                      disabled={savingNotes}
+                      className="text-xs px-4 py-1.5 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50"
+                    >
+                      {savingNotes ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setEditingNotes(false)}
+                      className="text-xs px-4 py-1.5 border border-green/20 text-green rounded-md hover:bg-green/5 transition-colors font-body"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : assignment.notes ? (
+                <p className="text-sm text-gray-600 font-body whitespace-pre-wrap">
+                  {assignment.notes}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-400 font-body">
+                  No notes yet.
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -1101,8 +1211,119 @@ export default function PartnerProjectDetailPage() {
           </div>
         )}
 
-        {activeTab === "tasks" && tasks && tasks.length > 0 && (
+        {activeTab === "tasks" && (
           <div className="space-y-4">
+            {/* Add task button */}
+            {assignment.status === "active" && (
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowAddTask(!showAddTask)}
+                  className="text-xs px-4 py-2 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body"
+                >
+                  {showAddTask ? "Cancel" : "Add Task"}
+                </button>
+              </div>
+            )}
+
+            {/* Add task form */}
+            {showAddTask && (
+              <form
+                onSubmit={handleCreateTask}
+                className="bg-white border border-green/10 rounded-lg p-5 space-y-4"
+              >
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                  New Task
+                </h3>
+                <div>
+                  <label className="block text-xs text-gray-500 font-body mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={taskForm.title}
+                    onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                    placeholder="What needs to be done?"
+                    required
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 font-body mb-1">Description (optional)</label>
+                  <textarea
+                    value={taskForm.description}
+                    onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                    rows={2}
+                    placeholder="Additional details..."
+                    className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-500 font-body mb-1">Priority</label>
+                    <select
+                      value={taskForm.priority}
+                      onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
+                      className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body bg-white"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 font-body mb-1">Due Date (optional)</label>
+                    <input
+                      type="date"
+                      value={taskForm.due_date}
+                      onChange={(e) => setTaskForm({ ...taskForm, due_date: e.target.value })}
+                      className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 font-body mb-1">Assign To</label>
+                    <div className="space-y-1 max-h-28 overflow-y-auto border border-green/20 rounded-md p-2">
+                      {assignable_partners && assignable_partners.map((p) => (
+                        <label key={p.id} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={taskForm.assigned_to.includes(p.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setTaskForm({ ...taskForm, assigned_to: [...taskForm.assigned_to, p.id] });
+                              } else {
+                                setTaskForm({ ...taskForm, assigned_to: taskForm.assigned_to.filter((id) => id !== p.id) });
+                              }
+                            }}
+                            className="rounded border-gray-300 text-green focus:ring-green/30"
+                          />
+                          <span className="text-xs text-gray-700 font-body">{p.name}</span>
+                        </label>
+                      ))}
+                      {(!assignable_partners || assignable_partners.length === 0) && (
+                        <p className="text-[10px] text-gray-400 font-body">No partners to assign</p>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-body mt-1">Leave empty for unassigned</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={creatingTask || !taskForm.title.trim()}
+                    className="px-5 py-2 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50"
+                  >
+                    {creatingTask ? "Creating..." : "Create Task"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddTask(false)}
+                    className="px-5 py-2 border border-green/20 text-green text-sm font-medium rounded-md hover:bg-green/5 transition-colors font-body"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
             {/* In Progress tasks */}
             {tasks.filter((t) => t.status === "in_progress").length > 0 && (
               <div>
@@ -1260,10 +1481,10 @@ export default function PartnerProjectDetailPage() {
               </div>
             )}
 
-            {tasks.length === 0 && (
+            {tasks.length === 0 && !showAddTask && (
               <div className="bg-white border border-green/10 rounded-lg p-5 text-center">
                 <p className="text-sm text-gray-400 font-body">
-                  No tasks assigned to you yet.
+                  No tasks yet. Create one to get started.
                 </p>
               </div>
             )}
