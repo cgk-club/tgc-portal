@@ -351,7 +351,7 @@ export default function PartnerGuidedTour({ show, onComplete }: GuidedTourProps)
         />
       )}
 
-      {/* Tooltip / Modal */}
+      {/* Tooltip / Modal — on mobile (<480px), always show as bottom card */}
       <div
         ref={tooltipRef}
         className={`transition-all duration-300 ease-in-out ${transitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
@@ -366,6 +366,14 @@ export default function PartnerGuidedTour({ show, onComplete }: GuidedTourProps)
                 maxWidth: 400,
                 width: 'calc(100% - 32px)',
               }
+            : typeof window !== 'undefined' && window.innerWidth < 480
+            ? {
+                position: 'fixed',
+                bottom: 16,
+                left: 16,
+                right: 16,
+                zIndex: 52,
+              }
             : {
                 position: 'fixed',
                 top: tooltipPos.top,
@@ -378,8 +386,8 @@ export default function PartnerGuidedTour({ show, onComplete }: GuidedTourProps)
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-white rounded-lg shadow-xl p-5 sm:p-6 border border-green/10">
-          {/* Arrow indicator for non-modal steps */}
-          {!isModal && spotlightRect && tooltipPos.placement === 'bottom' && (
+          {/* Arrow indicator for non-modal steps (hidden on mobile) */}
+          {!isModal && spotlightRect && tooltipPos.placement === 'bottom' && typeof window !== 'undefined' && window.innerWidth >= 480 && (
             <div
               className="absolute -top-2 w-4 h-4 bg-white border-l border-t border-green/10 rotate-45"
               style={{
@@ -390,7 +398,7 @@ export default function PartnerGuidedTour({ show, onComplete }: GuidedTourProps)
               }}
             />
           )}
-          {!isModal && spotlightRect && tooltipPos.placement === 'top' && (
+          {!isModal && spotlightRect && tooltipPos.placement === 'top' && typeof window !== 'undefined' && window.innerWidth >= 480 && (
             <div
               className="absolute -bottom-2 w-4 h-4 bg-white border-r border-b border-green/10 rotate-45"
               style={{
