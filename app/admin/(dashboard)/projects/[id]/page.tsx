@@ -1035,6 +1035,8 @@ export default function ProjectDetailPage() {
   const [newMilestoneTitle, setNewMilestoneTitle] = useState('')
   const [newMilestoneDue, setNewMilestoneDue] = useState('')
   const [newMilestoneDesc, setNewMilestoneDesc] = useState('')
+  const [editingMilestoneId, setEditingMilestoneId] = useState<string | null>(null)
+  const [milestoneEditForm, setMilestoneEditForm] = useState({ title: '', description: '', due_date: '' })
 
   // Document state
   const [showAddDoc, setShowAddDoc] = useState(false)
@@ -1215,6 +1217,32 @@ export default function ProjectDetailPage() {
   async function deleteMilestone(mid: string) {
     if (!confirm('Delete this milestone?')) return
     await fetch(`/api/admin/projects/${id}/milestones/${mid}`, { method: 'DELETE' })
+    fetchProject()
+  }
+
+  function startEditMilestone(m: Milestone) {
+    setEditingMilestoneId(m.id)
+    setMilestoneEditForm({
+      title: m.title,
+      description: m.description || '',
+      due_date: m.due_date || '',
+    })
+  }
+
+  async function saveEditMilestone() {
+    if (!editingMilestoneId || !milestoneEditForm.title.trim()) return
+    setSaving(true)
+    await fetch(`/api/admin/projects/${id}/milestones/${editingMilestoneId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: milestoneEditForm.title.trim(),
+        description: milestoneEditForm.description.trim() || null,
+        due_date: milestoneEditForm.due_date || null,
+      }),
+    })
+    setEditingMilestoneId(null)
+    setSaving(false)
     fetchProject()
   }
 
@@ -1970,6 +1998,9 @@ export default function ProjectDetailPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => startEditMilestone(m)} className="p-1 text-gray-400 hover:text-green text-xs" title="Edit">
+                      &#9998;
+                    </button>
                     {idx > 0 && (
                       <button onClick={() => moveMilestone(m.id, 'up')} className="p-1 text-gray-400 hover:text-green text-xs" title="Move up">
                         &#9650;
@@ -1984,6 +2015,40 @@ export default function ProjectDetailPage() {
                       &times;
                     </button>
                   </div>
+
+                  {/* Inline edit form */}
+                  {editingMilestoneId === m.id && (
+                    <div className="w-full mt-3 pt-3 border-t border-green/10">
+                      <div className="space-y-2">
+                        <input
+                          value={milestoneEditForm.title}
+                          onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, title: e.target.value })}
+                          className="w-full rounded-[4px] border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                        />
+                        <textarea
+                          rows={2}
+                          value={milestoneEditForm.description}
+                          onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, description: e.target.value })}
+                          placeholder="Description (optional)"
+                          className="w-full rounded-[4px] border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                        />
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="date"
+                            value={milestoneEditForm.due_date}
+                            onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, due_date: e.target.value })}
+                            className="rounded-[4px] border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:border-green focus:outline-none focus:ring-1 focus:ring-green font-body"
+                          />
+                          <Button size="sm" onClick={saveEditMilestone} disabled={saving}>
+                            {saving ? 'Saving...' : 'Save'}
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setEditingMilestoneId(null)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -201,6 +201,13 @@ export default function PartnerProjectDetailPage() {
   const [updateMessage, setUpdateMessage] = useState("");
   const [postingUpdate, setPostingUpdate] = useState(false);
 
+  // Milestone editing
+  const [showAddMilestone, setShowAddMilestone] = useState(false);
+  const [milestoneForm, setMilestoneForm] = useState({ title: "", description: "", due_date: "" });
+  const [editingMilestoneId, setEditingMilestoneId] = useState<string | null>(null);
+  const [milestoneEditForm, setMilestoneEditForm] = useState({ title: "", description: "", due_date: "" });
+  const [savingMilestone, setSavingMilestone] = useState(false);
+
   // Task creation form
   const [showAddTask, setShowAddTask] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: "", description: "", priority: "medium", due_date: "", assigned_to: [] as string[] });
@@ -331,6 +338,42 @@ export default function PartnerProjectDetailPage() {
     if (res.ok) {
       await fetchProject();
     }
+  }
+
+  async function handleCreateMilestone(e: React.FormEvent) {
+    e.preventDefault();
+    if (!milestoneForm.title.trim()) return;
+    setSavingMilestone(true);
+    await fetch(`/api/partner/projects/${projectId}/milestones`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: milestoneForm.title.trim(),
+        description: milestoneForm.description.trim() || null,
+        due_date: milestoneForm.due_date || null,
+      }),
+    });
+    setMilestoneForm({ title: "", description: "", due_date: "" });
+    setShowAddMilestone(false);
+    setSavingMilestone(false);
+    await fetchProject();
+  }
+
+  async function handleEditMilestone() {
+    if (!editingMilestoneId || !milestoneEditForm.title.trim()) return;
+    setSavingMilestone(true);
+    await fetch(`/api/partner/projects/${projectId}/milestones/${editingMilestoneId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: milestoneEditForm.title.trim(),
+        description: milestoneEditForm.description.trim() || null,
+        due_date: milestoneEditForm.due_date || null,
+      }),
+    });
+    setEditingMilestoneId(null);
+    setSavingMilestone(false);
+    await fetchProject();
   }
 
   async function handleCreateTask(e: React.FormEvent) {
@@ -996,81 +1039,140 @@ export default function PartnerProjectDetailPage() {
         )}
 
         {activeTab === "milestones" && (
-          <div className="bg-white border border-green/10 rounded-lg p-5">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">
-              Project Milestones
-            </h3>
-            {milestones.length === 0 ? (
-              <p className="text-sm text-gray-400 font-body text-center py-4">
-                No milestones defined yet.
-              </p>
-            ) : (
-              <div className="space-y-1">
-                {milestones.map((m, index) => {
-                  const style =
-                    MILESTONE_STYLES[m.status] || MILESTONE_STYLES.pending;
-                  const isLast = index === milestones.length - 1;
-
-                  return (
-                    <div key={m.id} className="flex gap-3">
-                      {/* Timeline connector */}
-                      <div className="flex flex-col items-center">
-                        <span className={`text-lg leading-none ${style.color}`}>
-                          {style.icon}
-                        </span>
-                        {!isLast && (
-                          <div className="w-px flex-1 bg-gray-200 my-1" />
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className={`pb-4 flex-1 ${isLast ? "" : ""}`}>
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p
-                              className={`text-sm font-body ${
-                                m.status === "completed"
-                                  ? "text-gray-400 line-through"
-                                  : "text-gray-800"
-                              }`}
-                            >
-                              {m.title}
-                            </p>
-                            {m.description && (
-                              <p className="text-xs text-gray-400 font-body mt-0.5">
-                                {m.description}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex flex-col items-end gap-0.5 flex-none">
-                            <span
-                              className={`text-[10px] px-2 py-0.5 rounded font-body capitalize ${
-                                m.status === "completed"
-                                  ? "bg-green/10 text-green"
-                                  : m.status === "in_progress"
-                                  ? "bg-gold/15 text-gold"
-                                  : m.status === "blocked"
-                                  ? "bg-red-50 text-red-500"
-                                  : "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {m.status.replace(/_/g, " ")}
-                            </span>
-                            {m.due_date && (
-                              <span className="text-[10px] text-gray-400 font-body">
-                                {m.status === "completed" && m.completed_date
-                                  ? `Done ${formatDate(m.completed_date)}`
-                                  : `Due ${formatDate(m.due_date)}`}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+          <div className="space-y-4">
+            {/* Add milestone button */}
+            {assignment.status === "active" && (
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowAddMilestone(!showAddMilestone)}
+                  className="text-xs px-4 py-2 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body"
+                >
+                  {showAddMilestone ? "Cancel" : "Add Milestone"}
+                </button>
               </div>
             )}
+
+            {/* Add milestone form */}
+            {showAddMilestone && (
+              <form onSubmit={handleCreateMilestone} className="bg-white border border-green/10 rounded-lg p-5 space-y-3">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">New Milestone</h3>
+                <input value={milestoneForm.title} onChange={(e) => setMilestoneForm({ ...milestoneForm, title: e.target.value })}
+                  placeholder="Milestone title" required
+                  className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body" />
+                <textarea value={milestoneForm.description} onChange={(e) => setMilestoneForm({ ...milestoneForm, description: e.target.value })}
+                  placeholder="Description (optional)" rows={2}
+                  className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body" />
+                <div className="flex items-center gap-3">
+                  <input type="date" value={milestoneForm.due_date} onChange={(e) => setMilestoneForm({ ...milestoneForm, due_date: e.target.value })}
+                    className="rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body" />
+                  <button type="submit" disabled={savingMilestone || !milestoneForm.title.trim()}
+                    className="px-5 py-2 bg-green text-white text-sm font-medium rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50">
+                    {savingMilestone ? "Adding..." : "Add"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="bg-white border border-green/10 rounded-lg p-5">
+              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-4">
+                Project Milestones
+              </h3>
+              {milestones.length === 0 ? (
+                <p className="text-sm text-gray-400 font-body text-center py-4">
+                  No milestones defined yet.
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {milestones.map((m, index) => {
+                    const style = MILESTONE_STYLES[m.status] || MILESTONE_STYLES.pending;
+                    const isLast = index === milestones.length - 1;
+                    const isEditing = editingMilestoneId === m.id;
+
+                    return (
+                      <div key={m.id} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <span className={`text-lg leading-none ${style.color}`}>{style.icon}</span>
+                          {!isLast && <div className="w-px flex-1 bg-gray-200 my-1" />}
+                        </div>
+
+                        <div className={`pb-4 flex-1`}>
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <input value={milestoneEditForm.title}
+                                onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, title: e.target.value })}
+                                className="w-full rounded-md border border-green/20 px-3 py-1.5 text-sm text-gray-800 focus:border-green focus:outline-none font-body" />
+                              <textarea value={milestoneEditForm.description} rows={2}
+                                onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, description: e.target.value })}
+                                placeholder="Description (optional)"
+                                className="w-full rounded-md border border-green/20 px-3 py-1.5 text-sm text-gray-800 focus:border-green focus:outline-none font-body" />
+                              <div className="flex items-center gap-2">
+                                <input type="date" value={milestoneEditForm.due_date}
+                                  onChange={(e) => setMilestoneEditForm({ ...milestoneEditForm, due_date: e.target.value })}
+                                  className="rounded-md border border-green/20 px-3 py-1.5 text-sm text-gray-800 focus:border-green focus:outline-none font-body" />
+                                <button onClick={handleEditMilestone} disabled={savingMilestone}
+                                  className="text-xs px-3 py-1.5 bg-green text-white rounded-md hover:bg-green-light font-body disabled:opacity-50">
+                                  {savingMilestone ? "Saving..." : "Save"}
+                                </button>
+                                <button onClick={() => setEditingMilestoneId(null)}
+                                  className="text-xs px-3 py-1.5 border border-green/20 text-green rounded-md hover:bg-green/5 font-body">
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <p className={`text-sm font-body ${m.status === "completed" ? "text-gray-400 line-through" : "text-gray-800"}`}>
+                                  {m.title}
+                                </p>
+                                {m.description && (
+                                  <p className="text-xs text-gray-400 font-body mt-0.5">{m.description}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 flex-none">
+                                <div className="flex flex-col items-end gap-0.5">
+                                  <span className={`text-[10px] px-2 py-0.5 rounded font-body capitalize ${
+                                    m.status === "completed" ? "bg-green/10 text-green"
+                                      : m.status === "in_progress" ? "bg-gold/15 text-gold"
+                                      : m.status === "blocked" ? "bg-red-50 text-red-500"
+                                      : "bg-gray-100 text-gray-500"
+                                  }`}>
+                                    {m.status.replace(/_/g, " ")}
+                                  </span>
+                                  {m.due_date && (
+                                    <span className="text-[10px] text-gray-400 font-body">
+                                      {m.status === "completed" && m.completed_date
+                                        ? `Done ${formatDate(m.completed_date)}`
+                                        : `Due ${formatDate(m.due_date)}`}
+                                    </span>
+                                  )}
+                                </div>
+                                {assignment.status === "active" && (
+                                  <button
+                                    onClick={() => {
+                                      setEditingMilestoneId(m.id);
+                                      setMilestoneEditForm({
+                                        title: m.title,
+                                        description: m.description || "",
+                                        due_date: m.due_date || "",
+                                      });
+                                    }}
+                                    className="text-[10px] text-gray-400 hover:text-green font-body"
+                                    title="Edit"
+                                  >
+                                    &#9998;
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
