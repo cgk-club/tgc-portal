@@ -107,7 +107,9 @@ interface ProjectDetail {
     role: string;
     status: string;
     notes: string | null;
+    notes_visibility: "private" | "partners";
   };
+  shared_notes: { author: string; role: string; notes: string }[];
   visibility_settings: VisibilitySettings;
   milestones: Milestone[];
   documents: Document[];
@@ -206,6 +208,7 @@ export default function PartnerProjectDetailPage() {
   // Notes editing
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState("");
+  const [notesVis, setNotesVis] = useState<"private" | "partners">("private");
   const [savingNotes, setSavingNotes] = useState(false);
 
   // Document upload form
@@ -359,7 +362,7 @@ export default function PartnerProjectDetailPage() {
     const res = await fetch(`/api/partner/projects/${projectId}/notes`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes: notesValue || null }),
+      body: JSON.stringify({ notes: notesValue || null, notes_visibility: notesVis }),
     });
     if (res.ok) {
       setEditingNotes(false);
@@ -376,7 +379,7 @@ export default function PartnerProjectDetailPage() {
     );
   }
 
-  const { project, client_first_name, assignment, milestones, documents, updates, other_partners, assignable_partners, tasks,
+  const { project, client_first_name, assignment, shared_notes, milestones, documents, updates, other_partners, assignable_partners, tasks,
     visibility_settings: vis, financials, guests, sponsors } = data;
 
   const typeStyle = TYPE_STYLES[project.type] || {
@@ -876,16 +879,49 @@ export default function PartnerProjectDetailPage() {
               </div>
             )}
 
+            {/* Shared notes from other partners */}
+            {shared_notes && shared_notes.length > 0 && (
+              <div className="bg-white border border-green/10 rounded-lg p-5">
+                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body mb-3">
+                  Shared Notes
+                </h3>
+                <div className="space-y-3">
+                  {shared_notes.map((sn, i) => (
+                    <div key={i} className="border-l-2 border-green/20 pl-3">
+                      <p className="text-[10px] text-gray-400 font-body mb-1">
+                        {sn.author} &middot; {sn.role}
+                      </p>
+                      <p className="text-sm text-gray-600 font-body whitespace-pre-wrap">
+                        {sn.notes}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Partner notes */}
             <div className="bg-white border border-green/10 rounded-lg p-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
-                  My Notes
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider font-body">
+                    My Notes
+                  </h3>
+                  {!editingNotes && assignment.notes && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-body ${
+                      assignment.notes_visibility === "partners"
+                        ? "bg-blue-50 text-blue-600"
+                        : "bg-gray-100 text-gray-500"
+                    }`}>
+                      {assignment.notes_visibility === "partners" ? "Shared" : "Private"}
+                    </span>
+                  )}
+                </div>
                 {assignment.status === "active" && !editingNotes && (
                   <button
                     onClick={() => {
                       setNotesValue(assignment.notes || "");
+                      setNotesVis(assignment.notes_visibility || "private");
                       setEditingNotes(true);
                     }}
                     className="text-[11px] text-green hover:underline font-body"
@@ -900,23 +936,47 @@ export default function PartnerProjectDetailPage() {
                     value={notesValue}
                     onChange={(e) => setNotesValue(e.target.value)}
                     rows={4}
-                    placeholder="Your private notes on this project..."
+                    placeholder="Your notes on this project..."
                     className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body mb-2"
                   />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSaveNotes}
-                      disabled={savingNotes}
-                      className="text-xs px-4 py-1.5 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50"
-                    >
-                      {savingNotes ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={() => setEditingNotes(false)}
-                      className="text-xs px-4 py-1.5 border border-green/20 text-green rounded-md hover:bg-green/5 transition-colors font-body"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="notes_vis"
+                          checked={notesVis === "private"}
+                          onChange={() => setNotesVis("private")}
+                          className="text-green focus:ring-green/30"
+                        />
+                        <span className="text-xs text-gray-600 font-body">Private</span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="notes_vis"
+                          checked={notesVis === "partners"}
+                          onChange={() => setNotesVis("partners")}
+                          className="text-green focus:ring-green/30"
+                        />
+                        <span className="text-xs text-gray-600 font-body">Visible to all partners</span>
+                      </label>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSaveNotes}
+                        disabled={savingNotes}
+                        className="text-xs px-4 py-1.5 bg-green text-white rounded-md hover:bg-green-light transition-colors font-body disabled:opacity-50"
+                      >
+                        {savingNotes ? "Saving..." : "Save"}
+                      </button>
+                      <button
+                        onClick={() => setEditingNotes(false)}
+                        className="text-xs px-4 py-1.5 border border-green/20 text-green rounded-md hover:bg-green/5 transition-colors font-body"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : assignment.notes ? (

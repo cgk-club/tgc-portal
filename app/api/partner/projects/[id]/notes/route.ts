@@ -20,13 +20,18 @@ export async function PATCH(
 
   const body = await request.json();
 
+  const updates: Record<string, unknown> = { notes: body.notes ?? null };
+  if (body.notes_visibility && ["private", "partners"].includes(body.notes_visibility)) {
+    updates.notes_visibility = body.notes_visibility;
+  }
+
   const { data, error } = await sb
     .from("project_partners")
-    .update({ notes: body.notes ?? null })
+    .update(updates)
     .eq("project_id", projectId)
     .eq("partner_id", session.partnerId)
     .eq("status", "active")
-    .select("id, notes")
+    .select("id, notes, notes_visibility")
     .single();
 
   if (error || !data) {

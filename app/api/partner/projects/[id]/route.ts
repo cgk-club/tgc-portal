@@ -43,7 +43,7 @@ export async function GET(
   // Verify partner is assigned to this project — include visibility_settings
   const { data: assignment, error: assignErr } = await sb
     .from("project_partners")
-    .select("id, role, status, notes, visibility_settings")
+    .select("id, role, status, notes, notes_visibility, visibility_settings")
     .eq("project_id", projectId)
     .eq("partner_id", session.partnerId)
     .in("status", ["active", "completed"])
@@ -134,7 +134,7 @@ export async function GET(
   // Get all partners on the project (IDs + roles for task assignment, org names for display)
   const { data: allProjectPartners } = await sb
     .from("project_partners")
-    .select("partner_id, role, status, partner:partner_accounts!partner_id(org_name)")
+    .select("partner_id, role, status, notes, notes_visibility, partner:partner_accounts!partner_id(org_name)")
     .eq("project_id", projectId)
     .in("status", ["active", "completed"]);
 
@@ -246,7 +246,16 @@ export async function GET(
       role: assignment.role,
       status: assignment.status,
       notes: assignment.notes,
+      notes_visibility: assignment.notes_visibility || "private",
     },
+    // Notes shared by other partners
+    shared_notes: (allProjectPartners || [])
+      .filter((p) => p.partner_id !== session.partnerId && p.notes_visibility === "partners" && p.notes)
+      .map((p) => ({
+        author: (p.partner as unknown as Record<string, unknown>)?.org_name || "Partner",
+        role: p.role,
+        notes: p.notes,
+      })),
     visibility_settings: visibility,
     milestones: milestones || [],
     documents: filteredDocuments,
