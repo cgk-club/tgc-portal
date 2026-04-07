@@ -98,6 +98,7 @@ export default function ClientSellPage() {
             partnerName={clientName}
             onComplete={() => setSubmitted(true)}
             onCancel={() => setSelectedCategory(null)}
+            chatEndpoint="/api/client/chat/seller"
           />
         )}
       </div>

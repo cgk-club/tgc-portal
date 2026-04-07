@@ -14,6 +14,7 @@ interface ListingChatProps {
   partnerName: string;
   onComplete: (data: Record<string, unknown>, rawInput: string) => void;
   onCancel: () => void;
+  chatEndpoint?: string;
 }
 
 export default function ListingChat({
@@ -22,6 +23,7 @@ export default function ListingChat({
   partnerName,
   onComplete,
   onCancel,
+  chatEndpoint = "/api/partner/chat/seller",
 }: ListingChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: `Welcome! I'll walk you through creating a ${categoryLabel} listing. Just a few questions to build something compelling. One moment while I prepare...` },
@@ -46,7 +48,7 @@ export default function ListingChat({
   useEffect(() => {
     async function init() {
       try {
-        const res = await fetch("/api/partner/chat/seller", {
+        const res = await fetch(chatEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -122,7 +124,7 @@ export default function ListingChat({
     setError("");
 
     try {
-      const res = await fetch("/api/partner/chat/seller", {
+      const res = await fetch(chatEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
