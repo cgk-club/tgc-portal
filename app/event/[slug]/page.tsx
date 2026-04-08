@@ -42,18 +42,10 @@ interface Brochure {
 
 const PROGRAMME = [
   {
-    day: "Thursday 5 June",
-    title: "Arrival",
-    items: [
-      "Check in aboard M/Y ARADOS, Port Hercule",
-      "Explore the circuit on foot before barriers close",
-      "Welcome evening on the yacht",
-    ],
-  },
-  {
-    day: "Friday 6 June",
+    day: "Friday 5 June",
     title: "Practice Day",
     items: [
+      "Board M/Y ARADOS in Monaco",
       "13:30 Free Practice 1",
       "17:00 Free Practice 2",
       "Daytime on the yacht and VIP Terraces",
@@ -61,7 +53,7 @@ const PROGRAMME = [
     ],
   },
   {
-    day: "Saturday 7 June",
+    day: "Saturday 6 June",
     title: "Qualifying",
     items: [
       "12:30 Free Practice 3",
@@ -71,7 +63,7 @@ const PROGRAMME = [
     ],
   },
   {
-    day: "Sunday 8 June",
+    day: "Sunday 7 June",
     title: "Race Day",
     items: [
       "15:00 Lights out, 78 laps of the Monaco street circuit",
@@ -191,7 +183,7 @@ export default function EventPage() {
             Monaco Grand Prix 2026
           </p>
           <p className="text-sm text-white/60 font-body mt-2">
-            5 - 8 June 2026 . Port Hercule, Monaco
+            5 - 7 June 2026 . Monaco
           </p>
         </div>
       </section>
@@ -200,9 +192,9 @@ export default function EventPage() {
       <section className="bg-green">
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-6 sm:gap-12">
           {[
-            { label: "Days", value: "4" },
+            { label: "Days", value: "3" },
             { label: "Guests", value: "80" },
-            { label: "Location", value: "Port Hercule" },
+            { label: "Location", value: "Monaco" },
             { label: "Venues", value: "Yacht + VIP Terraces" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
@@ -260,7 +252,7 @@ export default function EventPage() {
             Programme
           </p>
           <h2 className="text-2xl font-heading font-semibold text-green mb-8">
-            Four Days in Monaco
+            Three Days in Monaco
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {PROGRAMME.map((day) => (
