@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       user_id: "admin",
       title: `New marketplace listing from ${partnerName}`,
       body: `${listing.title} (${body.category}) — submitted by partner, awaiting photos and review`,
-      type: "listing",
+      type: "general",
       link: "/admin/marketplace",
     }).catch(() => {});
 
