@@ -335,7 +335,7 @@ export default function EventPage() {
                   {isCombination
                     ? "Tailored pricing"
                     : pkg.price > 0
-                      ? `from ${formatPrice(pkg.price, pkg.currency)}${isPass ? " per day" : ""}`
+                      ? `from ${formatPrice(pkg.price, pkg.currency)}${isPass ? (pkg.name.includes("Evening") ? " per evening" : " per day") : ""}`
                       : "On application"}
                 </p>
                 <p className="text-xs text-gray-500 font-body mb-4">
