@@ -134,7 +134,7 @@ export async function PATCH(
   const body = await request.json()
 
   const updates: Record<string, unknown> = {}
-  const allowed = ['org_name', 'email', 'org_ids', 'status', 'primary_org_id']
+  const allowed = ['org_name', 'email', 'org_ids', 'status', 'primary_org_id', 'referral_code']
   for (const key of allowed) {
     if (key in body) {
       if (key === 'email') {

@@ -69,6 +69,7 @@ interface PartnerDetail {
   email: string
   org_ids: string[]
   primary_org_id: string | null
+  referral_code: string | null
   status: string
   created_at: string
   users: PartnerUser[]
@@ -93,6 +94,7 @@ export default function PartnerDetailPage() {
   const [editEmail, setEditEmail] = useState('')
   const [editOrgIds, setEditOrgIds] = useState('')
   const [editPrimaryOrgId, setEditPrimaryOrgId] = useState('')
+  const [editReferralCode, setEditReferralCode] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [showAddUser, setShowAddUser] = useState(false)
@@ -110,6 +112,7 @@ export default function PartnerDetailPage() {
       setEditEmail(data.email)
       setEditOrgIds((data.org_ids || []).join(', '))
       setEditPrimaryOrgId(data.primary_org_id || '')
+      setEditReferralCode(data.referral_code || '')
     }
     setLoading(false)
   }, [id])
@@ -151,6 +154,7 @@ export default function PartnerDetailPage() {
         email: editEmail.trim(),
         org_ids: orgIds,
         primary_org_id: editPrimaryOrgId.trim() || null,
+        referral_code: editReferralCode.trim() || null,
       }),
     })
 
@@ -230,6 +234,11 @@ export default function PartnerDetailPage() {
               Created {new Date(partner.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </div>
+          {partner.referral_code && (
+            <p className="text-xs text-gray-500 font-body mt-1">
+              Referral code: <span className="font-semibold text-green">{partner.referral_code}</span>
+            </p>
+          )}
           {partner.org_ids.length > 0 && (
             <p className="text-xs text-gray-400 font-body mt-1">
               Org IDs: {partner.org_ids.join(', ')}
@@ -282,6 +291,20 @@ export default function PartnerDetailPage() {
                 onChange={(e) => setEditPrimaryOrgId(e.target.value)}
                 className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
               />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">Referral Code</label>
+              <input
+                value={editReferralCode}
+                onChange={(e) => setEditReferralCode(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))}
+                placeholder="e.g. HAMISH"
+                className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body"
+              />
+              {editReferralCode && (
+                <p className="text-[10px] text-gray-400 font-body mt-1">
+                  Link: portal.thegatekeepers.club/event/the-pavilion?ref={editReferralCode}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-xs text-gray-500 font-body mb-1">All Org IDs (comma-separated)</label>
