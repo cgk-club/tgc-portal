@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createListingFromChat } from "@/lib/marketplace";
+import { createNotification } from "@/lib/notifications";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(PARTNER_COOKIE_NAME)?.value;
@@ -110,6 +111,16 @@ export async function POST(request: NextRequest) {
       session.partnerId,
       partnerName
     );
+
+    // Notify admin
+    createNotification({
+      user_type: "admin",
+      user_id: "admin",
+      title: `New marketplace listing from ${partnerName}`,
+      body: `${listing.title} (${body.category}) — submitted by partner, awaiting photos and review`,
+      type: "listing",
+      link: "/admin/marketplace",
+    }).catch(() => {});
 
     return NextResponse.json(listing, { status: 201 });
   } catch (err) {

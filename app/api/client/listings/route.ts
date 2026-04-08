@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(CLIENT_COOKIE_NAME)?.value;
@@ -64,6 +65,16 @@ export async function POST(request: NextRequest) {
     console.error("Client listing creation error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Notify admin
+  createNotification({
+    user_type: "admin",
+    user_id: "admin",
+    title: `New marketplace listing from ${clientName}`,
+    body: `${title} (${body.category}) — submitted by client, awaiting photos and review`,
+    type: "listing",
+    link: "/admin/marketplace",
+  }).catch(() => {});
 
   return NextResponse.json(listing, { status: 201 });
 }
