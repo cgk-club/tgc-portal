@@ -306,6 +306,8 @@ export default function EventPage() {
             })();
 
             const isResidence = pkg.name.includes("Suite") || pkg.name.includes("Master");
+            const isCombination = pkg.name.includes("Combination");
+            const isPass = !isResidence && !isCombination;
 
             return (
               <div
@@ -321,13 +323,20 @@ export default function EventPage() {
                     Residences
                   </p>
                 )}
+                {isPass && (
+                  <p className="text-[9px] tracking-[2px] text-green/40 uppercase font-body mb-2">
+                    A la carte
+                  </p>
+                )}
                 <h3 className="text-sm font-heading font-semibold text-green mb-1">
                   {pkg.name}
                 </h3>
                 <p className="text-lg font-heading font-semibold text-green mb-1">
-                  {pkg.price > 0
-                    ? `from ${formatPrice(pkg.price, pkg.currency)}`
-                    : "On application"}
+                  {isCombination
+                    ? "Tailored pricing"
+                    : pkg.price > 0
+                      ? `from ${formatPrice(pkg.price, pkg.currency)}${isPass ? " per day" : ""}`
+                      : "On application"}
                 </p>
                 <p className="text-xs text-gray-500 font-body mb-4">
                   {pkg.description}
@@ -360,7 +369,7 @@ export default function EventPage() {
                   onClick={() => setSelectedPackage(pkg.name)}
                   className="mt-auto w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
                 >
-                  Register Interest
+                  Enquire
                 </button>
               </div>
             );

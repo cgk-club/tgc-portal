@@ -81,7 +81,7 @@ export default function LeadCaptureModal({
         </button>
 
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-2">
-          Register Interest
+          Enquire
         </p>
         <h3 className="text-lg font-heading font-semibold text-green mb-6">
           {packageName}
@@ -168,7 +168,7 @@ export default function LeadCaptureModal({
             disabled={submitting}
             className="w-full bg-green text-white py-3 rounded-md text-sm font-body tracking-wide hover:bg-green-light transition-colors disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Register Interest"}
+            {submitting ? "Submitting..." : "Enquire"}
           </button>
 
           <p className="text-[11px] text-gray-400 font-body text-center">
