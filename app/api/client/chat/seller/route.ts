@@ -123,7 +123,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Messages required" }, { status: 400 });
     }
 
-    const systemPrompt = getSellerPrompt(category || "general");
+    // Look up client name from database
+    const sb = (await import("@/lib/supabase")).getSupabaseAdmin();
+    const { data: clientAccount } = await sb
+      .from("client_accounts")
+      .select("name, email")
+      .eq("id", session.clientId)
+      .single();
+
+    const clientName = clientAccount?.name || "";
+    const clientEmail = clientAccount?.email || session.email;
+
+    let systemPrompt = getSellerPrompt(category || "general");
+
+    // Inject known client details so the AI does not ask for them
+    if (clientName || clientEmail) {
+      systemPrompt += `\n\nIMPORTANT: This client is already logged in. Their name is "${clientName}" and their email is "${clientEmail}". Do NOT ask for their name or email. Use these values in the final JSON output. Skip straight to the listing questions.`;
+    }
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

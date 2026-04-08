@@ -20,6 +20,8 @@ export default function ClientSellPage() {
   const [clientName, setClientName] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -32,6 +34,33 @@ export default function ClientSellPage() {
     }
     load()
   }, [router])
+
+  async function handleChatComplete(data: Record<string, unknown>, rawInput: string) {
+    setSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const res = await fetch('/api/client/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          category: selectedCategory,
+          seller_raw_input: rawInput,
+        }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to submit listing')
+      }
+
+      setSubmitted(true)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit listing. Please try again.')
+    }
+    setSubmitting(false)
+  }
 
   if (loading) {
     return (
@@ -78,6 +107,12 @@ export default function ClientSellPage() {
           Our guided process ensures your listing has everything a discerning buyer needs.
         </p>
 
+        {submitError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 font-body">{submitError}</p>
+          </div>
+        )}
+
         {!selectedCategory ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {CATEGORIES.map(cat => (
@@ -91,12 +126,17 @@ export default function ClientSellPage() {
               </button>
             ))}
           </div>
+        ) : submitting ? (
+          <div className="bg-white border border-green/10 rounded-lg p-8 text-center">
+            <div className="w-6 h-6 border-2 border-green/30 border-t-green rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm text-gray-500 font-body">Creating your listing...</p>
+          </div>
         ) : (
           <ListingChat
             category={selectedCategory}
             categoryLabel={CATEGORIES.find(c => c.slug === selectedCategory)?.label || selectedCategory}
             partnerName={clientName}
-            onComplete={() => setSubmitted(true)}
+            onComplete={handleChatComplete}
             onCancel={() => setSelectedCategory(null)}
             chatEndpoint="/api/client/chat/seller"
           />
