@@ -32,7 +32,7 @@ export default async function AdminDashboard() {
     { data: clientAccounts },
     { data: clientRequests },
     { data: eventEnquiries },
-    { data: dashboardTasks },
+    { data: dashboardTasks, error: tasksError },
   ] = await Promise.all([
     sb.from('itineraries')
       .select('id, client_name, title, status, start_date, currency, created_at, updated_at')
@@ -331,6 +331,9 @@ export default async function AdminDashboard() {
   }
 
   // Add scheduled tasks to calendar events
+  if (tasksError) {
+    console.error('[dashboard] Failed to fetch tasks:', tasksError.message)
+  }
   const allTasks = dashboardTasks || []
   for (const task of allTasks) {
     if (task.scheduled_date && !task.completed) {
