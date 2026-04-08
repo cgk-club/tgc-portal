@@ -13,6 +13,7 @@ const CATEGORIES = [
   { slug: 'artisan_products', label: 'Artisan Products', desc: 'Handmade and crafted pieces' },
   { slug: 'the_marina', label: 'The Marina', desc: 'Boats, yachts, and sailing vessels' },
   { slug: 'the_hangar', label: 'The Hangar', desc: 'Planes, helicopters, and private aviation' },
+  { slug: 'wines_spirits', label: 'Wines & Spirits', desc: 'Fine wines, whisky, and rare bottles' },
 ]
 
 export default function ClientSellPage() {
