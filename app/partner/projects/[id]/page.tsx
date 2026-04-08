@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import PartnerNav from "@/components/partner/PartnerNav";
 import EventBudgetTracker from "@/components/partner/EventBudgetTracker";
+import PartnerPipelineTab from "@/components/partner/PartnerPipelineTab";
 
 interface Milestone {
   id: string;
@@ -454,6 +455,7 @@ export default function PartnerProjectDetailPage() {
       ? [{ key: "budget", label: "Budget" }] : []),
     ...(vis?.guests === "view" && guests && guests.length > 0
       ? [{ key: "guests", label: `Guests (${guests.length})` }] : []),
+    { key: "pipeline", label: "My Pipeline" },
     { key: "activity", label: `Activity (${updates.length})` },
   ];
 
@@ -1757,6 +1759,10 @@ export default function PartnerProjectDetailPage() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === "pipeline" && (
+          <PartnerPipelineTab projectId={projectId} />
         )}
 
         {activeTab === "activity" && (

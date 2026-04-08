@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import EventBudgetTracker from '@/components/partner/EventBudgetTracker'
+import PipelineTab from '@/components/admin/PipelineTab'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -184,7 +185,24 @@ interface ProjectDetail {
 
 // ── Constants ──────────────────────────────────────────────────
 
-type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'budget' | 'partners' | 'clients' | 'tasks' | 'activity'
+type TabKey = 'overview' | 'milestones' | 'documents' | 'financials' | 'budget' | 'pipeline' | 'partners' | 'clients' | 'tasks' | 'activity'
+
+interface Referral {
+  id: string
+  prospect_name: string
+  prospect_email: string
+  prospect_phone: string | null
+  package_interest: string | null
+  attending_as: string | null
+  stage: string
+  referrer_name: string | null
+  referrer_code: string | null
+  source: string
+  admin_notes: string | null
+  created_at: string
+  enquired_at: string | null
+  converted_at: string | null
+}
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -193,6 +211,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'documents', label: 'Documents' },
   { key: 'financials', label: 'Financials' },
   { key: 'budget', label: 'Budget' },
+  { key: 'pipeline', label: 'Pipeline' },
   { key: 'partners', label: 'Partners' },
   { key: 'clients', label: 'Clients' },
   { key: 'activity', label: 'Activity' },
@@ -2438,6 +2457,11 @@ export default function ProjectDetailPage() {
       {/* ═══════════════════ BUDGET TAB ═══════════════════ */}
       {activeTab === 'budget' && (
         <EventBudgetTracker projectId={id as string} isActive={activeTab === 'budget'} role="admin" />
+      )}
+
+      {/* ═══════════════════ PIPELINE TAB ═══════════════════ */}
+      {activeTab === 'pipeline' && (
+        <PipelineTab projectId={id as string} />
       )}
 
       {/* ═══════════════════ PARTNERS TAB ═══════════════════ */}
