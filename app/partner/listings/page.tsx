@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ListingChat from "@/components/partner/ListingChat";
+import ListingPhotoUpload from "@/components/marketplace/ListingPhotoUpload";
 
 interface Listing {
   id: string;
@@ -237,6 +238,10 @@ export default function PartnerListingsPage() {
     }
   }
 
+  const [newListingId, setNewListingId] = useState("");
+  const [newListingTitle, setNewListingTitle] = useState("");
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+
   async function handleChatComplete(data: Record<string, unknown>, rawInput: string) {
     setSubmitting(true);
     setError("");
@@ -253,10 +258,10 @@ export default function PartnerListingsPage() {
       });
 
       if (res.ok) {
-        await fetchListings();
-        setSelectedCategory(null);
-        setShowCategoryPicker(false);
-        setActiveTab("listings");
+        const listing = await res.json();
+        setNewListingId(listing.id);
+        setNewListingTitle(listing.title || "Your listing");
+        setShowPhotoUpload(true);
       } else {
         const errData = await res.json().catch(() => ({}));
         setError(errData.error || "Failed to create listing.");
@@ -266,6 +271,16 @@ export default function PartnerListingsPage() {
     }
 
     setSubmitting(false);
+  }
+
+  function handlePhotoDone() {
+    setShowPhotoUpload(false);
+    setSelectedCategory(null);
+    setShowCategoryPicker(false);
+    setNewListingId("");
+    setNewListingTitle("");
+    fetchListings();
+    setActiveTab("listings");
   }
 
   function formatPrice(price: number | null, priceDisplay: string): string {
@@ -383,8 +398,20 @@ export default function PartnerListingsPage() {
           </div>
         )}
 
+        {/* Photo Upload (after chat submit) */}
+        {showPhotoUpload && newListingId && (
+          <div className="mb-8">
+            <ListingPhotoUpload
+              listingId={newListingId}
+              listingTitle={newListingTitle}
+              onComplete={handlePhotoDone}
+              onSkip={handlePhotoDone}
+            />
+          </div>
+        )}
+
         {/* Chat Intake */}
-        {selectedCategory && (
+        {selectedCategory && !showPhotoUpload && (
           <div className="mb-8">
             {submitting ? (
               <div className="bg-white border border-green/10 rounded-lg p-8 text-center">
