@@ -59,7 +59,10 @@ export default async function FichePage({ params, searchParams }: PageProps) {
       .eq('id', ficheData.id)
   }
 
-  const highlights: Highlight[] = Array.isArray(ficheData.highlights) ? ficheData.highlights : []
+  const rawHighlights = Array.isArray(ficheData.highlights) ? ficheData.highlights : []
+  const highlights: Highlight[] = rawHighlights.map((h: Highlight | string) =>
+    typeof h === 'string' ? { icon: '', label: h, value: h } : h
+  )
   const galleryUrls: string[] = Array.isArray(ficheData.gallery_urls) ? ficheData.gallery_urls : []
   const tags: string[] = Array.isArray(ficheData.tags) ? ficheData.tags : []
 
