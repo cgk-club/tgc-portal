@@ -1638,10 +1638,15 @@ export default function ProjectDetailPage() {
 
   // Financial summaries
   const expenses = project.financials.filter(f => ['expense', 'invoice', 'payment', 'retainer', 'admin_fee'].includes(f.type))
+  const paidExpenses = expenses.filter(f => f.status === 'paid')
+  const pendingExpenses = expenses.filter(f => f.status === 'pending')
   const income = project.financials.filter(f => f.type === 'income')
-  const totalSpent = expenses.reduce((s, f) => s + Number(f.amount), 0)
+  const totalSpent = paidExpenses.reduce((s, f) => s + Number(f.amount), 0)
+  const totalPending = pendingExpenses.reduce((s, f) => s + Number(f.amount), 0)
   const totalIncome = income.reduce((s, f) => s + Number(f.amount), 0)
   const netPosition = totalIncome - totalSpent
+  const isRevenueProject = ['rental_management', 'other'].includes(project.type)
+  const remaining = (project.budget || 0) - totalSpent
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -2270,7 +2275,7 @@ export default function ProjectDetailPage() {
       {activeTab === 'financials' && (
         <div>
           {/* Summary cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className={`grid grid-cols-2 ${isRevenueProject ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-4 mb-6`}>
             <div className="bg-white rounded-lg border border-green/10 p-4">
               <p className="text-xs text-gray-400 font-body">Budget</p>
               <p className="font-heading text-xl font-semibold text-green">
@@ -2278,23 +2283,45 @@ export default function ProjectDetailPage() {
               </p>
             </div>
             <div className="bg-white rounded-lg border border-green/10 p-4">
-              <p className="text-xs text-gray-400 font-body">Total Spent</p>
+              <p className="text-xs text-gray-400 font-body">Paid</p>
               <p className="font-heading text-xl font-semibold text-red-600">
                 {totalSpent > 0 ? formatCurrency(totalSpent, project.currency) : '-'}
               </p>
+              {project.budget && totalSpent > 0 && (
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
+                  <div
+                    className={`h-full rounded-full transition-all ${totalSpent > project.budget ? 'bg-red-500' : 'bg-gold'}`}
+                    style={{ width: `${Math.min(100, project.budget > 0 ? (totalSpent / project.budget) * 100 : 0)}%` }}
+                  />
+                </div>
+              )}
             </div>
-            <div className="bg-white rounded-lg border border-green/10 p-4">
-              <p className="text-xs text-gray-400 font-body">Total Income</p>
-              <p className="font-heading text-xl font-semibold text-green">
-                {totalIncome > 0 ? formatCurrency(totalIncome, project.currency) : '-'}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg border border-green/10 p-4">
-              <p className="text-xs text-gray-400 font-body">Net Position</p>
-              <p className={`font-heading text-xl font-semibold ${netPosition >= 0 ? 'text-green' : 'text-red-600'}`}>
-                {project.financials.length > 0 ? formatCurrency(netPosition, project.currency) : '-'}
-              </p>
-            </div>
+            {isRevenueProject ? (
+              <>
+                <div className="bg-white rounded-lg border border-green/10 p-4">
+                  <p className="text-xs text-gray-400 font-body">Income</p>
+                  <p className="font-heading text-xl font-semibold text-green">
+                    {totalIncome > 0 ? formatCurrency(totalIncome, project.currency) : '-'}
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg border border-green/10 p-4">
+                  <p className="text-xs text-gray-400 font-body">Net Position</p>
+                  <p className={`font-heading text-xl font-semibold ${netPosition >= 0 ? 'text-green' : 'text-red-600'}`}>
+                    {project.financials.length > 0 ? formatCurrency(netPosition, project.currency) : '-'}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="bg-white rounded-lg border border-green/10 p-4">
+                <p className="text-xs text-gray-400 font-body">Remaining</p>
+                <p className={`font-heading text-xl font-semibold ${remaining >= 0 ? 'text-green' : 'text-red-600'}`}>
+                  {project.budget ? formatCurrency(remaining, project.currency) : '-'}
+                </p>
+                {totalPending > 0 && (
+                  <p className="text-[10px] text-gray-400 font-body mt-0.5">{formatCurrency(totalPending, project.currency)} pending</p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between mb-4">
