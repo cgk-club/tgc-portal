@@ -397,8 +397,11 @@ function OverviewDashboard({
 
   // Financial summary
   const expenses = project.financials.filter(f => ['expense', 'invoice', 'payment', 'retainer', 'admin_fee'].includes(f.type))
+  const paidExpensesOv = expenses.filter(f => f.status === 'paid')
+  const pendingExpensesOv = expenses.filter(f => f.status === 'pending')
   const income = project.financials.filter(f => f.type === 'income')
-  const totalSpent = expenses.reduce((s, f) => s + Number(f.amount), 0)
+  const totalSpent = paidExpensesOv.reduce((s, f) => s + Number(f.amount), 0)
+  const totalPending = pendingExpensesOv.reduce((s, f) => s + Number(f.amount), 0)
   const totalIncome = income.reduce((s, f) => s + Number(f.amount), 0)
 
   // Recent activity
@@ -1640,16 +1643,16 @@ export default function ProjectDetailPage() {
     : project.updates
 
   // Financial summaries
-  const expenses = project.financials.filter(f => ['expense', 'invoice', 'payment', 'retainer', 'admin_fee'].includes(f.type))
-  const paidExpenses = expenses.filter(f => f.status === 'paid')
-  const pendingExpenses = expenses.filter(f => f.status === 'pending')
-  const income = project.financials.filter(f => f.type === 'income')
-  const totalSpent = paidExpenses.reduce((s, f) => s + Number(f.amount), 0)
-  const totalPending = pendingExpenses.reduce((s, f) => s + Number(f.amount), 0)
-  const totalIncome = income.reduce((s, f) => s + Number(f.amount), 0)
-  const netPosition = totalIncome - totalSpent
+  const finExpenses = project.financials.filter(f => ['expense', 'invoice', 'payment', 'retainer', 'admin_fee'].includes(f.type))
+  const finPaid = finExpenses.filter(f => f.status === 'paid')
+  const finPending = finExpenses.filter(f => f.status === 'pending')
+  const finIncome = project.financials.filter(f => f.type === 'income')
+  const finTotalSpent = finPaid.reduce((s, f) => s + Number(f.amount), 0)
+  const finTotalPending = finPending.reduce((s, f) => s + Number(f.amount), 0)
+  const finTotalIncome = finIncome.reduce((s, f) => s + Number(f.amount), 0)
+  const netPosition = finTotalIncome - finTotalSpent
   const isRevenueProject = ['rental_management', 'other'].includes(project.type)
-  const remaining = (project.budget || 0) - totalSpent
+  const remaining = (project.budget || 0) - finTotalSpent
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -2288,13 +2291,13 @@ export default function ProjectDetailPage() {
             <div className="bg-white rounded-lg border border-green/10 p-4">
               <p className="text-xs text-gray-400 font-body">Paid</p>
               <p className="font-heading text-xl font-semibold text-red-600">
-                {totalSpent > 0 ? formatCurrency(totalSpent, project.currency) : '-'}
+                {finTotalSpent > 0 ? formatCurrency(finTotalSpent, project.currency) : '-'}
               </p>
-              {project.budget && totalSpent > 0 && (
+              {project.budget && finTotalSpent > 0 && (
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
                   <div
-                    className={`h-full rounded-full transition-all ${totalSpent > project.budget ? 'bg-red-500' : 'bg-gold'}`}
-                    style={{ width: `${Math.min(100, project.budget > 0 ? (totalSpent / project.budget) * 100 : 0)}%` }}
+                    className={`h-full rounded-full transition-all ${finTotalSpent > project.budget ? 'bg-red-500' : 'bg-gold'}`}
+                    style={{ width: `${Math.min(100, project.budget > 0 ? (finTotalSpent / project.budget) * 100 : 0)}%` }}
                   />
                 </div>
               )}
@@ -2304,7 +2307,7 @@ export default function ProjectDetailPage() {
                 <div className="bg-white rounded-lg border border-green/10 p-4">
                   <p className="text-xs text-gray-400 font-body">Income</p>
                   <p className="font-heading text-xl font-semibold text-green">
-                    {totalIncome > 0 ? formatCurrency(totalIncome, project.currency) : '-'}
+                    {finTotalIncome > 0 ? formatCurrency(finTotalIncome, project.currency) : '-'}
                   </p>
                 </div>
                 <div className="bg-white rounded-lg border border-green/10 p-4">
@@ -2320,8 +2323,8 @@ export default function ProjectDetailPage() {
                 <p className={`font-heading text-xl font-semibold ${remaining >= 0 ? 'text-green' : 'text-red-600'}`}>
                   {project.budget ? formatCurrency(remaining, project.currency) : '-'}
                 </p>
-                {totalPending > 0 && (
-                  <p className="text-[10px] text-gray-400 font-body mt-0.5">{formatCurrency(totalPending, project.currency)} pending</p>
+                {finTotalPending > 0 && (
+                  <p className="text-[10px] text-gray-400 font-body mt-0.5">{formatCurrency(finTotalPending, project.currency)} pending</p>
                 )}
               </div>
             )}
