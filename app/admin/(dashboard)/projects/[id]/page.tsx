@@ -683,7 +683,7 @@ function OverviewDashboard({
           </p>
         </div>
         <div className="bg-white rounded-lg border border-green/10 p-4">
-          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Spent</p>
+          <p className="text-[10px] text-gray-400 font-body uppercase tracking-wider mb-1">Paid</p>
           <p className="text-xl font-heading font-semibold text-red-600">
             {totalSpent > 0 ? formatCurrency(totalSpent, project.currency) : '-'}
           </p>
@@ -694,6 +694,9 @@ function OverviewDashboard({
                 style={{ width: `${Math.min(100, project.budget > 0 ? (totalSpent / project.budget) * 100 : 0)}%` }}
               />
             </div>
+          )}
+          {totalPending > 0 && (
+            <p className="text-[10px] text-gray-400 font-body mt-0.5">{formatCurrency(totalPending, project.currency)} pending</p>
           )}
         </div>
         <div className="bg-white rounded-lg border border-green/10 p-4">
