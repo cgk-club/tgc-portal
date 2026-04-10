@@ -409,15 +409,27 @@ export default function EventPage() {
 
       {/* Footer */}
       <footer className="max-w-3xl mx-auto px-6 py-12 text-center">
-        <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-3">
-          The Gatekeepers Club
+        <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-5">
+          A joint venture
         </p>
-        <p className="text-sm text-gray-500 font-body">
-          christian@thegatekeepers.club
-        </p>
-        <p className="text-xs text-gray-400 font-body mt-1">
-          thegatekeepers.club
-        </p>
+        <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-16">
+          <div>
+            <p className="text-xs tracking-[2px] text-green/60 uppercase font-body mb-1">
+              The Gatekeepers Club
+            </p>
+            <p className="text-sm text-gray-500 font-body">
+              christian@thegatekeepers.club
+            </p>
+          </div>
+          <div>
+            <p className="text-xs tracking-[2px] text-green/60 uppercase font-body mb-1">
+              Game ON Media
+            </p>
+            <p className="text-sm text-gray-500 font-body">
+              hamish@hamemedia.com
+            </p>
+          </div>
+        </div>
       </footer>
 
       {/* Lead Capture Modal */}
