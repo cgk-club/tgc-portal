@@ -4,6 +4,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { createListingFromChat } from "@/lib/marketplace";
 import { createNotification } from "@/lib/notifications";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(PARTNER_COOKIE_NAME)?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

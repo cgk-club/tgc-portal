@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 
+export const dynamic = "force-dynamic";
+
 const anthropic = new Anthropic();
 
 const BASE_PROMPT = `You are the listing intake assistant for The Gatekeepers Club (TGC) Marketplace. You are speaking with an authenticated TGC partner who wants to list a product. Your role is to guide them through providing all the information needed to create a compelling listing.

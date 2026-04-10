@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 async function verifyFicheOwnership(partnerId: string, ficheId: string) {
   const sb = getSupabaseAdmin();
 

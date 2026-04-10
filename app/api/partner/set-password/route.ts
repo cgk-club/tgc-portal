@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import bcrypt from "bcryptjs";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(PARTNER_COOKIE_NAME)?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

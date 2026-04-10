@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { createPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import bcrypt from "bcryptjs";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
   if (!email || !password) {
