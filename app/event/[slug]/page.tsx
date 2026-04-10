@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 const LeadCaptureModal = dynamic(
@@ -40,7 +40,88 @@ interface Brochure {
   url: string;
 }
 
-const PROGRAMME = [
+interface Sponsor {
+  id: string;
+  name: string;
+  logo_url: string;
+  tier: string;
+  website_url?: string;
+}
+
+type Lang = "en" | "fr";
+
+const T = {
+  en: {
+    presents: "The Gatekeepers Club presents",
+    subtitle: "Monaco Grand Prix 2026",
+    dateLine: "5 - 7 June 2026 . Monaco",
+    days: "Days",
+    guests: "Guests",
+    location: "Location",
+    venues: "Venues",
+    venuesValue: "Yacht + VIP Terraces",
+    experience: "The Experience",
+    programme: "Programme",
+    threeDays: "Three Days in Monaco",
+    packages: "Packages",
+    chooseExperience: "Choose Your Experience",
+    chooseSubtitle: "From a single evening to a full residency aboard the yacht.",
+    residences: "Residences",
+    alaCarte: "A la carte",
+    tailored: "Tailored pricing",
+    from: "from",
+    perEvening: "per evening",
+    perDay: "per day",
+    onApplication: "On application",
+    enquire: "Enquire",
+    more: "more",
+    downloads: "Downloads",
+    brochures: "Brochures",
+    jointVenture: "A joint venture",
+    sponsors: "Our Partners",
+    thankYou: "Thank you",
+    thankYouMsg: "We have received your interest and will be in touch shortly with full details and next steps.",
+    download: "Download",
+    close: "Close",
+    switchLang: "FR",
+  },
+  fr: {
+    presents: "The Gatekeepers Club presente",
+    subtitle: "Grand Prix de Monaco 2026",
+    dateLine: "5 - 7 juin 2026 . Monaco",
+    days: "Jours",
+    guests: "Invites",
+    location: "Lieu",
+    venues: "Espaces",
+    venuesValue: "Yacht + Terrasses VIP",
+    experience: "L'Experience",
+    programme: "Programme",
+    threeDays: "Trois jours a Monaco",
+    packages: "Formules",
+    chooseExperience: "Choisissez votre experience",
+    chooseSubtitle: "D'une soiree a une residence complete a bord du yacht.",
+    residences: "Residences",
+    alaCarte: "A la carte",
+    tailored: "Tarif sur mesure",
+    from: "a partir de",
+    perEvening: "par soiree",
+    perDay: "par jour",
+    onApplication: "Sur demande",
+    enquire: "Nous contacter",
+    more: "de plus",
+    downloads: "Telechargements",
+    brochures: "Brochures",
+    jointVenture: "Une co-production",
+    sponsors: "Nos Partenaires",
+    thankYou: "Merci",
+    thankYouMsg: "Nous avons bien recu votre demande et reviendrons vers vous dans les plus brefs delais.",
+    download: "Telecharger",
+    close: "Fermer",
+    switchLang: "EN",
+  },
+};
+
+const PROGRAMME_EN = [
   {
     day: "Friday 5 June",
     title: "Practice Day",
@@ -74,6 +155,52 @@ const PROGRAMME = [
   },
 ];
 
+const PROGRAMME_FR = [
+  {
+    day: "Vendredi 5 juin",
+    title: "Essais libres",
+    items: [
+      "Embarquement sur le M/Y ARADOS a Monaco",
+      "13h30 Essais libres 1",
+      "17h00 Essais libres 2",
+      "Journee sur le yacht et les Terrasses VIP",
+      "Cocktail et diner sur le pont",
+    ],
+  },
+  {
+    day: "Samedi 6 juin",
+    title: "Qualifications",
+    items: [
+      "12h30 Essais libres 3",
+      "16h00 Qualifications",
+      "La plus grande soiree du week-end du GP",
+      "Soiree avec des athletes internationaux",
+    ],
+  },
+  {
+    day: "Dimanche 7 juin",
+    title: "Jour de course",
+    items: [
+      "15h00 Depart, 78 tours du circuit de Monaco",
+      "Course vue du yacht et des terrasses",
+      "Cocktail caritatif avec des athletes de renom",
+      "La celebration de cloture de The Pavilion",
+    ],
+  },
+];
+
+const DESCRIPTION_FR =
+  "Trois jours a bord du M/Y ARADOS a Monaco. La journee sur le yacht et les Terrasses VIP surplombant le circuit. Les soirees : cocktails, gastronomie et echanges avec des legendes du sport et des entrepreneurs internationaux. The Pavilion est une experience privee, sur invitation uniquement, concue pour reunir des personnalites du sport, des affaires et de la culture dans un cadre decontracte et privilegie.";
+
+const HIGHLIGHTS_FR = [
+  "M/Y ARADOS, superyacht de 47m a Monaco",
+  "Terrasses VIP sur le circuit du Grand Prix de Monaco",
+  "Cocktails et diners sur le pont chaque soir",
+  "Athletes et personnalites sportives de premier plan",
+  "80 invites maximum sur le yacht",
+  "Soiree caritative le dimanche soir",
+];
+
 function formatPrice(price: number, currency: string): string {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
@@ -86,12 +213,17 @@ function formatPrice(price: number, currency: string): string {
 export default function EventPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const refCode = searchParams.get("ref");
+  const lang: Lang = searchParams.get("lang") === "fr" ? "fr" : "en";
+  const t = T[lang];
+  const PROGRAMME = lang === "fr" ? PROGRAMME_FR : PROGRAMME_EN;
 
   const [event, setEvent] = useState<EventData | null>(null);
   const [packages, setPackages] = useState<EventPackage[]>([]);
   const [brochures, setBrochures] = useState<Brochure[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -111,6 +243,7 @@ export default function EventPage() {
         setEvent(data.event);
         setPackages(data.packages);
         setBrochures(data.brochures || []);
+        setSponsors(data.sponsors || []);
       } catch {
         setError(true);
       }
@@ -128,6 +261,18 @@ export default function EventPage() {
       }).catch(() => {});
     }
   }, [slug, refCode]);
+
+  function switchLang() {
+    const newLang = lang === "en" ? "fr" : "en";
+    const params = new URLSearchParams(searchParams.toString());
+    if (newLang === "en") {
+      params.delete("lang");
+    } else {
+      params.set("lang", newLang);
+    }
+    const qs = params.toString();
+    router.push(`/event/${slug}${qs ? `?${qs}` : ""}`);
+  }
 
   if (loading) {
     return (
@@ -155,12 +300,24 @@ export default function EventPage() {
           ?.split("=")[1] || null
       : null);
 
-  const highlightsList = event.highlights
-    ? event.highlights.split("\n").filter(Boolean)
-    : [];
+  const description = lang === "fr" ? DESCRIPTION_FR : event.description;
+  const highlightsList =
+    lang === "fr"
+      ? HIGHLIGHTS_FR
+      : event.highlights
+        ? event.highlights.split("\n").filter(Boolean)
+        : [];
 
   return (
     <div className="min-h-screen bg-pearl">
+      {/* Language Switcher */}
+      <button
+        onClick={switchLang}
+        className="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-sm border border-green/20 rounded-full px-3 py-1.5 text-xs font-body font-medium text-green hover:bg-white transition-colors shadow-sm"
+      >
+        {t.switchLang}
+      </button>
+
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[500px] flex items-end">
         <div
@@ -174,16 +331,16 @@ export default function EventPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 pb-12 w-full">
           <p className="text-[11px] tracking-[4px] text-gold uppercase font-body mb-3">
-            The Gatekeepers Club presents
+            {t.presents}
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-heading font-semibold text-white mb-3">
             The Pavilion
           </h1>
           <p className="text-xl sm:text-2xl text-white/80 font-body">
-            Monaco Grand Prix 2026
+            {t.subtitle}
           </p>
           <p className="text-sm text-white/60 font-body mt-2">
-            5 - 7 June 2026 . Monaco
+            {t.dateLine}
           </p>
         </div>
       </section>
@@ -192,10 +349,10 @@ export default function EventPage() {
       <section className="bg-green">
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-6 sm:gap-12">
           {[
-            { label: "Days", value: "3" },
-            { label: "Guests", value: "80" },
-            { label: "Location", value: "Monaco" },
-            { label: "Venues", value: "Yacht + VIP Terraces" },
+            { label: t.days, value: "3" },
+            { label: t.guests, value: "80" },
+            { label: t.location, value: "Monaco" },
+            { label: t.venues, value: t.venuesValue },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <p className="text-white font-heading font-semibold text-lg">
@@ -212,11 +369,10 @@ export default function EventPage() {
       {/* The Experience */}
       <section className="max-w-3xl mx-auto px-6 py-16">
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
-          The Experience
+          {t.experience}
         </p>
         <div className="text-base text-gray-700 font-body leading-relaxed space-y-4">
-          {event.description?.split(". ").reduce((acc: string[], sentence, i, arr) => {
-            // Group sentences into paragraphs of 2-3
+          {description?.split(". ").reduce((acc: string[], sentence, i, arr) => {
             const groupIndex = Math.floor(i / 3);
             if (!acc[groupIndex]) acc[groupIndex] = "";
             acc[groupIndex] += sentence + (i < arr.length - 1 ? ". " : "");
@@ -249,10 +405,10 @@ export default function EventPage() {
       <section className="bg-white border-y border-green/10">
         <div className="max-w-5xl mx-auto px-6 py-16">
           <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
-            Programme
+            {t.programme}
           </p>
           <h2 className="text-2xl font-heading font-semibold text-green mb-8">
-            Three Days in Monaco
+            {t.threeDays}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {PROGRAMME.map((day) => (
@@ -286,13 +442,13 @@ export default function EventPage() {
       {/* Packages */}
       <section className="max-w-5xl mx-auto px-6 py-16">
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
-          Packages
+          {t.packages}
         </p>
         <h2 className="text-2xl font-heading font-semibold text-green mb-2">
-          Choose Your Experience
+          {t.chooseExperience}
         </h2>
         <p className="text-sm text-gray-500 font-body mb-8">
-          From a single evening to a full residency aboard the yacht.
+          {t.chooseSubtitle}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -320,12 +476,12 @@ export default function EventPage() {
               >
                 {isResidence && (
                   <p className="text-[9px] tracking-[2px] text-gold uppercase font-body mb-2">
-                    Residences
+                    {t.residences}
                   </p>
                 )}
                 {isPass && (
                   <p className="text-[9px] tracking-[2px] text-green/40 uppercase font-body mb-2">
-                    A la carte
+                    {t.alaCarte}
                   </p>
                 )}
                 <h3 className="text-sm font-heading font-semibold text-green mb-1">
@@ -333,10 +489,10 @@ export default function EventPage() {
                 </h3>
                 <p className="text-lg font-heading font-semibold text-green mb-1">
                   {isCombination
-                    ? "Tailored pricing"
+                    ? t.tailored
                     : pkg.price > 0
-                      ? `from ${formatPrice(pkg.price, pkg.currency)}${isPass ? (pkg.name.includes("Evening") ? " per evening" : " per day") : ""}`
-                      : "On application"}
+                      ? `${t.from} ${formatPrice(pkg.price, pkg.currency)}${isPass ? (pkg.name.includes("Evening") ? ` ${t.perEvening}` : ` ${t.perDay}`) : ""}`
+                      : t.onApplication}
                 </p>
                 <p className="text-xs text-gray-500 font-body mb-4">
                   {pkg.description}
@@ -359,7 +515,7 @@ export default function EventPage() {
                     ))}
                     {services.length > 6 && (
                       <li className="text-[11px] text-gray-400 font-body pl-5">
-                        +{services.length - 6} more
+                        +{services.length - 6} {t.more}
                       </li>
                     )}
                   </ul>
@@ -369,7 +525,7 @@ export default function EventPage() {
                   onClick={() => setSelectedPackage(pkg.name)}
                   className="mt-auto w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
                 >
-                  Enquire
+                  {t.enquire}
                 </button>
               </div>
             );
@@ -382,10 +538,10 @@ export default function EventPage() {
         <section className="bg-white border-y border-green/10">
           <div className="max-w-3xl mx-auto px-6 py-12 text-center">
             <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
-              Downloads
+              {t.downloads}
             </p>
             <h2 className="text-xl font-heading font-semibold text-green mb-6">
-              Brochures
+              {t.brochures}
             </h2>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {brochures.map((b) => (
@@ -407,10 +563,38 @@ export default function EventPage() {
         </section>
       )}
 
+      {/* Sponsors */}
+      {sponsors.length > 0 && (
+        <section className="max-w-5xl mx-auto px-6 py-12">
+          <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-6 text-center">
+            {t.sponsors}
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12">
+            {sponsors.map((s) => (
+              <div key={s.id} className="text-center">
+                {s.website_url ? (
+                  <a href={s.website_url} target="_blank" rel="noopener noreferrer">
+                    {s.logo_url ? (
+                      <img src={s.logo_url} alt={s.name} className="h-10 sm:h-12 object-contain grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100" />
+                    ) : (
+                      <span className="text-sm font-heading font-semibold text-green/50 hover:text-green transition-colors">{s.name}</span>
+                    )}
+                  </a>
+                ) : s.logo_url ? (
+                  <img src={s.logo_url} alt={s.name} className="h-10 sm:h-12 object-contain grayscale opacity-60" />
+                ) : (
+                  <span className="text-sm font-heading font-semibold text-green/50">{s.name}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="max-w-3xl mx-auto px-6 py-12 text-center">
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-5">
-          A joint venture
+          {t.jointVenture}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-16">
           <div>
@@ -460,11 +644,10 @@ export default function EventPage() {
               </svg>
             </div>
             <h3 className="text-lg font-heading font-semibold text-green mb-2">
-              Thank you
+              {t.thankYou}
             </h3>
             <p className="text-sm text-gray-600 font-body mb-6">
-              We have received your interest and will be in touch shortly with
-              full details and next steps.
+              {t.thankYouMsg}
             </p>
             {brochures.length > 0 && (
               <div className="space-y-2 mb-4">
@@ -476,7 +659,7 @@ export default function EventPage() {
                     rel="noopener noreferrer"
                     className="block text-sm text-green font-body hover:underline"
                   >
-                    Download {b.title} (PDF)
+                    {t.download} {b.title} (PDF)
                   </a>
                 ))}
               </div>
@@ -485,7 +668,7 @@ export default function EventPage() {
               onClick={() => setShowSuccess(false)}
               className="text-xs text-gray-400 font-body hover:text-gray-600"
             >
-              Close
+              {t.close}
             </button>
           </div>
         </div>
