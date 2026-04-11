@@ -88,6 +88,25 @@ const T = {
     eveningFriDesc: "Welcome cocktail dinatoire on deck",
     eveningSatDesc: "Gala cocktail dinatoire (centrepiece)",
     eveningSunDesc: "Charity cocktail dinatoire with athletes",
+    mediaTitle: "Media & Content",
+    mediaIntro:
+      "Every sponsorship includes an editorial content programme across our channels. Pre-event, during the Grand Prix, and post-event. All content is editorial in tone, not advertorial.",
+    mediaPreEvent: "Pre-Event (8 weeks)",
+    mediaDuring: "During the Event",
+    mediaPostEvent: "Post-Event (4 weeks)",
+    mediaPlatLabel: "Platinum",
+    mediaGoldLabel: "Gold",
+    mediaBronzeLabel: "Bronze",
+    mediaPlatPre: "5 social posts + 3 newsletter mentions including a dedicated editorial spotlight on your brand",
+    mediaGoldPre: "3 social posts + 2 newsletter mentions woven into Pavilion editorial",
+    mediaBronzePre: "2 social posts + 1 newsletter mention",
+    mediaPlatDuring: "Daily Instagram Stories and feed posts with your branding, dedicated media booth interview, comprehensive professional photo library",
+    mediaGoldDuring: "Stories and feed coverage across the weekend, media booth interview clip, curated photo selection",
+    mediaBronzeDuring: "Story coverage featuring branded tenders, event atmosphere content, curated photo selection",
+    mediaPlatPost: "3 recap posts, dedicated newsletter feature, full-edit media booth interview, complete content package, ROI report with candid assessment",
+    mediaGoldPost: "2 recap posts, newsletter mention, interview clip published, curated content selection delivered",
+    mediaBronzePost: "Included in recap content, newsletter mention, curated content selection delivered",
+    mediaNote: "All content is approved by your team before publication. One approval round, 48-hour window.",
     ctaTitle: "Interested?",
     ctaText:
       "For the full sponsorship deck or to discuss how your brand fits within The Pavilion, get in touch directly.",
@@ -181,6 +200,25 @@ const T = {
     eveningFriDesc: "Cocktail dinatoire de bienvenue sur le pont",
     eveningSatDesc: "Cocktail dinatoire de gala (evenement phare)",
     eveningSunDesc: "Cocktail dinatoire caritatif avec athletes",
+    mediaTitle: "Media & Contenu",
+    mediaIntro:
+      "Chaque sponsoring inclut un programme de contenu editorial sur nos canaux. Avant, pendant et apres le Grand Prix. Le ton est editorial, jamais publicitaire.",
+    mediaPreEvent: "Avant l'evenement (8 semaines)",
+    mediaDuring: "Pendant l'evenement",
+    mediaPostEvent: "Apres l'evenement (4 semaines)",
+    mediaPlatLabel: "Platine",
+    mediaGoldLabel: "Or",
+    mediaBronzeLabel: "Bronze",
+    mediaPlatPre: "5 publications sociales + 3 mentions newsletter dont un portrait editorial dedie a votre marque",
+    mediaGoldPre: "3 publications sociales + 2 mentions newsletter integrees au contenu editorial Pavilion",
+    mediaBronzePre: "2 publications sociales + 1 mention newsletter",
+    mediaPlatDuring: "Stories et posts Instagram quotidiens avec votre branding, interview dediee au media booth, bibliotheque photo professionnelle complete",
+    mediaGoldDuring: "Stories et couverture sur le week-end, clip d'interview au media booth, selection photo curee",
+    mediaBronzeDuring: "Stories mettant en avant les tenders brandes, contenu ambiance, selection photo curee",
+    mediaPlatPost: "3 posts recap, feature newsletter dediee, interview media booth montee, package contenu complet, rapport ROI avec bilan candide",
+    mediaGoldPost: "2 posts recap, mention newsletter, clip interview publie, selection contenu curee livree",
+    mediaBronzePost: "Inclus dans le contenu recap, mention newsletter, selection contenu curee livree",
+    mediaNote: "Tout le contenu est approuve par votre equipe avant publication. Un tour d'approbation, delai de 48 heures.",
     ctaTitle: "Interesse ?",
     ctaText:
       "Pour recevoir le dossier de sponsoring complet ou discuter de la place de votre marque au sein de The Pavilion, contactez-nous directement.",
@@ -454,6 +492,53 @@ export default function SponsorshipPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Media & Content */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
+          {t.mediaTitle}
+        </p>
+        <p className="text-sm text-gray-600 font-body mb-10 max-w-2xl">
+          {t.mediaIntro}
+        </p>
+
+        {/* Media table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm font-body">
+            <thead>
+              <tr className="border-b border-green/10">
+                <th className="py-3 pr-4 text-[10px] tracking-[2px] text-gold uppercase font-body font-normal w-1/4"></th>
+                <th className="py-3 px-4 text-[10px] tracking-[2px] text-gold uppercase font-body font-normal">{t.mediaPlatLabel}</th>
+                <th className="py-3 px-4 text-[10px] tracking-[2px] text-gold uppercase font-body font-normal">{t.mediaGoldLabel}</th>
+                <th className="py-3 px-4 text-[10px] tracking-[2px] text-gold uppercase font-body font-normal">{t.mediaBronzeLabel}</th>
+              </tr>
+            </thead>
+            <tbody className="text-xs text-gray-600">
+              <tr className="border-b border-green/5">
+                <td className="py-4 pr-4 font-medium text-green">{t.mediaPreEvent}</td>
+                <td className="py-4 px-4">{t.mediaPlatPre}</td>
+                <td className="py-4 px-4">{t.mediaGoldPre}</td>
+                <td className="py-4 px-4">{t.mediaBronzePre}</td>
+              </tr>
+              <tr className="border-b border-green/5">
+                <td className="py-4 pr-4 font-medium text-green">{t.mediaDuring}</td>
+                <td className="py-4 px-4">{t.mediaPlatDuring}</td>
+                <td className="py-4 px-4">{t.mediaGoldDuring}</td>
+                <td className="py-4 px-4">{t.mediaBronzeDuring}</td>
+              </tr>
+              <tr className="border-b border-green/5">
+                <td className="py-4 pr-4 font-medium text-green">{t.mediaPostEvent}</td>
+                <td className="py-4 px-4">{t.mediaPlatPost}</td>
+                <td className="py-4 px-4">{t.mediaGoldPost}</td>
+                <td className="py-4 px-4">{t.mediaBronzePost}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 text-xs text-gray-400 font-body italic">
+          {t.mediaNote}
+        </p>
       </section>
 
       {/* CTA */}
