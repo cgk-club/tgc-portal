@@ -461,7 +461,7 @@ export default function EventPage() {
               }
             })();
 
-            const isResidence = pkg.name.includes("Suite") || pkg.name.includes("Master") || pkg.name.includes("Cabin");
+            const isResidence = pkg.name.startsWith("Pavilion ");
             const isCombination = pkg.name.includes("Combination");
             const isPass = !isResidence && !isCombination;
 
