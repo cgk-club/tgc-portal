@@ -233,7 +233,7 @@ export default function EventPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/event/${slug}`);
+        const res = await fetch(`/api/event/${slug}?lang=${lang}`);
         if (!res.ok) {
           setError(true);
           setLoading(false);
@@ -260,7 +260,7 @@ export default function EventPage() {
         body: JSON.stringify({ action: "view", ref_code: refCode }),
       }).catch(() => {});
     }
-  }, [slug, refCode]);
+  }, [slug, refCode, lang]);
 
   function switchLang() {
     const newLang = lang === "en" ? "fr" : "en";
@@ -462,7 +462,7 @@ export default function EventPage() {
             })();
 
             const isResidence = pkg.name.startsWith("Pavilion ");
-            const isCombination = pkg.name.includes("Combination");
+            const isCombination = pkg.name.includes("Combination") || pkg.name.includes("Combinaison");
             const isPass = !isResidence && !isCombination;
 
             return (

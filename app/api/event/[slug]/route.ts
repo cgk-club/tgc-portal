@@ -8,6 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
+  const lang = request.nextUrl.searchParams.get("lang") || "en";
 
   if (!slug) {
     return NextResponse.json({ error: "Slug required" }, { status: 400 });
@@ -29,15 +30,28 @@ export async function GET(
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
 
-  // Fetch active packages
-  const { data: packages } = await sb
+  // Fetch active packages (including French fields)
+  const { data: rawPackages } = await sb
     .from("event_packages")
     .select(
-      "id, name, description, price, currency, capacity, sold_count, included_services, sort_order"
+      "id, name, name_fr, description, description_fr, price, currency, capacity, sold_count, included_services, included_services_fr, sort_order"
     )
     .eq("event_id", event.id)
     .eq("status", "active")
     .order("sort_order", { ascending: true });
+
+  // Apply language
+  const packages = (rawPackages || []).map((pkg) => ({
+    id: pkg.id,
+    name: lang === "fr" && pkg.name_fr ? pkg.name_fr : pkg.name,
+    description: lang === "fr" && pkg.description_fr ? pkg.description_fr : pkg.description,
+    price: pkg.price,
+    currency: pkg.currency,
+    capacity: pkg.capacity,
+    sold_count: pkg.sold_count,
+    included_services: lang === "fr" && pkg.included_services_fr ? pkg.included_services_fr : pkg.included_services,
+    sort_order: pkg.sort_order,
+  }));
 
   // Fetch brochure URLs from project documents if available
   let brochures: { title: string; url: string }[] = [];
