@@ -130,7 +130,7 @@ const PROGRAMME_EN = [
       "13:30 Free Practice 1",
       "17:00 Free Practice 2",
       "Daytime on the yacht and VIP Terraces",
-      "Evening cocktails and dinner on deck",
+      "Cocktail dinatoire on deck: fine drinks, canapes, only stirred cocktails",
     ],
   },
   {
@@ -140,7 +140,7 @@ const PROGRAMME_EN = [
       "12:30 Free Practice 3",
       "16:00 Qualifying",
       "The biggest social night of the GP weekend",
-      "Evening entertainment with international athletes",
+      "Cocktail dinatoire with international athletes and media booth",
     ],
   },
   {
@@ -149,7 +149,7 @@ const PROGRAMME_EN = [
     items: [
       "15:00 Lights out, 78 laps of the Monaco street circuit",
       "Race viewing from yacht and terraces",
-      "Charity cocktail evening with A-list athletes",
+      "Charity cocktail dinatoire with A-list athletes",
       "The closing celebration of The Pavilion",
     ],
   },
@@ -164,7 +164,7 @@ const PROGRAMME_FR = [
       "13h30 Essais libres 1",
       "17h00 Essais libres 2",
       "Journee sur le yacht et les Terrasses VIP",
-      "Cocktail et diner sur le pont",
+      "Cocktail dinatoire sur le pont : boissons raffinées, canapes, cocktails remues uniquement",
     ],
   },
   {
@@ -174,7 +174,7 @@ const PROGRAMME_FR = [
       "12h30 Essais libres 3",
       "16h00 Qualifications",
       "La plus grande soiree du week-end du GP",
-      "Soiree avec des athletes internationaux",
+      "Cocktail dinatoire avec athletes internationaux et espace media",
     ],
   },
   {
@@ -183,19 +183,19 @@ const PROGRAMME_FR = [
     items: [
       "15h00 Depart, 78 tours du circuit de Monaco",
       "Course vue du yacht et des terrasses",
-      "Cocktail caritatif avec des athletes de renom",
+      "Cocktail dinatoire caritatif avec des athletes de renom",
       "La celebration de cloture de The Pavilion",
     ],
   },
 ];
 
 const DESCRIPTION_FR =
-  "Trois jours a bord du M/Y ARADOS a Monaco. La journee sur le yacht et les Terrasses VIP surplombant le circuit. Les soirees : cocktails, gastronomie et echanges avec des legendes du sport et des entrepreneurs internationaux. The Pavilion est une experience privee, sur invitation uniquement, concue pour reunir des personnalites du sport, des affaires et de la culture dans un cadre decontracte et privilegie.";
+  "Trois jours a bord du M/Y ARADOS a Monaco. La journee sur le yacht et les Terrasses VIP surplombant le circuit. Les soirees : cocktail dinatoire, canapes et boissons raffinées, echanges avec des legendes du sport et des entrepreneurs internationaux. Espace media pour podcasts et interviews. The Pavilion est une experience privee, sur invitation uniquement, concue pour reunir des personnalites du sport, des affaires et de la culture dans un cadre decontracte et privilegie.";
 
 const HIGHLIGHTS_FR = [
   "M/Y ARADOS, superyacht de 47m a Monaco",
   "Terrasses VIP sur le circuit du Grand Prix de Monaco",
-  "Cocktails et diners sur le pont chaque soir",
+  "Cocktail dinatoire sur le pont chaque soir",
   "Athletes et personnalites sportives de premier plan",
   "80 invites maximum sur le yacht",
   "Soiree caritative le dimanche soir",
