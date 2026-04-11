@@ -251,6 +251,22 @@ export default function EventPage() {
     }
     load();
 
+    // Track page view
+    const params = new URLSearchParams(window.location.search);
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        page: "event",
+        slug,
+        referrer: document.referrer || null,
+        utm_source: params.get("utm_source"),
+        utm_medium: params.get("utm_medium"),
+        utm_campaign: params.get("utm_campaign"),
+        lang,
+      }),
+    }).catch(() => {});
+
     // Track ref code view
     if (refCode) {
       document.cookie = `tgc_event_ref=${refCode};path=/;max-age=${30 * 24 * 60 * 60}`;

@@ -263,7 +263,23 @@ export default function SponsorshipPage() {
       } catch {}
     }
     load();
-  }, [slug]);
+
+    // Track page view
+    const p = new URLSearchParams(window.location.search);
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        page: "sponsorship",
+        slug,
+        referrer: document.referrer || null,
+        utm_source: p.get("utm_source"),
+        utm_medium: p.get("utm_medium"),
+        utm_campaign: p.get("utm_campaign"),
+        lang,
+      }),
+    }).catch(() => {});
+  }, [slug, lang]);
 
   function switchLang() {
     const newLang = lang === "en" ? "fr" : "en";
