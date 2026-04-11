@@ -16,7 +16,7 @@ const T = {
       "The Pavilion brings together entrepreneurs, athletes and cultural figures for three days aboard a superyacht and VIP terraces overlooking the Monaco Grand Prix. A sponsorship places your brand at the centre of this experience.",
     whyTitle: "Why The Pavilion",
     why: [
-      "80 guests maximum, by invitation only",
+      "100 guests maximum: 80 on the yacht, 20 on VIP terraces",
       "Three days of live Grand Prix action from yacht and terraces",
       "Evening programme with A-list athletes and entrepreneurs",
       "Cocktail dinatoire each evening: fine drinks, canapes, only stirred cocktails",
@@ -110,7 +110,7 @@ const T = {
       "The Pavilion reunit entrepreneurs, athletes et personnalites culturelles pendant trois jours a bord d'un superyacht et sur des terrasses VIP surplombant le Grand Prix de Monaco. Un sponsoring place votre marque au coeur de cette experience.",
     whyTitle: "Pourquoi The Pavilion",
     why: [
-      "80 invites maximum, sur invitation uniquement",
+      "100 invites maximum : 80 sur le yacht, 20 sur les terrasses VIP",
       "Trois jours de Grand Prix en direct depuis le yacht et les terrasses",
       "Cocktail dinatoire chaque soir : boissons raffinées, canapes, cocktails remues uniquement",
       "Espace media pour podcasts et interviews tout au long du week-end",

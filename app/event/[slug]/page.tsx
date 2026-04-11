@@ -197,7 +197,7 @@ const HIGHLIGHTS_FR = [
   "Terrasses VIP sur le circuit du Grand Prix de Monaco",
   "Cocktail dinatoire sur le pont chaque soir",
   "Athletes et personnalites sportives de premier plan",
-  "80 invites maximum sur le yacht",
+  "80 invites sur le yacht, 20 sur les terrasses VIP",
   "Soiree caritative le dimanche soir",
 ];
 
@@ -350,7 +350,7 @@ export default function EventPage() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-6 sm:gap-12">
           {[
             { label: t.days, value: "3" },
-            { label: t.guests, value: "80" },
+            { label: t.guests, value: "100" },
             { label: t.location, value: "Monaco" },
             { label: t.venues, value: t.venuesValue },
           ].map((stat) => (
