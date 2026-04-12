@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
+import LeadCaptureModal from "@/components/event-booking/LeadCaptureModal";
 
 type Lang = "en" | "fr";
 
@@ -251,6 +252,8 @@ export default function SponsorshipPage() {
   const t = T[lang];
 
   const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -387,15 +390,12 @@ export default function SponsorshipPage() {
               {t.exclusiveTag}
             </span>
           </div>
-          <a
-            href={`mailto:${t.ctaEmail}?subject=${encodeURIComponent(lang === "fr" ? "The Pavilion Monaco 2026 — Sponsoring Exclusif" : "The Pavilion Monaco 2026 — Exclusive Sponsorship")}`}
+          <button
+            onClick={() => setSelectedTier(lang === "fr" ? "Sponsoring Exclusif" : "Exclusive Sponsorship")}
             className="inline-flex items-center gap-2 mt-1 mb-2 px-5 py-2.5 bg-gold text-white rounded font-body text-sm hover:bg-gold/90 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
             {lang === "fr" ? "Nous contacter pour en discuter" : "Contact us to discuss"}
-          </a>
+          </button>
           <ul className="mt-4 space-y-2">
             {t.exclusiveItems.map((item, i) => (
               <li
@@ -571,47 +571,58 @@ export default function SponsorshipPage() {
         <p className="text-base text-gray-700 font-body leading-relaxed mb-8 max-w-xl mx-auto">
           {t.ctaText}
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href={`mailto:${t.ctaEmail}?subject=The Pavilion Monaco 2026 — Sponsorship`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-green text-white rounded font-body text-sm hover:bg-green/90 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            {t.ctaButton}
-          </a>
-          <a
-            href={`tel:${t.ctaPhone.replace(/\s/g, "")}`}
-            className="inline-flex items-center gap-2 px-6 py-3 border border-green/20 text-green rounded font-body text-sm hover:bg-green/5 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            {t.ctaPhone}
-          </a>
-        </div>
+        <button
+          onClick={() => setSelectedTier(lang === "fr" ? "Sponsoring — The Pavilion" : "Sponsorship — The Pavilion")}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-green text-white rounded font-body text-sm hover:bg-green/90 transition-colors"
+        >
+          {t.ctaButton}
+        </button>
       </section>
+
+      {/* Lead Capture Modal */}
+      {selectedTier && !showSuccess && (
+        <LeadCaptureModal
+          packageName={selectedTier}
+          eventSlug={slug}
+          refCode={null}
+          onClose={() => setSelectedTier(null)}
+          onSuccess={() => {
+            setSelectedTier(null);
+            setShowSuccess(true);
+          }}
+        />
+      )}
+
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowSuccess(false)}
+          />
+          <div className="relative bg-white rounded-2xl max-w-sm mx-4 p-8 shadow-xl text-center">
+            <div className="w-12 h-12 bg-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-heading font-semibold text-green mb-2">
+              {lang === "fr" ? "Merci" : "Thank you"}
+            </h3>
+            <p className="text-sm text-gray-600 font-body mb-6">
+              {lang === "fr"
+                ? "Nous avons bien recu votre demande et reviendrons vers vous dans les plus brefs delais."
+                : "We have received your enquiry and will be in touch shortly with full details."}
+            </p>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="text-xs text-gray-400 font-body hover:text-gray-600"
+            >
+              {lang === "fr" ? "Fermer" : "Close"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-green/10 py-8">
