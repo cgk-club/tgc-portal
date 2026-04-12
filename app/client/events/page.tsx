@@ -45,10 +45,7 @@ export default function ClientEventsPage() {
       const eventsRes = await fetch("/api/events/list");
       if (eventsRes.ok) {
         const data = await eventsRes.json();
-        // Filter to upcoming events (date_start in the future or no date_start)
-        const now = new Date().toISOString().split("T")[0];
-        const upcoming = data.filter((ev: { date_end?: string | null }) => !ev.date_end || ev.date_end >= now);
-        setEvents(upcoming);
+        setEvents(data);
       }
 
       setLoading(false);
