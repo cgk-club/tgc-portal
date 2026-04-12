@@ -239,8 +239,8 @@ export async function POST(request: NextRequest) {
   if (secret) {
     const signature = request.headers.get('X-Airtable-Content-MAC')
     if (!verifySignature(bodyText, signature)) {
-      // Log the failure but still process — HMAC format may need tuning
-      console.warn('Webhook HMAC verification failed — processing anyway')
+      console.warn('Webhook HMAC verification failed — rejecting request')
+      return NextResponse.json({ error: 'Invalid HMAC signature' }, { status: 401 })
     }
   }
 
