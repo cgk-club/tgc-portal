@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { randomBytes } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(
@@ -19,11 +20,7 @@ export async function POST(
   }
 
   // Generate token without changing status
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let token = ''
-  for (let i = 0; i < 12; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
+  const token = randomBytes(18).toString('base64url')
 
   const { error } = await getSupabaseAdmin()
     .from('itineraries')

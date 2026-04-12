@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSession, COOKIE_NAME } from '@/lib/auth'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Too many login attempts. Please try again later.' },
+      { status: 429 }
+    )
+  }
+
   const { password } = await request.json()
   const adminPassword = process.env.ADMIN_PASSWORD
 

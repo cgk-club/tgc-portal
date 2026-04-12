@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Too many login attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const { email, password } = await request.json();
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });

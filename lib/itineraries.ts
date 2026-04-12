@@ -1,4 +1,5 @@
 import { unstable_noStore as noStore } from 'next/cache'
+import { randomBytes } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { Itinerary, ItineraryDay, ItineraryItem } from '@/types'
 
@@ -285,11 +286,7 @@ export async function reorderItems(dayId: string, orderedIds: string[]): Promise
 }
 
 export async function generateShareToken(id: string): Promise<string> {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let token = ''
-  for (let i = 0; i < 12; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
+  const token = randomBytes(18).toString('base64url')
 
   await sb()
     .from('itineraries')
@@ -326,11 +323,7 @@ export async function getItineraryByQuoteToken(quoteToken: string): Promise<Itin
 }
 
 export async function generateQuoteToken(id: string): Promise<string> {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let token = ''
-  for (let i = 0; i < 12; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
+  const token = randomBytes(18).toString('base64url')
 
   await sb()
     .from('itineraries')
