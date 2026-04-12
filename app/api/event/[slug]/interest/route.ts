@@ -210,6 +210,28 @@ export async function POST(
       // Non-critical: email failure shouldn't break lead capture
     }
 
+    // Notify Christian via email
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: `The Gatekeepers Club <${FROM_EMAIL}>`,
+        to: "christian@thegatekeepers.club",
+        subject: `New enquiry: ${name} — ${package_interest || "The Pavilion"}`,
+        html: `<div style="font-family: Georgia, serif; max-width: 480px; padding: 20px;">
+          <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase; margin-bottom: 20px;">NEW LEAD</p>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${emailLower}</p>
+          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ""}
+          <p><strong>Interest:</strong> ${package_interest || "General"}</p>
+          <p><strong>Attending as:</strong> ${attending_as || "Not specified"}</p>
+          <p><strong>Event:</strong> ${event.title}</p>
+          ${ref_code ? `<p><strong>Referred by:</strong> ${ref_code}</p>` : `<p><strong>Source:</strong> Direct</p>`}
+        </div>`,
+      });
+    } catch {
+      // Non-critical
+    }
+
     return NextResponse.json({ ok: true });
   }
 
