@@ -33,7 +33,7 @@ export default function PartnerNav({ active }: PartnerNavProps) {
   }
 
   return (
-    <header className="border-b border-green/10 bg-white">
+    <header className="border-b border-green/10 bg-white sticky top-0 z-40">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between py-4">
           <Link

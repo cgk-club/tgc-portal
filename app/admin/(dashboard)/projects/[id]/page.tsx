@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import BackButton from '@/components/shared/BackButton'
 import Button from '@/components/ui/Button'
 import EventBudgetTracker from '@/components/partner/EventBudgetTracker'
 import PipelineTab from '@/components/admin/PipelineTab'
@@ -1656,13 +1657,7 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      {/* Back link */}
-      <button
-        onClick={() => router.push('/admin/projects')}
-        className="text-sm text-gray-500 hover:text-green font-body mb-6 block"
-      >
-        &larr; Back to Projects
-      </button>
+      <BackButton href="/admin/projects" label="Back to Projects" className="mb-6" />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6">

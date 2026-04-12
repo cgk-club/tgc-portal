@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ClientNav from "@/components/client/ClientNav";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 
 // ── Types ───────────────────────────────────────────────────────────
 
@@ -300,12 +301,13 @@ export default function ProjectDetailPage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Breadcrumb */}
-        <Link href="/client/projects" className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-green font-body mb-6 transition-colors">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          All projects
-        </Link>
+        <Breadcrumb
+          segments={[
+            { label: "My Projects", href: "/client/projects" },
+            { label: project.title },
+          ]}
+          className="mb-6"
+        />
 
         {/* ─── Header ─────────────────────────────────────────── */}
         <div className="bg-white border border-green/10 rounded-lg p-5 sm:p-6 mb-5">

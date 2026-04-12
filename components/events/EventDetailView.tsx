@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 interface EventStats {
   duration?: string;
   group_size?: string;
@@ -46,6 +48,7 @@ const STAT_LABELS: Record<string, { label: string; icon: string }> = {
 const STAT_ORDER = ["duration", "group_size", "distance", "countries", "start_point", "end_point"];
 
 export default function EventDetailView({ event }: { event: TGCEventDetail }) {
+  const router = useRouter();
   const highlightLines = event.highlights
     ? event.highlights.split("\n").filter(Boolean).map((line) => line.replace(/^[-\u2022]\s*/, ""))
     : [];
@@ -78,6 +81,17 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute top-6 left-6 z-20 inline-flex items-center gap-1.5 text-sm font-body text-white/80 hover:text-white transition-colors bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
 
         {/* Content overlay */}
         <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 md:p-16">

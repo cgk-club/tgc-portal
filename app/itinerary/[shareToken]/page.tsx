@@ -134,7 +134,7 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
         </div>
       )}
       {/* Header */}
-      <header className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 border-b border-gray-100">
+      <header className="sticky top-0 z-40 bg-pearl flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 border-b border-gray-100">
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">
           THE GATEKEEPERS CLUB
         </span>

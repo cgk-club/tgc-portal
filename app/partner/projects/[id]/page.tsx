@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
 import PartnerNav from "@/components/partner/PartnerNav";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 import EventBudgetTracker from "@/components/partner/EventBudgetTracker";
 import PartnerPipelineTab from "@/components/partner/PartnerPipelineTab";
 
@@ -464,26 +464,13 @@ export default function PartnerProjectDetailPage() {
       <PartnerNav active="projects" />
 
       <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14">
-        {/* Back link */}
-        <Link
-          href="/partner/projects"
-          className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-green font-body mb-6 transition-colors"
-        >
-          <svg
-            className="w-3 h-3"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Projects
-        </Link>
+        <Breadcrumb
+          segments={[
+            { label: "Projects", href: "/partner/projects" },
+            { label: project.title },
+          ]}
+          className="mb-6"
+        />
 
         {/* Project header */}
         <div className="bg-white border border-green/10 rounded-lg p-5 sm:p-6 mb-6">

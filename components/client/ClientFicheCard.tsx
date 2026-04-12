@@ -53,8 +53,6 @@ export default function ClientFicheCard({ item }: ClientFicheCardProps) {
         {slug && (
           <a
             href={fiche?.status === 'live' ? `/fiche/${slug}` : `/fiche/${slug}?preview=true`}
-            target="_blank"
-            rel="noopener noreferrer"
             className="text-sm text-green hover:text-green-light font-medium font-body"
           >
             View full details &rarr;

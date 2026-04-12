@@ -17,6 +17,7 @@ import EventsSportFiche from '@/components/fiche/templates/EventsSportFiche'
 import ArtsCultureFiche from '@/components/fiche/templates/ArtsCultureFiche'
 import PersonalServicesFiche from '@/components/fiche/templates/PersonalServicesFiche'
 import ClientMakerFiche from './ClientMakerFiche'
+import FicheBackButton from './FicheBackButton'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -79,7 +80,8 @@ export default async function FichePage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-pearl">
       {/* Header */}
-      <header className="absolute top-0 left-0 z-10 p-6">
+      <header className="absolute top-0 left-0 right-0 z-10 p-6 flex items-center justify-between">
+        <FicheBackButton />
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">
           THE GATEKEEPERS CLUB
         </span>
