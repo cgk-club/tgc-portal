@@ -128,12 +128,22 @@ export async function getItineraryByToken(shareToken: string): Promise<Itinerary
   const { data, error } = await sb()
     .from('itineraries')
     .select(`
-      *,
+      id, slug, client_name, title, cover_image_url, summary,
+      status, share_token, start_date, is_member, currency,
+      quote_status, created_at, updated_at,
       days:itinerary_days(
-        *,
+        id, itinerary_id, day_number, date, title, notes, sort_order,
         items:itinerary_items(
-          *,
-          fiche:fiches(*)
+          id, day_id, fiche_id, custom_title, custom_note,
+          time_of_day, exact_time, sort_order, item_type,
+          fiche:fiches(
+            id, airtable_record_id, slug, hero_image_url, headline,
+            description, highlights, gallery_urls, tags,
+            latitude, longitude, geocoded_at,
+            template_type, template_fields,
+            show_price, price_display, status, featured,
+            created_at, updated_at
+          )
         )
       )
     `)
@@ -143,7 +153,10 @@ export async function getItineraryByToken(shareToken: string): Promise<Itinerary
     .single()
 
   if (error) return null
-  return data
+  // Cast: query intentionally excludes sensitive fields (client_email, client_account_id,
+  // quote_notes, quote_token, default_bank_details, unit_price, quantity, is_zero_margin,
+  // is_included, price_note, tgc_note) for public safety
+  return data as unknown as Itinerary
 }
 
 export async function listItineraries(filters?: {

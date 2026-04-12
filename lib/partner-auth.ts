@@ -4,7 +4,8 @@ const PARTNER_COOKIE_NAME = 'tgc_partner_session'
 const THIRTY_DAYS = 30 * 24 * 60 * 60
 
 function getSecret(): Uint8Array {
-  const secret = process.env.ADMIN_SESSION_SECRET || 'dev-secret-change-me'
+  const secret = process.env.ADMIN_SESSION_SECRET
+  if (!secret) throw new Error('ADMIN_SESSION_SECRET environment variable is required')
   return new TextEncoder().encode(secret)
 }
 

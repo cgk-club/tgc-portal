@@ -10,7 +10,7 @@ export async function GET(
   const { data, error } = await getSupabase()
     .from("events")
     .select(
-      "id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, members_only, ticket_url, ticket_provider, ticket_commission_rate, brochure_url, gallery_images, stats"
+      "id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, members_only, ticket_url, ticket_provider, brochure_url, gallery_images, stats"
     )
     .eq("id", id)
     .eq("active", true)
