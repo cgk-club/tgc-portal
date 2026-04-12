@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import LeadCaptureModal from "@/components/event-booking/LeadCaptureModal";
+import SponsorshipLeadModal from "@/components/event-booking/SponsorshipLeadModal";
 
 type Lang = "en" | "fr";
 
@@ -390,12 +390,6 @@ export default function SponsorshipPage() {
               {t.exclusiveTag}
             </span>
           </div>
-          <button
-            onClick={() => setSelectedTier(lang === "fr" ? "Sponsoring Exclusif" : "Exclusive Sponsorship")}
-            className="inline-flex items-center gap-2 mt-1 mb-2 px-5 py-2.5 bg-gold text-white rounded font-body text-sm hover:bg-gold/90 transition-colors"
-          >
-            {lang === "fr" ? "Nous contacter pour en discuter" : "Contact us to discuss"}
-          </button>
           <ul className="mt-4 space-y-2">
             {t.exclusiveItems.map((item, i) => (
               <li
@@ -422,6 +416,12 @@ export default function SponsorshipPage() {
           <p className="mt-4 text-xs text-gray-500 font-body italic">
             {t.exclusiveNote}
           </p>
+          <button
+            onClick={() => setSelectedTier(t.exclusive)}
+            className="mt-4 w-full sm:w-auto bg-gold text-white py-2.5 px-6 rounded-md text-xs font-body tracking-wide hover:bg-gold/90 transition-colors"
+          >
+            {lang === "fr" ? "Nous contacter" : "Enquire"}
+          </button>
         </div>
 
         {/* Platinum / Gold / Bronze - Grid */}
@@ -433,7 +433,7 @@ export default function SponsorshipPage() {
             return (
               <div
                 key={tier}
-                className={`border ${colors.border} rounded-lg p-5 ${colors.bg}`}
+                className={`border ${colors.border} rounded-lg p-5 ${colors.bg} flex flex-col`}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <h3 className="text-lg font-heading font-semibold text-green">
@@ -476,6 +476,12 @@ export default function SponsorshipPage() {
                     </li>
                   ))}
                 </ul>
+                <button
+                  onClick={() => setSelectedTier(tierT[tier] as string)}
+                  className="mt-4 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
+                >
+                  {lang === "fr" ? "Nous contacter" : "Enquire"}
+                </button>
               </div>
             );
           })}
@@ -579,12 +585,12 @@ export default function SponsorshipPage() {
         </button>
       </section>
 
-      {/* Lead Capture Modal */}
+      {/* Sponsorship Lead Capture Modal */}
       {selectedTier && !showSuccess && (
-        <LeadCaptureModal
-          packageName={selectedTier}
+        <SponsorshipLeadModal
+          tierName={selectedTier}
           eventSlug={slug}
-          refCode={null}
+          lang={lang}
           onClose={() => setSelectedTier(null)}
           onSuccess={() => {
             setSelectedTier(null);
