@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import ListingPhotoUpload from '@/components/marketplace/ListingPhotoUpload'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -117,7 +118,7 @@ interface Order {
 
 const CATEGORIES = [
   'horology', 'art', 'automobiles', 'real_estate',
-  'artisan_products', 'the_marina', 'the_hangar',
+  'artisan_products', 'the_marina', 'the_hangar', 'wines_spirits',
 ]
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -128,6 +129,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   artisan_products: 'Artisan Products',
   the_marina: 'The Marina',
   the_hangar: 'The Hangar',
+  wines_spirits: 'Wines & Spirits',
 }
 
 const LISTING_STATUSES = ['draft', 'review', 'live', 'sold', 'reserved', 'withdrawn', 'archived', 'rejected']
@@ -720,7 +722,20 @@ export default function AdminMarketplacePage() {
                 <div className="sm:col-span-2">
                   <label className="block text-xs text-gray-500 font-body mb-1">Hero image URL</label>
                   <input value={listingForm.hero_image_url || ''} onChange={(e) => setListingForm({ ...listingForm, hero_image_url: e.target.value || null })} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                  {editingListing?.hero_image_url && (
+                    <img src={editingListing.hero_image_url} alt="Current hero" className="mt-2 w-32 h-32 object-cover rounded border border-green/10" />
+                  )}
                 </div>
+                {!creatingListing && editingListing && (
+                  <div className="sm:col-span-2">
+                    <ListingPhotoUpload
+                      listingId={editingListing.id}
+                      listingTitle={editingListing.title}
+                      onComplete={fetchListings}
+                      onSkip={() => {}}
+                    />
+                  </div>
+                )}
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 text-sm font-body">
                     <input type="checkbox" checked={listingForm.featured} onChange={(e) => setListingForm({ ...listingForm, featured: e.target.checked })} />
