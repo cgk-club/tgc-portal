@@ -731,7 +731,19 @@ export default function AdminMarketplacePage() {
                     <ListingPhotoUpload
                       listingId={editingListing.id}
                       listingTitle={editingListing.title}
-                      onComplete={fetchListings}
+                      onComplete={async () => {
+                        const res = await fetch(`/api/admin/marketplace/listings/${editingListing.id}`)
+                        if (res.ok) {
+                          const fresh = await res.json() as Listing
+                          setEditingListing(fresh)
+                          setListingForm((prev) => ({
+                            ...prev,
+                            hero_image_url: fresh.hero_image_url,
+                            gallery_image_urls: fresh.gallery_image_urls,
+                          }))
+                        }
+                        fetchListings()
+                      }}
                       onSkip={() => {}}
                     />
                   </div>
