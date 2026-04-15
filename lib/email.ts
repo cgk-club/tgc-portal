@@ -139,6 +139,38 @@ export async function sendClientRequestNotification(data: Record<string, unknown
   })
 }
 
+export async function sendFicheEditSubmittedNotification(data: {
+  partnerName: string
+  partnerEmail: string
+  ficheHeadline: string
+  ficheSlug: string
+  changedFields: string[]
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'
+  const lines = [
+    `Partner: ${data.partnerName} (${data.partnerEmail})`,
+    `Fiche: ${data.ficheHeadline || data.ficheSlug}`,
+    `Changed fields: ${data.changedFields.join(', ')}`,
+    '',
+    `Review at ${appUrl}/admin/approvals`,
+  ]
+  const textBody = lines.join('\n')
+  const htmlBody = lines.map(l => l ? `<p style="color: #333; font-size: 14px; line-height: 1.6; margin: 4px 0;">${l}</p>` : '<br />').join('')
+
+  await getResend().emails.send({
+    from: `TGC Portal <${FROM_EMAIL}>`,
+    to: 'christian@thegatekeepers.club',
+    subject: `Fiche edit submitted: ${data.ficheHeadline || data.ficheSlug} (${data.partnerName})`,
+    text: textBody,
+    html: `<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase; margin-bottom: 30px;">NEW FICHE EDIT SUBMITTED</p>
+      ${htmlBody}
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+      <p style="color: #999; font-size: 12px;">A partner has submitted changes awaiting your review.</p>
+    </div>`,
+  })
+}
+
 export async function sendOutreachEmail(to: string, subject: string, body: string) {
   await getResend().emails.send({
     from: `Christian de Jabrun <${FROM_EMAIL}>`,

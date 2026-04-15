@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { createNotification } from "@/lib/notifications";
+import { sendFicheEditSubmittedNotification } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,7 @@ export async function POST(
   // Verify fiche ownership
   const { data: fiche } = await sb
     .from("fiches")
-    .select("id, partner_account_id, airtable_record_id")
+    .select("id, partner_account_id, airtable_record_id, slug, headline")
     .eq("id", ficheId)
     .single();
 
@@ -49,6 +51,21 @@ export async function POST(
     return NextResponse.json({ error: "Changes object required" }, { status: 400 });
   }
 
+  // Supersede any earlier pending requests for the same fiche+partner so the
+  // approvals queue shows only the latest intent. The schema's status CHECK
+  // constraint only allows pending/approved/rejected, so older rows are marked
+  // rejected with a note.
+  await sb
+    .from("fiche_edit_requests")
+    .update({
+      status: "rejected",
+      reviewed_at: new Date().toISOString(),
+      admin_note: "Superseded by a later submission from the same partner.",
+    })
+    .eq("fiche_id", ficheId)
+    .eq("partner_id", partnerId)
+    .eq("status", "pending");
+
   const { data: editRequest, error } = await sb
     .from("fiche_edit_requests")
     .insert({
@@ -62,6 +79,35 @@ export async function POST(
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Push-notify admin: in-app activity row + email ping to christian@.
+  // Fire-and-forget so delivery issues never block the partner response.
+  const { data: partnerAccount } = await sb
+    .from("partner_accounts")
+    .select("org_name, email")
+    .eq("id", partnerId)
+    .single();
+
+  const partnerName = partnerAccount?.org_name || partnerAccount?.email || "Unknown partner";
+  const ficheLabel = fiche.headline || fiche.slug || "a fiche";
+  const changedFields = Object.keys(changes);
+
+  createNotification({
+    user_type: "admin",
+    user_id: "admin",
+    title: `Fiche edit submitted: ${ficheLabel}`,
+    body: `${partnerName} submitted changes to ${changedFields.length} field(s). Review in Approvals.`,
+    type: "approval",
+    link: "/admin/approvals",
+  }).catch(() => {});
+
+  sendFicheEditSubmittedNotification({
+    partnerName,
+    partnerEmail: partnerAccount?.email || "",
+    ficheHeadline: fiche.headline || "",
+    ficheSlug: fiche.slug || "",
+    changedFields,
+  }).catch(() => {});
 
   return NextResponse.json(editRequest, { status: 201 });
 }
