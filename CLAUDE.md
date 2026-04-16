@@ -231,17 +231,25 @@ git push
 
 ## Current State (update this section after each session)
 
-*Last updated: 19 March 2026*
+*Last updated: 6 April 2026*
 
 - Portal live at portal.thegatekeepers.club
-- 55 fiches total (14 live, 41 draft)
-- Phase 6 deployed: 11 total fiche templates (hospitality, real_estate, dining, maker, experience, transport, wine_estate, wellness, events_sport, arts_culture, default)
-- Transport template has air/sea vs ground sub-layouts; Events & Sport has venue vs sport sub-layouts
+- 11 fiche templates, transport + events sub-layouts
 - Phase 5 webhook endpoint live
 - Airtable Organizations table ID: `tblRiQuIfeQ34aN5L`
-- ficheTemplates.ts updated with all Category Sub mappings
-- Admin dashboard: Fiche Inbox card + enrichment scores on fiche list
-- Client portal operational — magic link auth via jeeves@thegatekeepers.club
+- Magic link auth: 7-day token expiry, 30-day session cookie
+- Human-like typing effect on all chat modules (variable speed, typos, cursor)
+- One-question-at-a-time chat flow across all prompts
+- Client chat skips known details (email, name) for logged-in users
+- Project dashboards: per-project (event hero, countdown, revenue, tasks) + list page (summary cards, deadlines)
+- Per-partner visibility controls: 7 granular toggles (financials, tasks, docs, activity, guests, sponsors, budget)
+- Task system: multi-partner assignment, priority, status tracking
+- View separation enforced at API level (admin/partner/client)
+- Event packages table (event_packages) + event guests table (event_guests)
+- Project tasks table (project_tasks)
+- Partner visibility settings column on project_partners
+- Approvals + requests badges refresh instantly (custom event dispatch)
+- Requests page has status workflow (new → contacted → quoted → confirmed → closed)
 - Resend domain verified for thegatekeepers.club
 
 ---
