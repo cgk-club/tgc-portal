@@ -80,6 +80,7 @@ export default function ApprovalsPage() {
   const [actionNote, setActionNote] = useState('')
   const [showNoteFor, setShowNoteFor] = useState<string | null>(null)
   const [processing, setProcessing] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const fetchAll = useCallback(async () => {
     const ts = Date.now()
@@ -110,6 +111,7 @@ export default function ApprovalsPage() {
 
   async function handleAction(endpoint: string, id: string, action: string, extra?: Record<string, unknown>) {
     setProcessing(id)
+    setActionError(null)
     try {
       const res = await fetch(`/api/admin/${endpoint}/${id}`, {
         method: 'PATCH',
@@ -132,10 +134,15 @@ export default function ApprovalsPage() {
         setActionNote('')
         setShowNoteFor(null)
         // Refetch to ensure server state is synced
-        fetchAll()
+        await fetchAll()
         // Tell sidebar to refresh badge counts immediately
         window.dispatchEvent(new Event('badge-refresh'))
+      } else {
+        const errBody = await res.json().catch(() => ({}))
+        setActionError(errBody.error || `Action failed (HTTP ${res.status}) — please try again.`)
       }
+    } catch {
+      setActionError('Network error — please check your connection and try again.')
     } finally {
       setProcessing(null)
     }
@@ -188,6 +195,13 @@ export default function ApprovalsPage() {
           )
         })}
       </div>
+
+      {actionError && (
+        <div className="mb-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          <span className="text-red-500 text-sm font-body flex-1">{actionError}</span>
+          <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600 text-xs font-body shrink-0">Dismiss</button>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-gray-500 font-body">Loading...</p>

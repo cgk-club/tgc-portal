@@ -24,9 +24,19 @@ export async function PATCH(
   if (body.action === 'approve') {
     // Apply the JSONB changes to the fiche
     if (editReq.fiche_id && editReq.changes) {
-      const changes = typeof editReq.changes === 'string'
+      const rawChanges = typeof editReq.changes === 'string'
         ? JSON.parse(editReq.changes)
         : { ...editReq.changes }
+
+      // Only apply known fiche columns — unknown fields cause a Postgres error
+      const SAFE_FICHE_FIELDS = new Set([
+        'headline', 'description', 'highlights', 'hero_image_url',
+        'gallery_urls', 'price_display', 'template_fields', 'tags',
+        'show_price', 'latitude', 'longitude',
+      ])
+      const changes: Record<string, unknown> = Object.fromEntries(
+        Object.entries(rawChanges).filter(([k]) => SAFE_FICHE_FIELDS.has(k))
+      )
 
       // Convert highlights string to JSONB array if needed
       if (typeof changes.highlights === 'string' && changes.highlights) {
@@ -36,13 +46,15 @@ export async function PATCH(
           .map((h: string) => ({ icon: '✦', label: h.trim(), value: '' }))
       }
 
-      const { error: updateError } = await sb
-        .from('fiches')
-        .update({ ...changes, updated_at: new Date().toISOString() })
-        .eq('id', editReq.fiche_id)
+      if (Object.keys(changes).length > 0) {
+        const { error: updateError } = await sb
+          .from('fiches')
+          .update({ ...changes, updated_at: new Date().toISOString() })
+          .eq('id', editReq.fiche_id)
 
-      if (updateError) {
-        return NextResponse.json({ error: `Failed to apply changes: ${updateError.message}` }, { status: 500 })
+        if (updateError) {
+          return NextResponse.json({ error: `Failed to apply changes: ${updateError.message}` }, { status: 500 })
+        }
       }
     }
 
