@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { createNotification } from '@/lib/notifications'
 
+export const dynamic = 'force-dynamic'
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -59,7 +61,7 @@ export async function PATCH(
     }
 
     // Mark the edit request as approved
-    const { data, error } = await sb
+    const { error: approveError } = await sb
       .from('fiche_edit_requests')
       .update({
         status: 'approved',
@@ -67,18 +69,16 @@ export async function PATCH(
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select()
-      .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (approveError) return NextResponse.json({ error: approveError.message }, { status: 500 })
 
     // Notify partner users about approval
     notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit approved', 'Your fiche changes have been approved and applied.', '/partner/fiche')
 
-    return NextResponse.json(data)
+    return NextResponse.json({ success: true, id })
 
   } else if (body.action === 'reject') {
-    const { data, error } = await sb
+    const { error: rejectError } = await sb
       .from('fiche_edit_requests')
       .update({
         status: 'rejected',
@@ -86,10 +86,8 @@ export async function PATCH(
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select()
-      .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (rejectError) return NextResponse.json({ error: rejectError.message }, { status: 500 })
 
     // Notify partner users about rejection
     const rejectBody = body.admin_note
@@ -97,7 +95,7 @@ export async function PATCH(
       : 'Your fiche edit was not approved. Please check with the team.'
     notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit not approved', rejectBody, '/partner/fiche')
 
-    return NextResponse.json(data)
+    return NextResponse.json({ success: true, id })
 
   } else {
     return NextResponse.json({ error: 'Invalid action. Use "approve" or "reject".' }, { status: 400 })

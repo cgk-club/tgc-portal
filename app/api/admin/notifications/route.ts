@@ -63,12 +63,14 @@ export async function GET(request: NextRequest) {
       sb.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'review'),
     ])
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       approvals: (ficheEdits || 0) + (partnerOffers || 0) + (partnerEvents || 0) + (partnerContent || 0),
       requests: requests || 0,
       feedback: feedback || 0,
       marketplace_review: marketplaceReview || 0,
     })
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+    return res
   } catch (err) {
     console.error('Notifications fetch error:', err)
     return NextResponse.json({
