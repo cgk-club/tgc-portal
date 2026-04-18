@@ -819,7 +819,7 @@ const TGCWellnessIntelligence = () => {
 
                   <div>
                     <div className="tgc-mono" style={{ color: index === 0 ? '#c9a870' : '#8b6f3e', marginBottom: '0.6rem', fontSize: '0.62rem' }}>
-                      Brochure realities
+                      What the brochure won&apos;t tell you
                     </div>
                     <ul style={{ margin: 0, padding: '0 0 0 1.2rem', listStyle: 'disc' }}>
                       {clinic.brochureRealities.slice(0, 3).map((r, i) => (
