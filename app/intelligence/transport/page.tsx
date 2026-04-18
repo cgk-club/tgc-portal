@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities, react/jsx-no-comment-textnodes */
 'use client'
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useMemo } from 'react'

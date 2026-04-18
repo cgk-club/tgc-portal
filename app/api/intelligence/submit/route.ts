@@ -151,6 +151,37 @@ export async function POST(request: NextRequest) {
           <tr><td style="padding: 4px 12px 4px 0; color: #888;">Organisation</td><td>${client?.organisation || '-'}</td></tr>
         </table>
       `
+    } else if (type === 'vip-hospitality') {
+      subject = `VIP Hospitality brief: ${body.event?.name || 'Event'} — ${client?.name || 'Enquiry'}`
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New VIP Hospitality Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Reference:</strong> ${body.refId || '-'}</p>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Event</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Event</td><td>${body.event?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Location</td><td>${body.event?.location || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Dates</td><td>${body.event?.dates || '-'}</td></tr>
+        </table>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Brief</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Party</td><td>${brief?.party || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Occasion</td><td>${brief?.occasion || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Priorities</td><td>${Array.isArray(brief?.priorities) ? brief.priorities.join(', ') : '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Dates</td><td>${brief?.datesConfirmed || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Budget</td><td>${brief?.budget || '-'}</td></tr>
+        </table>
+        ${brief?.notes ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${brief.notes}</p>` : ''}
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+        </table>
+      `
     } else {
       subject = `Intelligence brief: ${type} — ${client?.name || 'Enquiry'}`
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`
