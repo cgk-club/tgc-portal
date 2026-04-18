@@ -19,6 +19,14 @@ const CALENDLY_URL = 'https://calendar.app.google/aAsppu4Tju2my9ST7'
 
 type PriceBandEntry = { entry?: [number, number]; realistic?: [number, number]; trophy?: [number, number] }
 
+interface RentalRates {
+  shortTermWeekPeak?: [number, number]
+  shortTermWeekShoulder?: [number, number]
+  midTermMonth?: [number, number]
+  longTermMonth?: [number, number]
+  notes?: string
+}
+
 interface Market {
   name: string
   tier: 1 | 2 | 3 | 4
@@ -33,6 +41,8 @@ interface Market {
   structuringJurisdiction: string
   coverage: string
   icpRelevance: string
+  rentalRates?: RentalRates
+  rentalEditorial?: string
 }
 
 const MARKETS: Record<string, Market> = {
@@ -61,6 +71,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR',
     coverage: 'TGC direct network, notaires, architects, property managers. Your TGC contact for high-end mandates: Jez Moore',
     icpRelevance: 'CORE',
+    rentalRates: { shortTermWeekPeak: [8000, 50000], shortTermWeekShoulder: [3000, 15000], midTermMonth: [5000, 22000], longTermMonth: [3500, 15000], notes: 'July-August is exceptionally competitive; book 6-12 months ahead for quality villas. Winter availability good but many services close.' },
+    rentalEditorial: 'The most active luxury short-term rental market in Europe. Summer peak weeks at €8-50k/week for quality villas. Mid-term (furnished): strong expat and relocation demand year-round, particularly for Cap d\'Ail, Roquebrune, Villefranche. TGC sources off-market through owner networks, not agency portals.',
   },
 
   'occitanie': {
@@ -86,6 +98,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR',
     coverage: 'TGC home market, densest notaire network, direct architect relationships. Exclusive mandates held: contact for off-market access.',
     icpRelevance: 'CORE',
+    rentalRates: { shortTermWeekPeak: [800, 5000], shortTermWeekShoulder: [500, 2500], midTermMonth: [1000, 4000], longTermMonth: [700, 2500], notes: 'Growing mid-term market driven by relocation and remote workers. Good value versus Provence and the Riviera. TGC holds direct landlord relationships in Occitanie interior.' },
+    rentalEditorial: 'Best-value rental market in southern France with comparable climate to Provence at 40-60% of the rental cost. Mid-term demand is accelerating — remote workers and families settling before purchase. TGC holds exclusive rental relationships in the Occitanie interior, many not publicly listed.',
   },
 
   'provence-paca': {
@@ -112,6 +126,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR',
     coverage: 'Strong notaire/architect network Luberon and Alpilles; lighter Haute Provence. Your TGC contact for high-end mandates: Jez Moore',
     icpRelevance: 'CORE',
+    rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [2000, 8000], longTermMonth: [1400, 5000], notes: 'Luberon peak weeks very competitive July-August. Quiet Provence (Vaucluse plateau) offers significantly better rental value with similar character.' },
+    rentalEditorial: 'Luberon short-term is among the most competitive markets in France; good properties are reserved 12 months ahead in peak season. Mid-term and long-term supply is thin but growing. TGC sources direct from owners, not from the oversaturated holiday-villa agency pool.',
   },
 
   'paris': {
@@ -138,6 +154,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR',
     coverage: 'Dense notaire network 6e/7e/8e/16e; architects experienced with Bâtiments de France. Your TGC contact for high-end mandates: Jez Moore',
     icpRelevance: 'CORE',
+    rentalRates: { shortTermWeekPeak: [3500, 16000], shortTermWeekShoulder: [2200, 9000], midTermMonth: [3500, 14000], longTermMonth: [3000, 9000], notes: 'Meublé de tourisme rules restrict short-term letting in Paris proper (90-day max for primary, permit required). Mid-term furnished (bail mobilité, 1-10 months) is the cleanest vehicle and in strong demand. Prime unfurnished long-let: very active 6e/7e/8e/16e.' },
+    rentalEditorial: 'One of the world\'s deepest furnished rental markets. Mid-term bail mobilité is the right vehicle for 1-10 months — legally clean, strong supply, no tenancy-rights complications. Prime areas: 6e Saint-Germain, 7e Gros Caillou, 8e Triangle d\'Or. August is quiet, September-June is the active season.',
   },
 
   'london-prime': {
@@ -165,6 +183,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'UK',
     coverage: 'Strong PCL agency partnerships both buy and sell; tax barrister relationships for FIG structuring. Jez Moore, senior contact for mandates above £5M.',
     icpRelevance: 'CORE',
+    rentalRates: { shortTermWeekPeak: [5000, 28000], shortTermWeekShoulder: [3500, 16000], midTermMonth: [5500, 22000], longTermMonth: [4500, 16000], notes: 'Non-dom outflow has created the best PCL rental supply in five years. Chelsea, Kensington and Notting Hill particularly active. Corporate relocation demand steady from US and Middle East.' },
+    rentalEditorial: 'Non-dom abolition has pushed quality PCL supply to a five-year high. Landlords who were sellers are now lettors. Mid-term (3-12 months, furnished) is the most active segment; international families relocating for schools or corporate postings. Best selection September-November and January-March.',
   },
 
   'tuscany-umbria': {
@@ -192,6 +212,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'IT',
     coverage: 'Partnerships in Chianti/Val d\'Orcia and Umbria; architect network for heritage restoration',
     icpRelevance: 'CORE, UK non-dom exodus',
+    rentalRates: { shortTermWeekPeak: [3000, 16000], shortTermWeekShoulder: [1500, 7000], midTermMonth: [2500, 9000], longTermMonth: [1800, 6000], notes: 'Italian flat-tax attracting long-term relocators from UK and US. Supply of quality long-term rental properties in Tuscany improving as flat-tax arrivals buy and then rent their previous properties. Umbria notably underpriced for rentals versus Tuscany.' },
+    rentalEditorial: 'Italian flat-tax arrivals are reshaping the mid-term and long-term rental market. Incoming buyers often rent first (6-18 months) to verify the market before committing. Umbria rental supply is genuinely underpriced versus Tuscany. TGC coordinates trial residency periods that often convert to acquisition mandates.',
   },
 
   'balearics': {
@@ -219,6 +241,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'ES',
     coverage: 'Specialist partnerships each of the three islands',
     icpRelevance: 'HIGH',
+    rentalRates: { shortTermWeekPeak: [4500, 32000], shortTermWeekShoulder: [2000, 12000], midTermMonth: [3000, 12000], longTermMonth: [2200, 8000], notes: 'Tourist rental licence required and increasingly enforced. Book Ibiza peak (July-Aug) 6-12 months ahead. Menorca long-term supply very limited — genuine scarcity. Mallorca off-season mid-term is excellent value.' },
+    rentalEditorial: 'Balearics short-term is the most competitive Mediterranean island market. Ibiza peak weeks at €5-30k/week are routinely reserved a year ahead. Menorca is the quiet alternative — longer stays, genuine privacy, far fewer tourist licences competing for good properties. Long-term Menorca is a small but genuine market.',
   },
 
   'andalusia': {
@@ -245,6 +269,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'ES',
     coverage: 'Keith Kirwen, Marbella/Sotogrande specialist; Seville/Jerez network',
     icpRelevance: 'HIGH',
+    rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [2000, 8000], longTermMonth: [1500, 5500], notes: 'Marbella mid-term (3-6 months, winter season) is very active. La Zagaleta and Sotogrande long-term supply thin but growing. Inland Andalusia rentals extremely affordable and largely untapped.' },
+    rentalEditorial: 'Andalusia mid-term is the winter season — October through April. International families and executives who base from Marbella or Sotogrande during the European cold months. Inland Andalusia (Ronda area) has almost no rental infrastructure, making it TGC-sourced or nothing.',
   },
 
   'cote-basque-aquitaine': {
@@ -273,6 +299,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR',
     coverage: 'Biarritz specialist; direct Bordeaux notaire relationships; wine-industry advisors for châteaux. Your TGC contact for high-end mandates: Jez Moore',
     icpRelevance: 'MEDIUM-HIGH',
+    rentalRates: { shortTermWeekPeak: [2000, 12000], shortTermWeekShoulder: [900, 4500], midTermMonth: [1600, 6000], longTermMonth: [1200, 4000], notes: 'Biarritz peak (July-Aug) highly competitive. Cap Ferret increasingly popular, limited supply. Bordeaux city furnished monthly supply growing. Dordogne mainly British-network owner rentals.' },
+    rentalEditorial: 'Biarritz short-term is very active; good properties in July-August need 9-12 months lead time. Bordeaux city furnished rental is an underexploited mid-term market — excellent quality of life and TGV connection to Paris (2h04) makes it attractive for Paris-escaping families.',
   },
 
   'auvergne-rhone-alpes': {
@@ -327,6 +355,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'FR or CH',
     coverage: 'Courchevel/Méribel specialist; St Moritz Swiss partner; Gstaad separate partner',
     icpRelevance: 'HIGH',
+    rentalRates: { shortTermWeekPeak: [15000, 80000], shortTermWeekShoulder: [5000, 20000], midTermMonth: [8000, 35000], longTermMonth: [6000, 25000], notes: 'Winter peak (Christmas-NY, Feb half-term) at premium. Summer season increasingly active year-round. Ski-in/ski-out adds 30-40% premium. Many chalets owner-occupied, TGC-sourced off-market is the only way to access quality.' },
+    rentalEditorial: 'Alpine chalet rental is among the highest-value short-term markets in Europe. Christmas-NY and February half-term weeks for trophy chalets reach €30-80k/week. TGC sources from the owner-managed network rather than the public agency pool — the quality difference is significant.',
   },
 
   'geneva-lake': {
@@ -351,6 +381,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'CH',
     coverage: 'Swiss private-client-advisor partnership; Lavaux specialist; direct French-side notaire',
     icpRelevance: 'HIGH, UK non-dom anchor via lump-sum taxation',
+    rentalRates: { shortTermWeekPeak: [4000, 18000], shortTermWeekShoulder: [2500, 9000], midTermMonth: [4500, 14000], longTermMonth: [3800, 11000], notes: 'Swiss rental market highly regulated; furnished residential permits required for stays over 90 days. Very active international corporate and diplomatic rental community. French side (Thonon, Évian) 40-50% cheaper than Swiss side with same lake quality.' },
+    rentalEditorial: 'Geneva is one of Europe\'s most active mid-to-long-term corporate relocation markets — international organisations, private banks, family offices. Demand persistently exceeds supply at the quality end. French side of the lake offers exceptional value for families who can absorb a 20-minute commute.',
   },
 
   'croatia': {
@@ -377,6 +409,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'HR',
     coverage: 'Dubrovnik firm; emerging Hvar and Istria direct coverage',
     icpRelevance: 'MEDIUM-HIGH, Istria particularly',
+    rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [1800, 6000], longTermMonth: [1400, 4500], notes: 'Hvar and Dalmatian island short-term very active Jun-Sep. Istria short-term growing. Mid-term limited, mostly digital-nomad and remote-worker demand. Dubrovnik mid-term constrained by tourism overcrowding regulations.' },
+    rentalEditorial: 'Croatian short-term is a strong summer season market. Istria, our contrarian mid-term call, is building a quiet rental base for the coming years — good-value farmhouse and hilltop village rentals for clients exploring the market before committing to purchase.',
   },
 
   'montenegro': {
@@ -431,6 +465,8 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'GR',
     coverage: 'Athens-based firm covering Riviera and Cyclades; Peloponnese specialist; emerging Corfu relationship',
     icpRelevance: 'MEDIUM-HIGH',
+    rentalRates: { shortTermWeekPeak: [3500, 28000], shortTermWeekShoulder: [1500, 8000], midTermMonth: [2000, 8000], longTermMonth: [1500, 5500], notes: 'Mykonos and Santorini peak weeks among Europe\'s most expensive per-m². Quiet Cyclades (Tinos, Sifnos) at 30-40% of the price. Athens Riviera mid-term is a growing market for family relocation. Golden Visa holders increasingly renting Athens apartments while seeking acquisition.' },
+    rentalEditorial: 'Greek island short-term at the top end rivals the Riviera for weekly rates while offering significantly more space and privacy. Athens Riviera is a growing mid-term relocation market with a genuine international community and improving infrastructure. TGC sources the quiet islands — Tinos, Sifnos, Paxos — which the public market barely covers.',
   },
 
   'western-cape': {
@@ -532,6 +568,93 @@ const MARKETS: Record<string, Market> = {
     structuringJurisdiction: 'US',
     coverage: 'Palm Beach Sotheby\'s and Miami Knight Frank partnerships; US tax advisor for cross-border',
     icpRelevance: 'MEDIUM',
+  },
+
+  'amsterdam': {
+    name: 'Amsterdam', tier: 2, country: 'NL',
+    subLabel: 'Jordaan · Oud-Zuid · De Pijp · Amstelveen · Watergraafsmeer',
+    region: 'Benelux',
+    loudQuiet: {
+      loud: ['Jordaan tourist core', 'Leidseplein / Rembrandtplein', 'Vondelpark north side'],
+      quiet: ['Jordaan south (quieter streets)', 'Oud-Zuid residential', 'Amstelveen (family, greenery)', 'Amsterdam-West (Baarsjes, Bos en Lommer)'],
+    },
+    editorial: 'Amsterdam is one of Europe\'s primary corporate relocation cities — international organisations, tech companies, finance. The rental market is structurally undersupplied at the quality end. Buying is constrained (foreigner purchase possible but market tight); renting first while evaluating is the correct approach for most arrivals.',
+    priceBands: {
+      'Oud-Zuid apartments (per m²)': { entry: [0.006, 0.009], realistic: [0.009, 0.013], trophy: [0.013, 0.018] },
+      'Jordaan / Canal belt': { entry: [0.007, 0.011], realistic: [0.011, 0.016], trophy: [0.016, 0.022] },
+      'Amstelveen family houses': { entry: [0.8, 1.5], realistic: [1.5, 2.8], trophy: [3, 5] },
+    },
+    brochureRealities: [
+      'Expat rental market is highly competitive — quality 4-bed family homes are genuinely scarce',
+      'Cycling is not optional: school runs, grocery, social life all use bikes',
+      'Amsterdam winter (Nov-Feb) is grey and wet, with short days',
+      'Ground-floor apartments: flooding risk, check historical data',
+      'Service charges on canal-house buildings can be substantial',
+    ],
+    structuringJurisdiction: 'NL',
+    coverage: 'Benelux network via TGC European expansion; local relocation-specialist partner',
+    icpRelevance: 'HIGH, relocation and mid-term',
+    rentalRates: { shortTermWeekPeak: [2500, 10000], shortTermWeekShoulder: [1800, 6000], midTermMonth: [3500, 10000], longTermMonth: [3000, 8000], notes: 'Market structurally undersupplied at quality end. Mid-term corporate lets very competitive. Family homes (4+ bedrooms) in Oud-Zuid and Amstelveen are particularly scarce. Rental prices have risen 20%+ since 2022 despite government caps on social sector.' },
+    rentalEditorial: 'Amsterdam\'s quality family rental market is one of the tightest in Europe. Corporate families relocating for international organisations (UN, EU agencies) or tech companies often wait months for the right property. TGC engages the off-market landlord network directly — the difference between finding something in 4 weeks versus 4 months.',
+  },
+
+  'lisbon-porto': {
+    name: 'Lisbon / Porto', tier: 2, country: 'PT',
+    subLabel: 'Lisbon Príncipe Real · Lapa · Chiado · Porto Foz · Bonfim',
+    region: 'Iberia Atlantic',
+    loudQuiet: {
+      loud: ['Lisbon Alfama tourist core', 'Porto Ribeira', 'Cascais beachfront'],
+      quiet: ['Lisbon Príncipe Real', 'Lapa', 'Estrela', 'Porto Foz / Nevogilde', 'Bonfim', 'Estoril corridor'],
+    },
+    editorial: 'Portugal\'s Non-Habitual Resident (NHR) regime was revised in 2024 (replaced by IFICI), closing some advantages. The country remains competitive: no inheritance tax between direct family, mild wealth tax exposure, and a quality of life proposition that remains underpriced versus comparable Western European cities. Porto is our current stronger call — less tourist pressure, better value, growing international community.',
+    criticalContext: 'NHR regime replaced January 2024 by IFICI (Incentivo Fiscal à Investigação Científica e Inovação). Qualifying professions include tech, research, culture, arts. Original NHR beneficiaries retain their status. Foreign pension income no longer fully exempt. Golden Visa routes now exclude Lisbon, Porto and coastal areas (interior only).',
+    priceBands: {
+      'Lisbon prime apartments (per m²)': { entry: [0.005, 0.008], realistic: [0.008, 0.012], trophy: [0.012, 0.018] },
+      'Lisbon Príncipe Real / Lapa': { entry: [0.6, 1.2], realistic: [1.2, 3], trophy: [3.5, 7] },
+      'Porto Foz / Nevogilde': { entry: [0.5, 1], realistic: [1, 2.5], trophy: [3, 6] },
+      'Estoril / Cascais corridor': { entry: [0.7, 1.5], realistic: [1.5, 4], trophy: [5, 12] },
+    },
+    brochureRealities: [
+      'Lisbon summer (July-Aug) is hot (38-42°C) and tourist-saturated — most residents leave',
+      'Landlord-tenant law reform 2023-2024: longer notice periods, rent caps in some areas',
+      'Lisbon centre: chronic parking shortage, hills make walking tiring',
+      'Porto: Atlantic weather, grey and wet October-March',
+      'Building quality varies: some renovated buildings have poor insulation',
+    ],
+    structuringJurisdiction: 'PT',
+    coverage: 'Lisbon and Porto relocation partners; Estoril corridor specialist',
+    icpRelevance: 'HIGH, relocation, tax-motivated',
+    rentalRates: { shortTermWeekPeak: [2000, 10000], shortTermWeekShoulder: [1200, 5000], midTermMonth: [2500, 7000], longTermMonth: [2000, 5500], notes: 'Market heated significantly 2020-2024. Lisbon prime mid-term supply improved as investor-buyers now let. Porto remains better value at 30-40% below Lisbon. Estoril corridor (Cascais, Estoril, Sintra approach) good family mid/long-term with sea proximity.' },
+    rentalEditorial: 'Portugal is a primary relocation destination for IFICI-qualifying arrivals and lifestyle relocators. Mid-term (3-12 months furnished) is the most active segment — arrivals testing the market before buying. Porto is TGC\'s current recommendation: lower prices, less tourist pressure, and a rapidly maturing international community.',
+  },
+
+  'barcelona-city': {
+    name: 'Barcelona', tier: 2, country: 'ES',
+    subLabel: 'Eixample · Sarrià-Sant Gervasi · Pedralbes · Zona Alta',
+    region: 'Mediterranean Iberia',
+    loudQuiet: {
+      loud: ['Barceloneta', 'Gothic Quarter tourist core', 'Passeig de Gràcia hotels-and-shops strip'],
+      quiet: ['Eixample Esquerra interior', 'Sarrià village', 'Sant Gervasi residential', 'Pedralbes', 'Bonanova'],
+    },
+    editorial: 'Barcelona\'s rental market is among the most regulated in Europe — the city has introduced rental caps, restricted short-term licences, and imposed moratoria on new tourist flats. For long-term renters, this is actually advantageous: supply is improving, caps protect against price spikes. Short-term through legitimate licensed operators only. The family rental market in Sarrià, Pedralbes and Zona Alta is the intelligent play.',
+    criticalContext: 'Barcelona city: strict rental caps in designated "stressed area." New short-term tourist licence moratorium 2024 (no new licences until 2030). International schools heavily oversubscribed, enrollment lists needed 2-3 years ahead. Catalonia wealth tax applies, unlike Madrid or Andalusia.',
+    priceBands: {
+      'Eixample dreta apartments (per m²)': { entry: [0.005, 0.008], realistic: [0.008, 0.013], trophy: [0.013, 0.02] },
+      'Sarrià / Pedralbes townhouses': { entry: [1.5, 3], realistic: [3, 7], trophy: [8, 18] },
+      'Zona Alta luxury apartments': { entry: [0.8, 1.5], realistic: [1.5, 4], trophy: [4.5, 10] },
+    },
+    brochureRealities: [
+      'Tourist licence moratorium: no new short-term lets until 2030 minimum',
+      'Catalonia wealth tax: 0.21-2.75% above €500k, unlike Madrid / Andalusia',
+      'International school waitlists: start 2-3 years before move',
+      'Summer (July-Aug) tourist overcrowding in tourist zones, residents leave',
+      'Political uncertainty (Catalan independence) is background noise but persistent',
+    ],
+    structuringJurisdiction: 'ES',
+    coverage: 'Barcelona relocation specialist; Sarrià/Pedralbes family-property network',
+    icpRelevance: 'HIGH, family relocation, European HQ',
+    rentalRates: { shortTermWeekPeak: [2500, 12000], shortTermWeekShoulder: [1500, 6000], midTermMonth: [3000, 9000], longTermMonth: [2500, 7000], notes: 'Short-term through licensed operators only — no new licences until 2030. Mid-term (months d\'habitació, 3-11 months) is the correct vehicle for international arrivals. Long-term family homes in Sarrià/Pedralbes are in strong demand and short supply. Rental cap regulations apply in most areas.' },
+    rentalEditorial: 'Barcelona mid-term is the intelligent play for international families arriving via corporate posting or lifestyle relocation. The regulatory environment that frustrates short-term operators actually protects long-term tenants from price volatility. Sarrià, Sant Gervasi and Pedralbes are the family rental markets — quieter, greener, close to international schools. TGC sources direct from owner-managed properties within the regulatory framework.',
   },
 
   'new-york-hamptons': {
@@ -677,9 +800,9 @@ const COMMERCIAL_DEFAULTS: Record<string, Record<number, { retainer: number; suc
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────────────────
 
-type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation'
-type FlowFamily = 'acquisition' | 'disposal' | 'retained' | null
-type Direction = 'buy' | 'invest' | 'develop' | 'let' | 'sell' | 'retained' | null
+type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial'
+type FlowFamily = 'acquisition' | 'disposal' | 'retained' | 'rental' | null
+type Direction = 'buy' | 'invest' | 'develop' | 'let' | 'sell' | 'retained' | 'rent-short' | 'rent-mid' | 'rent-long' | null
 
 interface Brief {
   propertyType: string
@@ -691,6 +814,22 @@ interface Brief {
   timeline: string
   confidentiality: string
   secondaryMarkets: string[]
+}
+
+interface RentalBrief {
+  propertyType: string
+  groupAdults: string
+  groupChildren: string
+  pets: string
+  budgetWeek: string
+  budgetMonth: string
+  durationMonths: string
+  moveInDate: string
+  flexibility: string
+  priorities: string[]
+  nonNegotiables: string
+  arrivalDate: string
+  departureDate: string
 }
 
 interface StructuringState {
@@ -725,6 +864,10 @@ function TGCRealEstateIntelligence() {
   })
   const [structuring, setStructuring] = useState<StructuringState>({ vehicle: '', taxResidence: '', considerations: '' })
   const [client, setClient] = useState<ClientState>({ name: '', email: '', phone: '', taxResidence: '' })
+  const [rentalBrief, setRentalBrief] = useState<RentalBrief>({
+    propertyType: '', groupAdults: '', groupChildren: '', pets: '', budgetWeek: '', budgetMonth: '',
+    durationMonths: '', moveInDate: '', flexibility: '', priorities: [], nonNegotiables: '', arrivalDate: '', departureDate: '',
+  })
   const [internalView, setInternalView] = useState(false)
   const [mandateId, setMandateId] = useState<string | null>(null)
   const [loadedDraft, setLoadedDraft] = useState(false)
@@ -782,6 +925,7 @@ function TGCRealEstateIntelligence() {
     setDirection(null)
     setMarketId(null)
     setBrief({ propertyType: '', budgetMin: '', budgetMax: '', sizeMin: '', sizeMax: '', nonNegotiables: '', timeline: '', confidentiality: '', secondaryMarkets: [] })
+    setRentalBrief({ propertyType: '', groupAdults: '', groupChildren: '', pets: '', budgetWeek: '', budgetMonth: '', durationMonths: '', moveInDate: '', flexibility: '', priorities: [], nonNegotiables: '', arrivalDate: '', departureDate: '' })
     setStructuring({ vehicle: '', taxResidence: '', considerations: '' })
     setClient({ name: '', email: '', phone: '', taxResidence: '' })
     setMandateId(null)
@@ -807,10 +951,9 @@ function TGCRealEstateIntelligence() {
   const handleSubmitMandate = async () => {
     const id = `TGC-RE-${Date.now().toString(36).toUpperCase()}`
     setMandateId(id)
-    const payload = {
-      mandateId: id, flowFamily, direction,
-      client, brief, structuring, market: marketId, commercial,
-    }
+    const payload = isRentalFlow
+      ? { mandateId: id, flowFamily, direction, client, rentalBrief, market: marketId }
+      : { mandateId: id, flowFamily, direction, client, brief, structuring, market: marketId, commercial }
     await submitMandate(payload)
     setScreen('confirmation')
   }
@@ -929,7 +1072,11 @@ The Gatekeepers Club - thegatekeepersclub.com
   }
 
   // Progress indicator
-  const screens = (['welcome', 'flow-direction', 'market', 'brief', showStructuringScreen ? 'structuring' : null, 'verdict', 'commercial', 'client', 'confirmation'] as (Screen | null)[]).filter(Boolean) as Screen[]
+  const isRentalFlow = flowFamily === 'rental'
+  const screens = (isRentalFlow
+    ? ['welcome', 'rental-type', 'market', 'rental-brief', 'rental-verdict', 'rental-commercial', 'client', 'confirmation']
+    : ['welcome', 'flow-direction', 'market', 'brief', showStructuringScreen ? 'structuring' : null, 'verdict', 'commercial', 'client', 'confirmation']
+  ).filter(Boolean) as Screen[]
   const currentIdx = screens.indexOf(screen)
   const progressWidth = screens.length
 
@@ -938,22 +1085,26 @@ The Gatekeepers Club - thegatekeepersclub.com
   const renderWelcome = () => (
     <div>
       <div style={styles.eyebrow}>Real Estate Intelligence</div>
-      <h1 style={styles.h1}>Thirty-one markets. Honestly mapped.</h1>
+      <h1 style={styles.h1}>Thirty-four markets. Honestly mapped.</h1>
       <p style={styles.lead}>
-        Tell us what you want to do. We will translate it into a formal mandate, open the right structuring conversation, and put one of our gatekeepers on it within four hours.
+        Buying, renting, or selling. We will translate your situation into a formal mandate, open the right conversation, and put one of our gatekeepers on it within four hours.
       </p>
       <p style={styles.bodyP}>
-        TGC operates primarily off-market. The right property rarely appears in an agent window.
-      </p>
-      <p style={styles.bodyP}>
-        We run three flow families. Choose the one that matches your situation.
+        TGC acts as your representative — buyer, tenant, or vendor. The right property rarely appears in an agent window.
       </p>
       <div style={{ marginTop: 28 }}>
+        <div
+          style={{ ...styles.card, ...(flowFamily === 'rental' ? styles.cardSelected : {}), borderLeft: '3px solid #c8aa4a' }}
+          onClick={() => { setFlowFamily('rental'); setScreen('rental-type'); }}>
+          <div style={{ ...styles.eyebrow, marginBottom: 8 }}>Tenant representation</div>
+          <div style={styles.cardTitle}>Find a property to rent</div>
+          <div style={styles.cardDesc}>Short-term holiday. Mid-term relocation (1-12 months). Long-term residential (12+ months). TGC acts as your tenant representative — sourcing, negotiating, and securing on your behalf.</div>
+        </div>
         <div
           style={{ ...styles.card, ...(flowFamily === 'acquisition' ? styles.cardSelected : {}) }}
           onClick={() => { setFlowFamily('acquisition'); setScreen('flow-direction'); }}>
           <div style={styles.cardTitle}>Acquisition</div>
-          <div style={styles.cardDesc}>Buying. Primary residence, second home, pied-à-terre, investment, development land, or a long-let rental.</div>
+          <div style={styles.cardDesc}>Buying. Primary residence, second home, pied-à-terre, investment, or development. TGC as exclusive buyer's representative.</div>
         </div>
         <div
           style={{ ...styles.card, ...(flowFamily === 'disposal' ? styles.cardSelected : {}) }}
@@ -978,7 +1129,6 @@ The Gatekeepers Club - thegatekeepersclub.com
       { id: 'buy-piedaterre', label: 'Buy · Pied-à-terre', desc: 'Smaller urban base, typically Paris, London, New York, or Monaco.', dir: 'buy' as Direction },
       { id: 'buy-invest', label: 'Buy · Investment', desc: 'Capital appreciation or yield play. Different structuring conversation.', dir: 'invest' as Direction },
       { id: 'buy-develop', label: 'Buy · Land / development', desc: 'Raw land or redevelopment opportunity. Longer horizon, different risk profile.', dir: 'develop' as Direction },
-      { id: 'buy-let', label: 'Long-let rental', desc: 'Not buying. Leasing for 6+ months, typically for relocation.', dir: 'let' as Direction },
     ] : flowFamily === 'disposal' ? [
       { id: 'sell-open', label: 'Sell · Open market', desc: 'Full professional marketing across the right channels.', dir: 'sell' as Direction },
       { id: 'sell-discreet', label: 'Sell · Discreet register', desc: 'Private buyer list, no public marketing. Most common for TGC mandates.', dir: 'sell' as Direction },
@@ -1015,13 +1165,13 @@ The Gatekeepers Club - thegatekeepersclub.com
     })
     const tierLabels: Record<number, { title: string; subtitle: string }> = {
       1: { title: 'Heartland', subtitle: 'Direct TGC network, end-to-end mandate execution' },
-      2: { title: 'Active Mediterranean', subtitle: 'Strong editorial, working partnerships' },
+      2: { title: 'Active & European', subtitle: 'Strong editorial, working partnerships' },
       3: { title: 'Emerging & Authentic', subtitle: 'Curated editorial, trusted partner delivery' },
       4: { title: 'Global Partner Markets', subtitle: 'Mandate-taking via established international partners' },
     }
     return (
       <div>
-        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('flow-direction')}>Back</button>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(isRentalFlow ? 'rental-type' : 'flow-direction')}>Back</button>
         <div style={styles.eyebrow}>Market</div>
         <h2 style={styles.h2}>Where?</h2>
         <p style={styles.bodyP}>Thirty-one markets, grouped by how deep our direct network runs.</p>
@@ -1039,7 +1189,7 @@ The Gatekeepers Club - thegatekeepersclub.com
               <div style={styles.grid2}>
                 {tierGroups[tier].map(m => (
                   <div key={m.id} style={{ ...styles.card, ...(marketId === m.id ? styles.cardSelected : {}), marginBottom: 0 }}
-                       onClick={() => { setMarketId(m.id); setScreen('brief'); }}>
+                       onClick={() => { setMarketId(m.id); setScreen(isRentalFlow ? 'rental-brief' : 'brief'); }}>
                     <div style={styles.cardTitle}>{m.name}</div>
                     <div style={styles.cardDesc}>{m.subLabel}</div>
                   </div>
@@ -1112,6 +1262,327 @@ The Gatekeepers Club - thegatekeepersclub.com
             disabled={!brief.propertyType || !brief.budgetMax || !brief.timeline}>
             Continue
           </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ──────────────────────── RENTAL SCREENS ────────────────────────
+
+  const renderRentalType = () => (
+    <div>
+      <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('welcome')}>Back</button>
+      <div style={styles.eyebrow}>Rental Search · Tenant Representation</div>
+      <h2 style={styles.h2}>What kind of rental?</h2>
+      <p style={styles.bodyP}>Three distinct briefs. The duration shapes everything — the questions, the market, and how we source.</p>
+      <div style={{ marginTop: 24 }}>
+        <div style={{ ...styles.card, ...(direction === 'rent-short' ? styles.cardSelected : {}) }}
+          onClick={() => { setDirection('rent-short'); setScreen('market'); }}>
+          <div style={{ ...styles.eyebrow, marginBottom: 6 }}>Days to 4 weeks</div>
+          <div style={styles.cardTitle}>Short-term · Holiday</div>
+          <div style={styles.cardDesc}>A villa, apartment, or estate for a specific stay. Summer, ski season, or an extended break. TGC sources from the owner network, not public portals. Quality that does not appear on the usual sites.</div>
+        </div>
+        <div style={{ ...styles.card, ...(direction === 'rent-mid' ? styles.cardSelected : {}) }}
+          onClick={() => { setDirection('rent-mid'); setScreen('market'); }}>
+          <div style={{ ...styles.eyebrow, marginBottom: 6 }}>1 to 12 months</div>
+          <div style={styles.cardTitle}>Mid-term · Relocation</div>
+          <div style={styles.cardDesc}>Settling into a region, covering a corporate posting, or taking a year to explore before deciding where to plant roots permanently. The most strategic rental type: unhurried, considered, right.</div>
+        </div>
+        <div style={{ ...styles.card, ...(direction === 'rent-long' ? styles.cardSelected : {}) }}
+          onClick={() => { setDirection('rent-long'); setScreen('market'); }}>
+          <div style={{ ...styles.eyebrow, marginBottom: 6 }}>12 months or more</div>
+          <div style={styles.cardTitle}>Long-term · Residential</div>
+          <div style={styles.cardDesc}>A genuine home for the foreseeable future. Schools, community, routine. TGC operates as your tenant representative end-to-end: brief, sourcing, negotiation, lease review, and handover.</div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderRentalBrief = () => {
+    const isShort = direction === 'rent-short'
+    const propertyTypes = ['Villa / standalone house', 'Apartment', 'Estate / domain', 'Townhouse / maison de maître', 'Chalet', 'Château / manor house']
+    const priorityOptions = ['Quiet and private', 'Proximity to international school', 'Home-office setup', 'Sea / lake view', 'Walking distance to town', 'Pet-friendly outdoor space', 'Chef or catering access', 'Pool essential', 'Garage / secure parking', 'Staff accommodation']
+    const flexibilityOptions = ['Fixed — these exact dates', 'Flexible within 2 weeks', 'Flexible within a month', 'Open — when the right property is available']
+    const durationOptions = ['1 month', '2-3 months', '3-6 months', '6-12 months']
+
+    const togglePriority = (p: string) => {
+      const current = rentalBrief.priorities
+      setRentalBrief({ ...rentalBrief, priorities: current.includes(p) ? current.filter(x => x !== p) : [...current, p] })
+    }
+
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('market')}>Back</button>
+        <div style={styles.eyebrow}>{isShort ? 'Short-term · Holiday' : direction === 'rent-mid' ? 'Mid-term · Relocation' : 'Long-term · Residential'} · {market?.name}</div>
+        <h2 style={styles.h2}>Tell us about the rental.</h2>
+        <p style={styles.bodyP}>The more honest the brief, the better the shortlist.</p>
+
+        <label style={styles.label}>Property type</label>
+        <select style={styles.input} value={rentalBrief.propertyType} onChange={e => setRentalBrief({ ...rentalBrief, propertyType: e.target.value })}>
+          <option value="">Select...</option>
+          {propertyTypes.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+
+        {isShort ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={styles.label}>Arrival date</label>
+                <input type="date" style={styles.input} value={rentalBrief.arrivalDate} onChange={e => setRentalBrief({ ...rentalBrief, arrivalDate: e.target.value })} />
+              </div>
+              <div>
+                <label style={styles.label}>Departure date</label>
+                <input type="date" style={styles.input} value={rentalBrief.departureDate} onChange={e => setRentalBrief({ ...rentalBrief, departureDate: e.target.value })} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={styles.label}>Adults</label>
+                <input type="number" style={styles.input} value={rentalBrief.groupAdults} placeholder="e.g., 4" onChange={e => setRentalBrief({ ...rentalBrief, groupAdults: e.target.value })} />
+              </div>
+              <div>
+                <label style={styles.label}>Children</label>
+                <input type="number" style={styles.input} value={rentalBrief.groupChildren} placeholder="0" onChange={e => setRentalBrief({ ...rentalBrief, groupChildren: e.target.value })} />
+              </div>
+              <div>
+                <label style={styles.label}>Pets?</label>
+                <select style={styles.input} value={rentalBrief.pets} onChange={e => setRentalBrief({ ...rentalBrief, pets: e.target.value })}>
+                  <option value="">Select...</option>
+                  <option value="No pets">No pets</option>
+                  <option value="1 dog">1 dog</option>
+                  <option value="2+ dogs">2+ dogs</option>
+                  <option value="Cat(s)">Cat(s)</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <label style={styles.label}>Budget per week (EUR)</label>
+            <input type="number" style={styles.input} value={rentalBrief.budgetWeek} placeholder="e.g., 8000" onChange={e => setRentalBrief({ ...rentalBrief, budgetWeek: e.target.value })} />
+          </>
+        ) : (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={styles.label}>Duration</label>
+                <select style={styles.input} value={rentalBrief.durationMonths} onChange={e => setRentalBrief({ ...rentalBrief, durationMonths: e.target.value })}>
+                  <option value="">Select...</option>
+                  {(direction === 'rent-long' ? ['12 months', '18 months', '24+ months', 'Open-ended'] : durationOptions).map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={styles.label}>Earliest move-in</label>
+                <input type="date" style={styles.input} value={rentalBrief.moveInDate} onChange={e => setRentalBrief({ ...rentalBrief, moveInDate: e.target.value })} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={styles.label}>Adults</label>
+                <input type="number" style={styles.input} value={rentalBrief.groupAdults} placeholder="e.g., 2" onChange={e => setRentalBrief({ ...rentalBrief, groupAdults: e.target.value })} />
+              </div>
+              <div>
+                <label style={styles.label}>Children</label>
+                <input type="number" style={styles.input} value={rentalBrief.groupChildren} placeholder="0" onChange={e => setRentalBrief({ ...rentalBrief, groupChildren: e.target.value })} />
+              </div>
+              <div>
+                <label style={styles.label}>Pets?</label>
+                <select style={styles.input} value={rentalBrief.pets} onChange={e => setRentalBrief({ ...rentalBrief, pets: e.target.value })}>
+                  <option value="">Select...</option>
+                  <option value="No pets">No pets</option>
+                  <option value="1 dog">1 dog</option>
+                  <option value="2+ dogs">2+ dogs</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <label style={styles.label}>Budget per month (EUR, all-in furnished)</label>
+            <input type="number" style={styles.input} value={rentalBrief.budgetMonth} placeholder="e.g., 5000" onChange={e => setRentalBrief({ ...rentalBrief, budgetMonth: e.target.value })} />
+            <label style={styles.label}>Timing flexibility</label>
+            <select style={styles.input} value={rentalBrief.flexibility} onChange={e => setRentalBrief({ ...rentalBrief, flexibility: e.target.value })}>
+              <option value="">Select...</option>
+              {flexibilityOptions.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </>
+        )}
+
+        <label style={styles.label}>Priorities — select all that apply</label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8, marginTop: 8 }}>
+          {priorityOptions.map(p => (
+            <div key={p}
+              style={{ ...styles.card, marginBottom: 0, padding: '10px 14px', background: rentalBrief.priorities.includes(p) ? 'rgba(14,79,81,0.07)' : '#F9F8F5', borderColor: rentalBrief.priorities.includes(p) ? '#0e4f51' : '#e5e7eb', cursor: 'pointer' }}
+              onClick={() => togglePriority(p)}>
+              <div style={{ fontSize: 13, color: '#1a1815' }}>{p}</div>
+            </div>
+          ))}
+        </div>
+
+        <label style={styles.label}>Non-negotiables (the things we cannot compromise on)</label>
+        <textarea rows={3} style={{ ...styles.input, resize: 'vertical' }} value={rentalBrief.nonNegotiables}
+          placeholder={isShort ? "e.g., Pool, 5+ bedrooms, sea view, within 20 min of Nice airport, no hill-climb from road" : "e.g., Must be close to international school, home office separate room, ground-floor or lift access for elderly parent"}
+          onChange={e => setRentalBrief({ ...rentalBrief, nonNegotiables: e.target.value })} />
+
+        <div style={{ marginTop: 32 }}>
+          <button style={styles.button}
+            onClick={() => setScreen('rental-verdict')}
+            disabled={!rentalBrief.propertyType || (!isShort && !rentalBrief.budgetMonth && !rentalBrief.durationMonths) || (isShort && !rentalBrief.budgetWeek)}>
+            See the market view →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderRentalVerdict = () => {
+    if (!market) return null
+    const isShort = direction === 'rent-short'
+    const rates = market.rentalRates
+    const fmtK = (n: number) => n >= 1000 ? `€${Math.round(n/1000)}k` : `€${n}`
+    const fmtRange = (a: number, b: number) => `${fmtK(a)} – ${fmtK(b)}`
+
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('rental-brief')}>Back</button>
+        <div style={styles.eyebrow}>Rental market view · {market.name}</div>
+        <h2 style={styles.h2}>{market.name}</h2>
+        <p style={{ fontSize: 14, color: '#0e4f51', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{market.subLabel}</p>
+
+        {market.rentalEditorial && (
+          <p style={styles.lead}>{market.rentalEditorial}</p>
+        )}
+
+        {rates && (
+          <div style={{ marginBottom: 32 }}>
+            <h3 style={styles.h3}>Realistic rental rates (2026)</h3>
+            <div style={{ background: '#F9F8F5', border: '1px solid #e5e7eb', padding: 20 }}>
+              {rates.shortTermWeekPeak && (
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Short-term · Peak season / week</div>
+                  <div style={styles.bandValue}>{fmtRange(...rates.shortTermWeekPeak)}</div>
+                </div>
+              )}
+              {rates.shortTermWeekShoulder && (
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Short-term · Shoulder season / week</div>
+                  <div style={styles.bandValue}>{fmtRange(...rates.shortTermWeekShoulder)}</div>
+                </div>
+              )}
+              {rates.midTermMonth && (
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Mid-term · Monthly furnished</div>
+                  <div style={styles.bandValue}>{fmtRange(...rates.midTermMonth)}</div>
+                </div>
+              )}
+              {rates.longTermMonth && (
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Long-term · Monthly</div>
+                  <div style={styles.bandValue}>{fmtRange(...rates.longTermMonth)}</div>
+                </div>
+              )}
+              {rates.notes && (
+                <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 16, lineHeight: 1.6 }}>{rates.notes}</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!isShort && (
+          <>
+            <h3 style={styles.h3}>The loud / quiet framework</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+              <div>
+                <div style={styles.eyebrow}>The trophy locations</div>
+                <ul style={styles.list}>
+                  {market.loudQuiet.loud.map((l, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{l}</li>)}
+                </ul>
+              </div>
+              <div>
+                <div style={styles.eyebrow}>The quieter alternatives</div>
+                <ul style={styles.list}>
+                  {market.loudQuiet.quiet.map((q, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{q}</li>)}
+                </ul>
+              </div>
+            </div>
+          </>
+        )}
+
+        <h3 style={styles.h3}>What the brochure will not tell you</h3>
+        <ul style={styles.list}>
+          {market.brochureRealities.map((r, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{r}</li>)}
+        </ul>
+
+        <div style={{ background: '#0e4f51', color: '#fff', padding: 24, margin: '32px 0', borderLeft: '3px solid #c8aa4a' }}>
+          <div style={{ ...styles.eyebrow, color: '#c8aa4a', marginBottom: 8 }}>TGC as your tenant representative</div>
+          <ul style={{ ...styles.list, marginBottom: 0 }}>
+            {[
+              'We source from the owner-managed network, not public portals — most quality properties do not appear online',
+              'We conduct viewings, verify lease terms, and negotiate the terms on your behalf',
+              'We review the lease before you sign — clause by clause, in your language',
+              isShort ? 'We coordinate access, caretaker handover, and any special arrangements before arrival' : 'We manage the handover, inventory, and any required local registrations',
+            ].map((item, i) => (
+              <li key={i} style={{ ...styles.listItem, color: 'rgba(255,255,255,0.88)', paddingLeft: 20 }}><span style={{ ...styles.dash, color: '#c8aa4a' }}>*</span>{item}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <button style={styles.button} onClick={() => setScreen('rental-commercial')}>How we work together →</button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderRentalCommercial = () => {
+    const isShort = direction === 'rent-short'
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('rental-verdict')}>Back</button>
+        <div style={styles.eyebrow}>The commercial arrangement</div>
+        <h2 style={styles.h2}>How we work together.</h2>
+        <p style={styles.bodyP}>Straightforward and success-based. You do not pay until we place you.</p>
+
+        <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginTop: 20 }}>
+          {isShort ? (
+            <>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Sourcing fee</div>
+                <div style={styles.bandValue}>Included in the rental arrangement</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Client cost</div>
+                <div style={styles.bandValue}>The rental price as quoted, nothing added</div>
+              </div>
+              <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 12 }}>For short-term holiday rentals, our fee is covered by the landlord arrangement. You pay only the rental price — no agency top-up.</p>
+            </>
+          ) : (
+            <>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Retainer</div>
+                <div style={styles.bandValue}>None</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Placement fee</div>
+                <div style={styles.bandValue}>One month's rent, on successful securing</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Gatekeeper Points</div>
+                <div style={styles.bandValue}>Accrued at standard TGC rate</div>
+              </div>
+              <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 12 }}>Success-based only. No upfront retainer. We earn when you are placed.</p>
+            </>
+          )}
+        </div>
+
+        <h3 style={styles.h3}>What you get</h3>
+        <ul style={styles.list}>
+          <li style={styles.listItem}><span style={styles.dash}>*</span>A single named Gatekeeper who manages the search end-to-end</li>
+          <li style={styles.listItem}><span style={styles.dash}>*</span>Off-market sourcing from the owner and landlord network — not portals</li>
+          <li style={styles.listItem}><span style={styles.dash}>*</span>Shortlist of 3-5 properties, verified and visited before presentation</li>
+          <li style={styles.listItem}><span style={styles.dash}>*</span>Lease negotiation on your behalf</li>
+          <li style={styles.listItem}><span style={styles.dash}>*</span>Lease review in plain English, clause by clause</li>
+          {!isShort && <li style={styles.listItem}><span style={styles.dash}>*</span>Local registration support (bail mobilité, tenancy agreement, utility connections)</li>}
+        </ul>
+
+        <div style={{ marginTop: 32 }}>
+          <button style={styles.button} onClick={() => setScreen('client')}>Continue, your details</button>
         </div>
       </div>
     )
@@ -1340,18 +1811,18 @@ The Gatekeepers Club - thegatekeepersclub.com
 
   const renderConfirmation = () => (
     <div>
-      <div style={styles.eyebrow}>Mandate received</div>
+      <div style={styles.eyebrow}>{isRentalFlow ? 'Rental brief received' : 'Mandate received'}</div>
       <h2 style={styles.h2}>Thank you, {client.name?.split(' ')[0]}.</h2>
       <p style={styles.lead}>
         Your brief is with us. A Gatekeeper has it in hand now.
       </p>
 
       <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default' }}>
-        <div style={styles.eyebrow}>Mandate reference</div>
+        <div style={styles.eyebrow}>Reference</div>
         <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{mandateId}</div>
         <div style={styles.priceBand}>
-          <div style={styles.bandLabel}>Direction</div>
-          <div style={styles.bandValue}>{direction?.toUpperCase()}</div>
+          <div style={styles.bandLabel}>Type</div>
+          <div style={styles.bandValue}>{isRentalFlow ? (direction === 'rent-short' ? 'Short-term rental' : direction === 'rent-mid' ? 'Mid-term rental' : 'Long-term rental') : direction?.toUpperCase()}</div>
         </div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Market</div>
@@ -1359,47 +1830,54 @@ The Gatekeepers Club - thegatekeepersclub.com
         </div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Property type</div>
-          <div style={styles.bandValue}>{brief.propertyType}</div>
+          <div style={styles.bandValue}>{isRentalFlow ? rentalBrief.propertyType : brief.propertyType}</div>
         </div>
-        <div style={styles.priceBand}>
-          <div style={styles.bandLabel}>Budget</div>
-          <div style={styles.bandValue}>EUR {brief.budgetMin}M to EUR {brief.budgetMax}M</div>
-        </div>
-        <div style={styles.priceBand}>
-          <div style={styles.bandLabel}>Timeline</div>
-          <div style={styles.bandValue}>{brief.timeline}</div>
-        </div>
-        <div style={styles.priceBand}>
-          <div style={styles.bandLabel}>Confidentiality</div>
-          <div style={styles.bandValue}>{brief.confidentiality}</div>
-        </div>
+        {isRentalFlow ? (
+          <>
+            {direction === 'rent-short' ? (
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Budget</div>
+                <div style={styles.bandValue}>EUR {rentalBrief.budgetWeek}/week</div>
+              </div>
+            ) : (
+              <>
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Duration</div>
+                  <div style={styles.bandValue}>{rentalBrief.durationMonths}</div>
+                </div>
+                <div style={styles.priceBand}>
+                  <div style={styles.bandLabel}>Budget</div>
+                  <div style={styles.bandValue}>EUR {rentalBrief.budgetMonth}/month</div>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Budget</div>
+              <div style={styles.bandValue}>EUR {brief.budgetMin}M to EUR {brief.budgetMax}M</div>
+            </div>
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Timeline</div>
+              <div style={styles.bandValue}>{brief.timeline}</div>
+            </div>
+          </>
+        )}
       </div>
 
       <h3 style={styles.h3}>What happens next</h3>
       <ul style={styles.list}>
         <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 4 hours:</strong> your assigned Gatekeeper will acknowledge receipt personally</li>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> a full considered response to your brief, including our first honest view</li>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 72 hours:</strong> a discovery call to refine the mandate and walk through the draft letter</li>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 14 days:</strong> signed mandate letter and active search begins</li>
+        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> {isRentalFlow ? 'first shortlist questions and any clarifications needed to start the search' : 'a full considered response including our first honest view'}</li>
+        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 72 hours:</strong> {isRentalFlow ? 'first property suggestions from the network, including off-market ones' : 'a discovery call to refine the mandate and walk through the draft letter'}</li>
+        {!isRentalFlow && <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 14 days:</strong> signed mandate letter and active search begins</li>}
       </ul>
 
       <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <button style={styles.button} onClick={downloadMandateLetter}>Download draft mandate letter</button>
+        {!isRentalFlow && <button style={styles.button} onClick={downloadMandateLetter}>Download draft mandate letter</button>}
         <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" style={{ ...styles.buttonGold, textDecoration: 'none', display: 'inline-block' }}>Book discovery call</a>
-        <button style={styles.buttonSecondary} onClick={resetAll}>Start another mandate</button>
-      </div>
-
-      <div style={{ marginTop: 48, padding: 20, background: '#F9F8F5', borderLeft: '3px solid #c8aa4a' }}>
-        <div style={styles.eyebrow}>While you wait, illustrative of your brief</div>
-        <p style={{ fontSize: 14, color: '#1a1815', marginTop: 8, lineHeight: 1.6 }}>
-          Based on your brief, the kind of property we would shortlist for you in {market?.name} typically sits in the <strong>{
-            budget < (market?.priceBands[Object.keys(market?.priceBands || {})[0]]?.realistic?.[0] || 5)
-              ? 'entry'
-              : budget < (market?.priceBands[Object.keys(market?.priceBands || {})[0]]?.realistic?.[1] || 15)
-              ? 'realistic'
-              : 'trophy'
-          }</strong> band. Your Gatekeeper will send 3-5 specific properties, including off-market ones, within 24 hours of our discovery call.
-        </p>
+        <button style={styles.buttonSecondary} onClick={resetAll}>Start another brief</button>
       </div>
     </div>
   )
@@ -1408,11 +1886,15 @@ The Gatekeepers Club - thegatekeepersclub.com
     switch (screen) {
       case 'welcome': return renderWelcome()
       case 'flow-direction': return renderFlowDirection()
+      case 'rental-type': return renderRentalType()
       case 'market': return renderMarketSelector()
       case 'brief': return renderBrief()
+      case 'rental-brief': return renderRentalBrief()
       case 'structuring': return renderStructuring()
       case 'verdict': return renderVerdict()
+      case 'rental-verdict': return renderRentalVerdict()
       case 'commercial': return renderCommercial()
+      case 'rental-commercial': return renderRentalCommercial()
       case 'client': return renderClient()
       case 'confirmation': return renderConfirmation()
       default: return renderWelcome()
