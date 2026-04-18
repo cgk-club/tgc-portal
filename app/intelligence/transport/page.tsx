@@ -444,6 +444,27 @@ const TGCTransportIntelligence = () => {
 
       <div style={{ maxWidth: '1040px', margin: '0 auto' }}>
 
+        {/* ============ SUITE NAV ============ */}
+        <div style={{ marginBottom: '1.75rem' }}>
+          <a href="/intelligence" style={{ display: 'inline-block', color: '#6b7280', fontSize: '0.75rem', textDecoration: 'none', fontFamily: "'Lato', sans-serif", letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+            ← Intelligence Suite
+          </a>
+          <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', scrollbarWidth: 'none' } as React.CSSProperties}>
+            {[
+              { num: '01', label: 'Transport', href: '/intelligence/transport', active: true },
+              { num: '02', label: 'Real Estate', href: '/intelligence/realestate', active: false },
+              { num: '03', label: 'Wellness', href: '/intelligence/wellness', active: false },
+              { num: '04', label: 'Events', href: '/intelligence/events-production', active: false },
+              { num: '05', label: 'VIP', href: '/intelligence/vip-hospitality', active: false },
+              { num: '06', label: 'Art', href: '/intelligence/art-collectables', active: false },
+            ].map(t => (
+              <a key={t.num} href={t.href} style={{ padding: '0.3rem 0.75rem', border: t.active ? 'none' : '1px solid #e5e7eb', background: t.active ? '#0e4f51' : 'transparent', color: t.active ? '#ffffff' : '#6b7280', fontSize: '0.7rem', fontFamily: "'Lato', sans-serif", letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', borderRadius: '3px', textDecoration: 'none' }}>
+                {t.num} {t.label}
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* ============ HEADER ============ */}
         <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div
