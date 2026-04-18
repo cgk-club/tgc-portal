@@ -43,6 +43,9 @@ interface Market {
   icpRelevance: string
   rentalRates?: RentalRates
   rentalEditorial?: string
+  disposalEditorial?: string   // 2026 selling conditions
+  typicalBuyer?: string        // who buys here
+  saleTimeline?: string        // realistic time to complete
 }
 
 const MARKETS: Record<string, Market> = {
@@ -73,6 +76,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE',
     rentalRates: { shortTermWeekPeak: [8000, 50000], shortTermWeekShoulder: [3000, 15000], midTermMonth: [5000, 22000], longTermMonth: [3500, 15000], notes: 'July-August is exceptionally competitive; book 6-12 months ahead for quality villas. Winter availability good but many services close.' },
     rentalEditorial: 'The most active luxury short-term rental market in Europe. Summer peak weeks at €8-50k/week for quality villas. Mid-term (furnished): strong expat and relocation demand year-round, particularly for Cap d\'Ail, Roquebrune, Villefranche. TGC sources off-market through owner networks, not agency portals.',
+    disposalEditorial: '2026: Soft above €20M, with trophy assets taking 18-24 months. The €3-12M bracket is more liquid — genuine buyers exist but expectations have reset from the 2021-22 peak. Serious buyers prefer off-market; anything reaching the public portals is regarded with suspicion. Discreet buyer register is TGC\'s default approach for quality mandates. CGT for non-resident sellers: 36.2% headline; structuring at point of sale is critical.',
+    typicalBuyer: 'European UHNW (French, Italian, Belgian, Swiss) and Middle East family offices. Monaco-residency-seekers remain active below €10M in adjacent communes (Cap d\'Ail, Roquebrune, Beaulieu). Occasional US family office buyer, typically price-insensitive but patient.',
+    saleTimeline: '6-12 months at honest pricing in the €3-12M range. 12-24 months for trophy assets above €15M. Overpriced mandates sit indefinitely.',
   },
 
   'occitanie': {
@@ -100,6 +106,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE',
     rentalRates: { shortTermWeekPeak: [800, 5000], shortTermWeekShoulder: [500, 2500], midTermMonth: [1000, 4000], longTermMonth: [700, 2500], notes: 'Growing mid-term market driven by relocation and remote workers. Good value versus Provence and the Riviera. TGC holds direct landlord relationships in Occitanie interior.' },
     rentalEditorial: 'Best-value rental market in southern France with comparable climate to Provence at 40-60% of the rental cost. Mid-term demand is accelerating — remote workers and families settling before purchase. TGC holds exclusive rental relationships in the Occitanie interior, many not publicly listed.',
+    disposalEditorial: '2026: Thin transaction volume but patient, motivated buyers exist. Open-market disposal is rarely the right approach here — TGC\'s direct buyer network through notaires and lifestyle contacts consistently outperforms public listing. Wine domains and estates require specialist positioning; buyer pools are narrow but genuinely motivated. Pricing must reflect the scarcity of comparable transactions, not extrapolation from Provence or Languedoc averages.',
+    typicalBuyer: 'French UHNW seeking authenticity over address. British and German lifestyle relocators on a longer research horizon. Wine domain buyers (specialist category — producers, enthusiasts, investors). Remote-work transition families who have found the region and want roots. Each requires different marketing language and different channels.',
+    saleTimeline: '12-24 months is the realistic range. Patience is rewarded — the right buyer at the right price is better than a discounted sale to the wrong one. TGC\'s Occitanie network often produces off-market matches within 6 months for well-positioned properties.',
   },
 
   'provence-paca': {
@@ -128,6 +137,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE',
     rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [2000, 8000], longTermMonth: [1400, 5000], notes: 'Luberon peak weeks very competitive July-August. Quiet Provence (Vaucluse plateau) offers significantly better rental value with similar character.' },
     rentalEditorial: 'Luberon short-term is among the most competitive markets in France; good properties are reserved 12 months ahead in peak season. Mid-term and long-term supply is thin but growing. TGC sources direct from owners, not from the oversaturated holiday-villa agency pool.',
+    disposalEditorial: '2026: Luberon trophy is softening — the decade-long premium has compressed. Properly presented properties at honest current-market pricing are moving in 8-14 months. Overpriced stock sits. Quiet Provence (Vaucluse plateau, Haute Provence) has a smaller buyer pool but motivated specialist demand. The Alpilles (Saint-Rémy axis) remains the most liquid sub-market in the region.',
+    typicalBuyer: 'French UHNW and upper-professional, British second-home buyer (a diminishing but still active segment post-Brexit), Belgian and Swiss lifestyle buyer, fashion and media executives. Haute Provence attracts a quieter, more intellectual buyer profile than trophy Luberon.',
+    saleTimeline: '8-14 months at realistic pricing in Luberon and Alpilles. 14-24 months for larger estates and Haute Provence. Renovation projects require specialist buyers and longer search cycles.',
   },
 
   'paris': {
@@ -156,6 +168,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE',
     rentalRates: { shortTermWeekPeak: [3500, 16000], shortTermWeekShoulder: [2200, 9000], midTermMonth: [3500, 14000], longTermMonth: [3000, 9000], notes: 'Meublé de tourisme rules restrict short-term letting in Paris proper (90-day max for primary, permit required). Mid-term furnished (bail mobilité, 1-10 months) is the cleanest vehicle and in strong demand. Prime unfurnished long-let: very active 6e/7e/8e/16e.' },
     rentalEditorial: 'One of the world\'s deepest furnished rental markets. Mid-term bail mobilité is the right vehicle for 1-10 months — legally clean, strong supply, no tenancy-rights complications. Prime areas: 6e Saint-Germain, 7e Gros Caillou, 8e Triangle d\'Or. August is quiet, September-June is the active season.',
+    disposalEditorial: '2026: Flat-to-soft since 2022 but stabilising. Volume returning to prime arrondissements as the post-inflation plateau settles. Hôtel particulier market remains thin but genuinely active for the right product. Per-m² prices in 6e/7e are holding; 8e is softening at the top. The SCI unwinding question must be resolved before marketing — rushed disposal from poorly structured vehicles erodes net proceeds significantly.',
+    typicalBuyer: 'French UHNW and corporate executive (the deepest domestic buyer pool in any European capital). European diplomatic and multinational executive. Occasional Gulf buyer for prestigious Haussmann. The international buyer pool for Paris has narrowed post-2022; domestic French remains the engine.',
+    saleTimeline: '6-12 months at honest per-m² pricing in the prime arrondissements. Hôtel particulier: 12-18 months for the right buyer. SCI restructuring or dissolution should be initiated 6-9 months before planned sale.',
   },
 
   'london-prime': {
@@ -185,6 +200,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE',
     rentalRates: { shortTermWeekPeak: [5000, 28000], shortTermWeekShoulder: [3500, 16000], midTermMonth: [5500, 22000], longTermMonth: [4500, 16000], notes: 'Non-dom outflow has created the best PCL rental supply in five years. Chelsea, Kensington and Notting Hill particularly active. Corporate relocation demand steady from US and Middle East.' },
     rentalEditorial: 'Non-dom abolition has pushed quality PCL supply to a five-year high. Landlords who were sellers are now lettors. Mid-term (3-12 months, furnished) is the most active segment; international families relocating for schools or corporate postings. Best selection September-November and January-March.',
+    disposalEditorial: '2026 is the best PCL selling window since 2015. Non-dom abolition has driven meaningful inbound demand from US and Gulf buyers who see post-correction PCL as genuine value against global equivalents. Act while this window is open — the combination of available supply and motivated foreign demand is unusual. NRCGT and SDLT exposure must be modelled before completion. Offshore company structures are almost universally the wrong vehicle now; personal name disposals are cleaner.',
+    typicalBuyer: 'US and Gulf UHNW (the primary inbound buyers of 2025-26, on a value play against New York and Dubai). UK domestic upgraders. Corporate purchasers for senior executive accommodation. Chelsea, Kensington, and Notting Hill are the most active sub-markets for volume.',
+    saleTimeline: '3-9 months at correctly benchmarked pricing. PCL is currently one of the most liquid UHNW property markets globally. Properties that have been re-priced to 2026 reality — not 2022 expectation — are selling within weeks of discreet launch.',
   },
 
   'tuscany-umbria': {
@@ -214,6 +232,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'CORE, UK non-dom exodus',
     rentalRates: { shortTermWeekPeak: [3000, 16000], shortTermWeekShoulder: [1500, 7000], midTermMonth: [2500, 9000], longTermMonth: [1800, 6000], notes: 'Italian flat-tax attracting long-term relocators from UK and US. Supply of quality long-term rental properties in Tuscany improving as flat-tax arrivals buy and then rent their previous properties. Umbria notably underpriced for rentals versus Tuscany.' },
     rentalEditorial: 'Italian flat-tax arrivals are reshaping the mid-term and long-term rental market. Incoming buyers often rent first (6-18 months) to verify the market before committing. Umbria rental supply is genuinely underpriced versus Tuscany. TGC coordinates trial residency periods that often convert to acquisition mandates.',
+    disposalEditorial: '2026: Flat-tax demand is driving genuine buyer interest — UK non-doms and US buyers specifically. Tuscany trophy is well-bid at realistic prices; Umbria less liquid but motivated specialist buyers exist and are underserved by the public market. Cadastral categorisation must be verified and resolved before marketing — an agricultural-classified property cannot be positioned as a residential villa. Heritage restoration properties require specialist buyer positioning.',
+    typicalBuyer: 'UK non-dom relocator (flat-tax is the primary driver). American lifestyle buyer with Italian cultural affinity. Northern European UHNW (German, Scandinavian, Benelux) seeking Mediterranean base. Italian wealthy domestic buyer for the best Chianti Classico addresses.',
+    saleTimeline: '9-18 months in Tuscany for well-positioned properties. 12-24 months in Umbria and Le Marche. Heritage restoration projects attract a narrower but genuine buyer pool; timeline unpredictable.',
   },
 
   'balearics': {
@@ -243,6 +264,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'HIGH',
     rentalRates: { shortTermWeekPeak: [4500, 32000], shortTermWeekShoulder: [2000, 12000], midTermMonth: [3000, 12000], longTermMonth: [2200, 8000], notes: 'Tourist rental licence required and increasingly enforced. Book Ibiza peak (July-Aug) 6-12 months ahead. Menorca long-term supply very limited — genuine scarcity. Mallorca off-season mid-term is excellent value.' },
     rentalEditorial: 'Balearics short-term is the most competitive Mediterranean island market. Ibiza peak weeks at €5-30k/week are routinely reserved a year ahead. Menorca is the quiet alternative — longer stays, genuine privacy, far fewer tourist licences competing for good properties. Long-term Menorca is a small but genuine market.',
+    disposalEditorial: '2026: Ibiza and Mallorca have softened from the 2022 peak but genuine buyers remain for well-positioned properties. Balearic Wealth Tax creates urgency for some non-Spanish sellers. Tourist rental licence status is now a material factor in valuation — licensed properties command a premium over unlicensed. Menorca is a thin market; specialist buyers exist but timelines are longer.',
+    typicalBuyer: 'Northern European UHNW — German, Scandinavian, and British are the three dominant nationalities across all islands. Spanish domestic UHNW for Mallorca Deià-Valldemossa and Palma prime. Ibiza south coast attracts an international entertainment and tech buyer profile.',
+    saleTimeline: '6-12 months Ibiza and Mallorca at realistic pricing. 12-18 months Menorca and specialist/unlicensed properties. July-August is a poor time to launch; September-November and February-April are the active buyer seasons.',
   },
 
   'andalusia': {
@@ -271,6 +295,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'HIGH',
     rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [2000, 8000], longTermMonth: [1500, 5500], notes: 'Marbella mid-term (3-6 months, winter season) is very active. La Zagaleta and Sotogrande long-term supply thin but growing. Inland Andalusia rentals extremely affordable and largely untapped.' },
     rentalEditorial: 'Andalusia mid-term is the winter season — October through April. International families and executives who base from Marbella or Sotogrande during the European cold months. Inland Andalusia (Ronda area) has almost no rental infrastructure, making it TGC-sourced or nothing.',
+    disposalEditorial: '2026: One of the strongest selling markets in Europe. Zero-wealth-tax is drawing significant Gulf and American inbound demand, particularly in Marbella, La Zagaleta, and Sotogrande. The Golden Triangle (Marbella-Benahavís-Estepona) is seeing competitive buyer interest. Inland Andalusia (Ronda area) requires specialist positioning — the buyer pool is narrow but motivated and typically un-serviced by the main agencies.',
+    typicalBuyer: 'Gulf UHNW (the dominant inbound buyer group since 2023, particularly for La Zagaleta and Golden Mile). British (declining but still active). Scandinavian and Northern European lifestyle buyer for Estepona and inland. American buyer for Sotogrande (polo community). Spanish domestic UHNW for the best Marbella addresses.',
+    saleTimeline: '4-10 months in Marbella Golden Mile and La Zagaleta at market pricing. 8-14 months Sotogrande. 12-24 months inland Andalusia — the buyer pool is genuine but narrow.',
   },
 
   'cote-basque-aquitaine': {
@@ -301,6 +328,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'MEDIUM-HIGH',
     rentalRates: { shortTermWeekPeak: [2000, 12000], shortTermWeekShoulder: [900, 4500], midTermMonth: [1600, 6000], longTermMonth: [1200, 4000], notes: 'Biarritz peak (July-Aug) highly competitive. Cap Ferret increasingly popular, limited supply. Bordeaux city furnished monthly supply growing. Dordogne mainly British-network owner rentals.' },
     rentalEditorial: 'Biarritz short-term is very active; good properties in July-August need 9-12 months lead time. Bordeaux city furnished rental is an underexploited mid-term market — excellent quality of life and TGV connection to Paris (2h04) makes it attractive for Paris-escaping families.',
+    disposalEditorial: '2026: Biarritz is well-bid for sea-facing properties. Cap Ferret/Arcachon is tightly held — sellers rarely appear voluntarily, and buyers queue. Bordeaux city prime has softened from its 2021 peak as remote-work demand normalised. Wine châteaux require specialist preparation — valuation is complex and buyers are sophisticated; mispriced mandates damage the asset.',
+    typicalBuyer: 'French UHNW (Biarritz has a deep domestic French buyer base unlike most coastal markets). Belgian and Swiss lifestyle buyer. Bordeaux wine investors and producers. British second-home buyer for Dordogne (legacy segment, still active). Cap Ferret is almost exclusively French — one of the most intensely domestic UHNW markets in France.',
+    saleTimeline: '6-12 months Biarritz sea-facing. Cap Ferret: rare mandates find buyers quickly through the right network. Bordeaux city: 8-14 months. Wine châteaux: 12-30 months depending on appellations and vineyard economics.',
   },
 
   'auvergne-rhone-alpes': {
@@ -357,6 +387,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'HIGH',
     rentalRates: { shortTermWeekPeak: [15000, 80000], shortTermWeekShoulder: [5000, 20000], midTermMonth: [8000, 35000], longTermMonth: [6000, 25000], notes: 'Winter peak (Christmas-NY, Feb half-term) at premium. Summer season increasingly active year-round. Ski-in/ski-out adds 30-40% premium. Many chalets owner-occupied, TGC-sourced off-market is the only way to access quality.' },
     rentalEditorial: 'Alpine chalet rental is among the highest-value short-term markets in Europe. Christmas-NY and February half-term weeks for trophy chalets reach €30-80k/week. TGC sources from the owner-managed network rather than the public agency pool — the quality difference is significant.',
+    disposalEditorial: '2026: Trophy chalet market has softened after a decade of compounding — peak-2022 pricing is not achievable and attempts to hold it extend timelines significantly. UK non-dom exit is driving some St Moritz mandates. Verbier and Courchevel remain more liquid than Gstaad at comparable price points. Chalet running costs (€150-300k/year on a €10M asset) create seller motivation that buyers understand and factor into negotiation. Lex Koller resale restrictions for Swiss properties must be navigated carefully for non-EU/EFTA sellers.',
+    typicalBuyer: 'Gulf and Asian UHNW (increasingly dominant, particularly Gstaad and St Moritz). European private equity families. UK non-dom entering Swiss lump-sum structuring. French UHNW for Courchevel and Megève. The pool of credible buyers for €20M+ chalets is genuinely small — 100-200 globally. TGC reaches this pool through discreet register, not public marketing.',
+    saleTimeline: '12-24 months for trophy. 8-14 months for well-priced Megève and Chamonix. Launching outside the ski season (May-September) is productive — buyers plan purchases in summer for winter use.',
   },
 
   'geneva-lake': {
@@ -383,6 +416,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'HIGH, UK non-dom anchor via lump-sum taxation',
     rentalRates: { shortTermWeekPeak: [4000, 18000], shortTermWeekShoulder: [2500, 9000], midTermMonth: [4500, 14000], longTermMonth: [3800, 11000], notes: 'Swiss rental market highly regulated; furnished residential permits required for stays over 90 days. Very active international corporate and diplomatic rental community. French side (Thonon, Évian) 40-50% cheaper than Swiss side with same lake quality.' },
     rentalEditorial: 'Geneva is one of Europe\'s most active mid-to-long-term corporate relocation markets — international organisations, private banks, family offices. Demand persistently exceeds supply at the quality end. French side of the lake offers exceptional value for families who can absorb a 20-minute commute.',
+    disposalEditorial: '2026: International demand steady, particularly from corporate and financial sector buyers. Cologny and Vandœuvres lakefront are robust — scarcity keeps values firm. Lavaux terrace villages are niche but motivated specialist buyers exist. The French side (Thonon, Évian) is more liquid but at lower absolute values. Lex Koller resale restrictions require careful navigation for any property purchased under cantonal approval.',
+    typicalBuyer: 'International corporate executive and family office (Geneva\'s permanent resident base). Gulf and Asian UHNW seeking Swiss structuring. French UHNW for the French side. Private banking professionals — Cologny has one of the deepest domestic high-net-worth buyer pools in Switzerland.',
+    saleTimeline: '9-18 months for prime Cologny/lakefront. 12-18 months for Lavaux specialty. French side: 8-14 months. Lex Koller properties require 3-4 months additional administrative timeline.',
   },
 
   'croatia': {
@@ -411,6 +447,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'MEDIUM-HIGH, Istria particularly',
     rentalRates: { shortTermWeekPeak: [2500, 14000], shortTermWeekShoulder: [1200, 6000], midTermMonth: [1800, 6000], longTermMonth: [1400, 4500], notes: 'Hvar and Dalmatian island short-term very active Jun-Sep. Istria short-term growing. Mid-term limited, mostly digital-nomad and remote-worker demand. Dubrovnik mid-term constrained by tourism overcrowding regulations.' },
     rentalEditorial: 'Croatian short-term is a strong summer season market. Istria, our contrarian mid-term call, is building a quiet rental base for the coming years — good-value farmhouse and hilltop village rentals for clients exploring the market before committing to purchase.',
+    disposalEditorial: '2026: Dubrovnik overvalued relative to comparable EU island markets — realistic repricing required. Hvar and the Dalmatian islands are mid-cycle with genuine Northern European buyer demand. Istria is TGC\'s contrarian call — a growing pool of lifestyle buyers discovering the region positions it well for sellers. Cadastral and land-registry verification is non-negotiable before marketing; unresolved Yugoslav-era issues will derail any sale.',
+    typicalBuyer: 'Northern and Western European lifestyle buyer (German, Austrian, Scandinavian, Dutch). Emerging tech and media executive class. Croatian diaspora returning. British buyer for Dalmatian islands (residual segment).',
+    saleTimeline: '6-12 months Istria and well-positioned Dalmatian properties. Dubrovnik Old Town apartments: 12-18 months at honest pricing. Hvar: seasonal — spring launches for summer buyer activity.',
   },
 
   'montenegro': {
@@ -467,6 +506,9 @@ const MARKETS: Record<string, Market> = {
     icpRelevance: 'MEDIUM-HIGH',
     rentalRates: { shortTermWeekPeak: [3500, 28000], shortTermWeekShoulder: [1500, 8000], midTermMonth: [2000, 8000], longTermMonth: [1500, 5500], notes: 'Mykonos and Santorini peak weeks among Europe\'s most expensive per-m². Quiet Cyclades (Tinos, Sifnos) at 30-40% of the price. Athens Riviera mid-term is a growing market for family relocation. Golden Visa holders increasingly renting Athens apartments while seeking acquisition.' },
     rentalEditorial: 'Greek island short-term at the top end rivals the Riviera for weekly rates while offering significantly more space and privacy. Athens Riviera is a growing mid-term relocation market with a genuine international community and improving infrastructure. TGC sources the quiet islands — Tinos, Sifnos, Paxos — which the public market barely covers.',
+    disposalEditorial: '2026: Athens Riviera is the strongest disposal market in Greece — genuine buyers and improving liquidity. Island villas have softened from 2022 peaks; realistic sellers are finding buyers, optimistic ones are not. Golden Visa threshold increases have shifted buyer composition. Complex island property titles (family-ownership histories, boundary disputes) must be resolved before marketing — a title issue discovered mid-sale kills transactions.',
+    typicalBuyer: 'Golden Visa investors (Gulf, Chinese, and Israeli profiles dominant post-2024 threshold increase). Northern European lifestyle buyer for Cyclades and Corfu. Athens Riviera attracts Greek diaspora returnees and European corporate buyers. Quiet Cyclades (Sifnos, Paxos) are specialist — buyers are informed, patient, and price-aware.',
+    saleTimeline: '8-16 months Athens Riviera and main islands. Quiet Cyclades and Peloponnese: 12-24 months — the buyer pool is smaller but genuine. Island properties with title complexity: add 6-12 months for resolution before marketing.',
   },
 
   'western-cape': {
@@ -1011,7 +1053,7 @@ function computeMarketMatch(profile: AcqProfile): { marketId:string; score:numbe
   })
 }
 
-type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial' | 'acq-questions' | 'acq-match'
+type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial' | 'acq-questions' | 'acq-match' | 'disposal-brief' | 'disposal-verdict'
 type FlowFamily = 'acquisition' | 'disposal' | 'retained' | 'rental' | null
 type Direction = 'buy' | 'invest' | 'develop' | 'let' | 'sell' | 'retained' | 'rent-short' | 'rent-mid' | 'rent-long' | null
 
@@ -1025,6 +1067,17 @@ interface Brief {
   timeline: string
   confidentiality: string
   secondaryMarkets: string[]
+}
+
+interface SellerBrief {
+  propertyType: string
+  sizeM2: string
+  askingPrice: string      // EUR millions
+  reasonForSale: string
+  timeline: string
+  confidentiality: string
+  keyFeatures: string      // what makes this property distinctive
+  currentStatus: string    // owner-occupied / vacant / tenanted
 }
 
 interface RentalBrief {
@@ -1075,6 +1128,8 @@ function TGCRealEstateIntelligence() {
   })
   const [structuring, setStructuring] = useState<StructuringState>({ vehicle: '', taxResidence: '', considerations: '' })
   const [client, setClient] = useState<ClientState>({ name: '', email: '', phone: '', taxResidence: '' })
+  const [sellerBrief, setSellerBrief] = useState<SellerBrief>({ propertyType:'', sizeM2:'', askingPrice:'', reasonForSale:'', timeline:'', confidentiality:'', keyFeatures:'', currentStatus:'' })
+  const [disposalSubType, setDisposalSubType] = useState<string>('')
   const [acqProfile, setAcqProfile] = useState<AcqProfile>({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
   const [acqStep, setAcqStep] = useState(0)
   const [acqMatches, setAcqMatches] = useState<ReturnType<typeof computeMarketMatch>>([])
@@ -1139,6 +1194,8 @@ function TGCRealEstateIntelligence() {
     setDirection(null)
     setMarketId(null)
     setBrief({ propertyType: '', budgetMin: '', budgetMax: '', sizeMin: '', sizeMax: '', nonNegotiables: '', timeline: '', confidentiality: '', secondaryMarkets: [] })
+    setSellerBrief({ propertyType:'', sizeM2:'', askingPrice:'', reasonForSale:'', timeline:'', confidentiality:'', keyFeatures:'', currentStatus:'' })
+    setDisposalSubType('')
     setAcqProfile({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
     setAcqStep(0); setAcqMatches([])
     setRentalBrief({ propertyType: '', groupAdults: '', groupChildren: '', pets: '', budgetWeek: '', budgetMonth: '', durationMonths: '', moveInDate: '', flexibility: '', priorities: [], nonNegotiables: '', arrivalDate: '', departureDate: '' })
@@ -1169,6 +1226,8 @@ function TGCRealEstateIntelligence() {
     setMandateId(id)
     const payload = isRentalFlow
       ? { mandateId: id, flowFamily, direction, client, rentalBrief, market: marketId }
+      : isDisposalFlow
+      ? { mandateId: id, flowFamily, direction: disposalSubType, client, sellerBrief, market: marketId, commercial }
       : { mandateId: id, flowFamily, direction, client, brief, structuring, market: marketId, commercial }
     await submitMandate(payload)
     setScreen('confirmation')
@@ -1290,10 +1349,13 @@ The Gatekeepers Club - thegatekeepersclub.com
   // Progress indicator
   const isRentalFlow = flowFamily === 'rental'
   const isAcqFlow = flowFamily === 'acquisition'
+  const isDisposalFlow = flowFamily === 'disposal'
   const screens = (isRentalFlow
     ? ['welcome', 'rental-type', 'market', 'rental-brief', 'rental-verdict', 'rental-commercial', 'client', 'confirmation']
     : isAcqFlow
     ? ['welcome', 'acq-questions', 'acq-match', 'verdict', showStructuringScreen ? 'structuring' : null, 'brief', 'commercial', 'client', 'confirmation']
+    : isDisposalFlow
+    ? ['welcome', 'flow-direction', 'market', 'disposal-brief', 'disposal-verdict', 'commercial', 'client', 'confirmation']
     : ['welcome', 'flow-direction', 'market', 'brief', showStructuringScreen ? 'structuring' : null, 'verdict', 'commercial', 'client', 'confirmation']
   ).filter(Boolean) as Screen[]
   const currentIdx = screens.indexOf(screen)
@@ -1349,10 +1411,10 @@ The Gatekeepers Club - thegatekeepersclub.com
       { id: 'buy-invest', label: 'Buy · Investment', desc: 'Capital appreciation or yield play. Different structuring conversation.', dir: 'invest' as Direction },
       { id: 'buy-develop', label: 'Buy · Land / development', desc: 'Raw land or redevelopment opportunity. Longer horizon, different risk profile.', dir: 'develop' as Direction },
     ] : flowFamily === 'disposal' ? [
-      { id: 'sell-open', label: 'Sell · Open market', desc: 'Full professional marketing across the right channels.', dir: 'sell' as Direction },
-      { id: 'sell-discreet', label: 'Sell · Discreet register', desc: 'Private buyer list, no public marketing. Most common for TGC mandates.', dir: 'sell' as Direction },
-      { id: 'sell-ultra', label: 'Sell · Ultra-private', desc: 'Specific buyer identified or pursued. Zero market footprint.', dir: 'sell' as Direction },
-      { id: 'sell-reinvest', label: 'Exit and re-allocate', desc: 'Selling here, buying somewhere else. One coordinated TGC mandate across both.', dir: 'sell' as Direction },
+      { id: 'sell-open',     label: 'Sell · Open market',       desc: 'Full professional marketing across the right channels. Maximum exposure to the qualified buyer pool.', dir: 'sell' as Direction },
+      { id: 'sell-discreet', label: 'Sell · Discreet register',  desc: 'Private buyer list, no public marketing. The most common approach for TGC mandates — serious buyers prefer it.', dir: 'sell' as Direction },
+      { id: 'sell-ultra',    label: 'Sell · Ultra-private',      desc: 'Specific buyer identified or approached. Zero market footprint, no list, no disclosure.', dir: 'sell' as Direction },
+      { id: 'sell-reinvest', label: 'Exit and re-allocate',      desc: 'Selling here, acquiring elsewhere. One coordinated TGC mandate — disposal and acquisition run in parallel.', dir: 'sell' as Direction },
     ] : [
       { id: 'retained-family-office', label: 'Family office · multi-mandate', desc: 'Ongoing relationship. Multiple properties, multiple jurisdictions, single point of coordination.', dir: 'retained' as Direction },
       { id: 'retained-discovery', label: 'Opening conversation', desc: 'Not a specific mandate yet, you want to start the dialogue.', dir: 'retained' as Direction },
@@ -1365,8 +1427,8 @@ The Gatekeepers Club - thegatekeepersclub.com
         <p style={styles.bodyP}>The sub-type shapes what we ask next.</p>
         <div style={{ marginTop: 24 }}>
           {options.map(o => (
-            <div key={o.id} style={{ ...styles.card, ...(direction === o.dir && marketId === null ? styles.cardSelected : {}) }}
-                 onClick={() => { setDirection(o.dir); setScreen('market'); }}>
+            <div key={o.id} style={{ ...styles.card, ...(disposalSubType === o.id || (direction === o.dir && marketId === null && flowFamily !== 'disposal') ? styles.cardSelected : {}) }}
+                 onClick={() => { setDirection(o.dir); if (flowFamily === 'disposal') setDisposalSubType(o.id); setScreen('market'); }}>
               <div style={styles.cardTitle}>{o.label}</div>
               <div style={styles.cardDesc}>{o.desc}</div>
             </div>
@@ -1408,7 +1470,7 @@ The Gatekeepers Club - thegatekeepersclub.com
               <div style={styles.grid2}>
                 {tierGroups[tier].map(m => (
                   <div key={m.id} style={{ ...styles.card, ...(marketId === m.id ? styles.cardSelected : {}), marginBottom: 0 }}
-                       onClick={() => { setMarketId(m.id); setScreen(isRentalFlow ? 'rental-brief' : 'brief'); }}>
+                       onClick={() => { setMarketId(m.id); setScreen(isRentalFlow ? 'rental-brief' : isDisposalFlow ? 'disposal-brief' : 'brief'); }}>
                     <div style={styles.cardTitle}>{m.name}</div>
                     <div style={styles.cardDesc}>{m.subLabel}</div>
                   </div>
@@ -1640,6 +1702,179 @@ The Gatekeepers Club - thegatekeepersclub.com
           <div style={{ fontSize:12, color:'#6b7280', lineHeight:1.6 }}>
             Not seeing the right market? <button style={{ background:'none', border:'none', color:'#0e4f51', cursor:'pointer', fontSize:12, padding:0, textDecoration:'underline' }} onClick={() => { setAcqStep(0); setScreen('acq-questions') }}>Adjust your brief</button> — one changed answer can shift the shortlist significantly.
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ──────────────────────── DISPOSAL SCREENS ────────────────────────
+
+  const renderDisposalBrief = () => {
+    const propertyTypes = ['Villa / standalone house', 'Apartment / pied-à-terre', 'Estate / domain / farmhouse', 'Townhouse / hôtel particulier', 'Chalet', 'Château / manor house', 'Commercial property', 'Land / development plot']
+    const timelines = ['Urgent — within 3 months', 'Motivated — 6-12 months', 'Measured — 12-24 months', 'Patient — when the right buyer appears']
+    const reasons = ['Lifestyle change or relocation', 'Portfolio rebalancing', 'Upgrading or downsizing', 'Estate planning', 'Tax restructuring', 'Capital release', 'Prefer not to say']
+    const statuses = ['Owner-occupied', 'Vacant', 'Tenanted — long-term', 'Tenanted — short-term seasonal', 'Part-occupied / part-let']
+    const subLabel: Record<string,string> = { 'sell-open':'Open market', 'sell-discreet':'Discreet register', 'sell-ultra':'Ultra-private', 'sell-reinvest':'Exit & re-allocate' }
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('market')}>Back</button>
+        <div style={styles.eyebrow}>Disposal · {subLabel[disposalSubType] || 'Sale'} · {market?.name}</div>
+        <h2 style={styles.h2}>Tell us about the property.</h2>
+        <p style={styles.bodyP}>The brief shapes how we position the mandate and who we approach. Everything here stays between us.</p>
+
+        <label style={styles.label}>Property type</label>
+        <select style={styles.input} value={sellerBrief.propertyType} onChange={e => setSellerBrief({ ...sellerBrief, propertyType: e.target.value })}>
+          <option value="">Select...</option>
+          {propertyTypes.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div>
+            <label style={styles.label}>Size (m²)</label>
+            <input type="number" style={styles.input} value={sellerBrief.sizeM2} placeholder="e.g., 450" onChange={e => setSellerBrief({ ...sellerBrief, sizeM2: e.target.value })} />
+          </div>
+          <div>
+            <label style={styles.label}>Guide price (EUR M)</label>
+            <input type="number" style={styles.input} value={sellerBrief.askingPrice} placeholder="e.g., 6.5" onChange={e => setSellerBrief({ ...sellerBrief, askingPrice: e.target.value })} />
+          </div>
+        </div>
+
+        <label style={styles.label}>Current status</label>
+        <select style={styles.input} value={sellerBrief.currentStatus} onChange={e => setSellerBrief({ ...sellerBrief, currentStatus: e.target.value })}>
+          <option value="">Select...</option>
+          {statuses.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+
+        <label style={styles.label}>Reason for sale (internal use — shapes our strategy)</label>
+        <select style={styles.input} value={sellerBrief.reasonForSale} onChange={e => setSellerBrief({ ...sellerBrief, reasonForSale: e.target.value })}>
+          <option value="">Select...</option>
+          {reasons.map(r => <option key={r} value={r}>{r}</option>)}
+        </select>
+
+        <label style={styles.label}>Timeline</label>
+        <select style={styles.input} value={sellerBrief.timeline} onChange={e => setSellerBrief({ ...sellerBrief, timeline: e.target.value })}>
+          <option value="">Select...</option>
+          {timelines.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+
+        <label style={styles.label}>Confidentiality</label>
+        <select style={styles.input} value={sellerBrief.confidentiality} onChange={e => setSellerBrief({ ...sellerBrief, confidentiality: e.target.value })}>
+          <option value="">Select...</option>
+          <option value="Open">Open — standard marketing is fine</option>
+          <option value="Discreet">Discreet — no public listing, private buyer register only</option>
+          <option value="Ultra-private">Ultra-private — specific buyer approached, zero public footprint</option>
+        </select>
+
+        <label style={styles.label}>What makes this property distinctive (2-4 things that will define our positioning)</label>
+        <textarea rows={4} style={{ ...styles.input, resize: 'vertical' }} value={sellerBrief.keyFeatures}
+          placeholder="e.g., Sea view from every room, 8 hectares of pinède, recently renovated to high specification, private access road, helicopter pad"
+          onChange={e => setSellerBrief({ ...sellerBrief, keyFeatures: e.target.value })} />
+
+        <div style={{ marginTop: 32 }}>
+          <button style={styles.button}
+            onClick={() => setScreen('disposal-verdict')}
+            disabled={!sellerBrief.propertyType || !sellerBrief.askingPrice || !sellerBrief.timeline}>
+            See market view →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderDisposalVerdict = () => {
+    if (!market) return null
+    const subLabel: Record<string,{label:string;approach:string}> = {
+      'sell-open':     { label:'Open market', approach:'Full professional marketing across qualified buyer channels — agent partnerships, TGC buyer register, curated private outreach.' },
+      'sell-discreet': { label:'Discreet register', approach:'Private buyer register only. No public listing, no photography circulated without NDA. Our preferred approach for significant mandates.' },
+      'sell-ultra':    { label:'Ultra-private', approach:'Specific buyer identification and approach. Zero public footprint. Typically used when a specific buyer profile or person has been identified.' },
+      'sell-reinvest': { label:'Exit and re-allocate', approach:'Disposal and acquisition coordinated as one mandate. Your Gatekeeper manages both sides in parallel to avoid a capital gap.' },
+    }
+    const sub = subLabel[disposalSubType] || subLabel['sell-discreet']
+    const askingPriceNum = parseFloat(sellerBrief.askingPrice) || 0
+    const allPriceBands = Object.entries(market.priceBands)
+    const firstBand = allPriceBands[0]?.[1]
+    const pricePosition = firstBand
+      ? askingPriceNum < (firstBand.entry?.[1] || 0) ? 'entry'
+        : askingPriceNum < (firstBand.realistic?.[1] || 0) ? 'realistic'
+        : 'trophy'
+      : 'realistic'
+
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('disposal-brief')}>Back</button>
+        <div style={styles.eyebrow}>Disposal view · {market.name}</div>
+        <h2 style={styles.h2}>{market.name}</h2>
+        <p style={{ fontSize: 14, color: '#0e4f51', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{market.subLabel}</p>
+
+        {market.disposalEditorial ? (
+          <p style={styles.lead}>{market.disposalEditorial}</p>
+        ) : (
+          <p style={styles.lead}>{market.editorial}</p>
+        )}
+
+        {market.criticalContext && (
+          <div style={{ background: '#F9F8F5', borderLeft: '3px solid #c8aa4a', padding: 20, marginBottom: 24 }}>
+            <div style={styles.eyebrow}>Critical context for sellers</div>
+            <p style={{ fontSize: 15, color: '#1a1815', margin: 0, lineHeight: 1.6 }}>{market.criticalContext}</p>
+          </div>
+        )}
+
+        {market.typicalBuyer && (
+          <div style={{ marginBottom: 28 }}>
+            <h3 style={styles.h3}>Likely buyer profile</h3>
+            <p style={{ fontSize: 15, color: '#1a1815', lineHeight: 1.6 }}>{market.typicalBuyer}</p>
+          </div>
+        )}
+
+        <h3 style={styles.h3}>Pricing reality check</h3>
+        <div style={{ background: '#F9F8F5', border: '1px solid #e5e7eb', padding: 20, marginBottom: 28 }}>
+          {sellerBrief.askingPrice && (
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Your guide price</div>
+              <div style={styles.bandValue}>EUR {sellerBrief.askingPrice}M — {pricePosition} band for this market</div>
+            </div>
+          )}
+          {allPriceBands.slice(0,2).map(([label, bands]) => (
+            <div key={label} style={{ padding: '10px 0', borderBottom: '1px dashed #e5e7eb' }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1815', marginBottom: 6 }}>{label}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, fontSize: 12 }}>
+                {bands.entry && <div><div style={{ color: '#c8aa4a', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 2 }}>Entry</div><div style={{ fontWeight: 700 }}>EUR {bands.entry[0]}-{bands.entry[1]}M</div></div>}
+                {bands.realistic && <div><div style={{ color: '#c8aa4a', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 2 }}>Realistic</div><div style={{ fontWeight: 700 }}>EUR {bands.realistic[0]}-{bands.realistic[1]}M</div></div>}
+                {bands.trophy && <div><div style={{ color: '#c8aa4a', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 2 }}>Trophy</div><div style={{ fontWeight: 700 }}>EUR {bands.trophy[0]}-{bands.trophy[1]}M</div></div>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {market.saleTimeline && (
+          <div style={{ marginBottom: 28 }}>
+            <h3 style={styles.h3}>Realistic timeline</h3>
+            <p style={{ fontSize: 15, color: '#1a1815', lineHeight: 1.6 }}>{market.saleTimeline}</p>
+          </div>
+        )}
+
+        <div style={{ background: '#0e4f51', color: '#fff', padding: 24, marginBottom: 28, borderLeft: '3px solid #c8aa4a' }}>
+          <div style={{ ...styles.eyebrow, color: '#c8aa4a', marginBottom: 8 }}>TGC's approach — {sub.label}</div>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', margin: 0, lineHeight: 1.6 }}>{sub.approach}</p>
+          {disposalSubType === 'sell-reinvest' && (
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
+              Your Gatekeeper will open both sides simultaneously. The acquisition brief is captured separately after the disposal mandate is confirmed — or we can begin both now.
+            </p>
+          )}
+        </div>
+
+        {internalView && (
+          <div style={styles.internalPanel}>
+            <div style={{ color: '#c8aa4a', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.15em' }}>// INTERNAL VIEW</div>
+            <div>TGC coverage: {market.coverage}</div>
+            <div>Market ID: {marketId} · Tier {market.tier}</div>
+            <div>Asking price: EUR {sellerBrief.askingPrice}M · Size: {sellerBrief.sizeM2}m² · Reason: {sellerBrief.reasonForSale}</div>
+            <div>Disposal sub-type: {disposalSubType}</div>
+          </div>
+        )}
+
+        <div style={{ marginTop: 16 }}>
+          <button style={styles.button} onClick={() => setScreen('commercial')}>The commercial arrangement →</button>
         </div>
       </div>
     )
@@ -2102,11 +2337,11 @@ The Gatekeepers Club - thegatekeepersclub.com
     if (!market || !commercial) return null
     return (
       <div>
-        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('verdict')}>Back</button>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(isDisposalFlow ? 'disposal-verdict' : isAcqFlow ? 'brief' : 'verdict')}>Back</button>
         <div style={styles.eyebrow}>The commercial arrangement</div>
         <h2 style={styles.h2}>How we work together.</h2>
         <p style={styles.bodyP}>
-          For a {direction === 'sell' ? 'disposal' : direction === 'let' ? 'rental search' : 'buy-side'} mandate on {market.name} ({market.tier === 1 ? 'Tier 1' : market.tier === 2 ? 'Tier 2' : market.tier === 3 ? 'Tier 3' : 'Tier 4'} coverage), our standard opening looks like this.
+          For a {isDisposalFlow ? 'disposal' : direction === 'let' ? 'rental search' : 'buy-side'} mandate on {market.name} ({market.tier === 1 ? 'Tier 1' : market.tier === 2 ? 'Tier 2' : market.tier === 3 ? 'Tier 3' : 'Tier 4'} coverage), our standard opening looks like this.
         </p>
 
         <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginTop: 20 }}>
@@ -2192,7 +2427,7 @@ The Gatekeepers Club - thegatekeepersclub.com
 
   const renderConfirmation = () => (
     <div>
-      <div style={styles.eyebrow}>{isRentalFlow ? 'Rental brief received' : 'Mandate received'}</div>
+      <div style={styles.eyebrow}>{isRentalFlow ? 'Rental brief received' : isDisposalFlow ? 'Disposal mandate received' : 'Mandate received'}</div>
       <h2 style={styles.h2}>Thank you, {client.name?.split(' ')[0]}.</h2>
       <p style={styles.lead}>
         Your brief is with us. A Gatekeeper has it in hand now.
@@ -2203,7 +2438,7 @@ The Gatekeepers Club - thegatekeepersclub.com
         <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{mandateId}</div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Type</div>
-          <div style={styles.bandValue}>{isRentalFlow ? (direction === 'rent-short' ? 'Short-term rental' : direction === 'rent-mid' ? 'Mid-term rental' : 'Long-term rental') : direction?.toUpperCase()}</div>
+          <div style={styles.bandValue}>{isRentalFlow ? (direction === 'rent-short' ? 'Short-term rental' : direction === 'rent-mid' ? 'Mid-term rental' : 'Long-term rental') : isDisposalFlow ? ({ 'sell-open':'Open market sale', 'sell-discreet':'Discreet disposal', 'sell-ultra':'Ultra-private disposal', 'sell-reinvest':'Exit & re-allocate' }[disposalSubType] || 'Disposal') : direction?.toUpperCase()}</div>
         </div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Market</div>
@@ -2211,8 +2446,20 @@ The Gatekeepers Club - thegatekeepersclub.com
         </div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Property type</div>
-          <div style={styles.bandValue}>{isRentalFlow ? rentalBrief.propertyType : brief.propertyType}</div>
+          <div style={styles.bandValue}>{isRentalFlow ? rentalBrief.propertyType : isDisposalFlow ? sellerBrief.propertyType : brief.propertyType}</div>
         </div>
+        {isDisposalFlow && (
+          <>
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Guide price</div>
+              <div style={styles.bandValue}>EUR {sellerBrief.askingPrice}M</div>
+            </div>
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Timeline</div>
+              <div style={styles.bandValue}>{sellerBrief.timeline}</div>
+            </div>
+          </>
+        )}
         {isRentalFlow ? (
           <>
             {direction === 'rent-short' ? (
@@ -2256,10 +2503,22 @@ The Gatekeepers Club - thegatekeepersclub.com
       </ul>
 
       <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        {!isRentalFlow && <button style={styles.button} onClick={downloadMandateLetter}>Download draft mandate letter</button>}
+        {!isRentalFlow && !isDisposalFlow && <button style={styles.button} onClick={downloadMandateLetter}>Download draft mandate letter</button>}
         <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" style={{ ...styles.buttonGold, textDecoration: 'none', display: 'inline-block' }}>Book discovery call</a>
         <button style={styles.buttonSecondary} onClick={resetAll}>Start another brief</button>
       </div>
+
+      {isDisposalFlow && disposalSubType === 'sell-reinvest' && (
+        <div style={{ marginTop: 40, padding: 24, background: '#F9F8F5', borderLeft: '3px solid #0e4f51' }}>
+          <div style={styles.eyebrow}>Exit & Re-allocate — acquisition side</div>
+          <p style={{ fontSize: 15, color: '#1a1815', marginTop: 8, marginBottom: 20, lineHeight: 1.6 }}>
+            Your disposal mandate is open. When you're ready, brief us on where you want to re-allocate. We'll run both sides in parallel.
+          </p>
+          <button style={styles.button} onClick={() => { setFlowFamily('acquisition'); setAcqStep(0); setScreen('acq-questions') }}>
+            Open the acquisition brief →
+          </button>
+        </div>
+      )}
     </div>
   )
 
@@ -2268,6 +2527,8 @@ The Gatekeepers Club - thegatekeepersclub.com
       case 'welcome': return renderWelcome()
       case 'acq-questions': return renderAcqQuestions()
       case 'acq-match': return renderAcqMatch()
+      case 'disposal-brief': return renderDisposalBrief()
+      case 'disposal-verdict': return renderDisposalVerdict()
       case 'flow-direction': return renderFlowDirection()
       case 'rental-type': return renderRentalType()
       case 'market': return renderMarketSelector()
