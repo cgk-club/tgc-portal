@@ -226,12 +226,27 @@ git push
 - **Phase 4:** Typed fiche templates (hospitality/villa/dining/maker/default)
 - **Phase 5:** Airtable webhook automation — auto-creates draft fiches from new orgs
 - **Phase 6:** Six new fiche templates (experience, transport, wine estate, wellness, events/sport, arts/culture)
+- **Phase 12 — Intelligence Suite (18 Apr 2026):** Three public intelligence tools at `/intelligence/[transport|realestate|wellness]`, plus landing page at `/intelligence`. Submit API at `/api/intelligence/submit` (Resend email to jeeves@ + client confirmation). lucide-react added.
+
+---
+
+## Intelligence Suite
+
+Routes: `/intelligence`, `/intelligence/transport`, `/intelligence/realestate`, `/intelligence/wellness`
+
+- **Transport:** 60 corridors (9 added 18 Apr: Monaco-Courchevel, Monaco-Sardinia, Paris-Bordeaux, London-Edinburgh, Barcelona-Ibiza, Palma-Ibiza, Athens-Santorini, Miami-Palm Beach, LA-Santa Barbara), asset economics calculator, localStorage journey saving
+- **Real estate:** 31 markets, 3 mandate flows (acquire/dispose/retain), structuring screen (FR: ≥€1.3M, UK: ≥£2M, other: ≥€5M), mandate letter generator. Jez Moore (Tier 1 high-end), Keith Kirwen (Andalusia), Amélie Rigo exclusives (Occitanie). Off-market framing throughout.
+- **Wellness:** 12 clinics, 6-question matching engine, annual programme economics calculator. Lanserhof marked TGC Active.
+- **Submit API:** POST `/api/intelligence/submit` — accepts `{type, brief, client, corridor?, market?}`, sends formatted Resend email to jeeves@, sends confirmation to client.
+- **Events + Art:** Coming soon (no pages yet)
+
+Public lead magnet: `intelligence.thegatekeepers.club` should CNAME to `portal.thegatekeepers.club` (DNS not yet configured).
 
 ---
 
 ## Current State (update this section after each session)
 
-*Last updated: 6 April 2026*
+*Last updated: 18 April 2026*
 
 - Portal live at portal.thegatekeepers.club
 - 11 fiche templates, transport + events sub-layouts
@@ -251,6 +266,8 @@ git push
 - Approvals + requests badges refresh instantly (custom event dispatch)
 - Requests page has status workflow (new → contacted → quoted → confirmed → closed)
 - Resend domain verified for thegatekeepers.club
+- **Known Railway quirk:** Next.js server can cache a 404 for a fiche route even with `force-dynamic`. If a fiche 404s after publishing, redeploy to clear. `?preview=true` is the quick diagnostic (200 = DB fine, server cache issue).
+- `.claude/` added to .gitignore — worktree files must never be committed
 
 ---
 

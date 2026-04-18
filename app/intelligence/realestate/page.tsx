@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react'
 // ──────────────────────────────────────────────────────────────────────────────
 // TGC REAL ESTATE INTELLIGENCE · v1
 // Thirty-one micro-markets · three flow families · honest editorial
-// Paper #f5f1ea · Ink #1a1815 · Gold #8b6f3e → #5a4a2a
+// Paper #F9F8F5 · Ink #1a1815 · Gold #c8aa4a → #0e4f51
 // Cormorant Garamond (display) · Inter (body) · JetBrains Mono (data)
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -891,41 +891,41 @@ The Gatekeepers Club - thegatekeepersclub.com
   // ──────────────────────── STYLES ────────────────────────
 
   const styles: Record<string, React.CSSProperties> = {
-    root: { minHeight: '100vh', background: '#f5f1ea', color: '#1a1815', fontFamily: "'Inter', system-ui, sans-serif", padding: '40px 20px', lineHeight: 1.6 },
+    root: { minHeight: '100vh', background: '#F9F8F5', color: '#1a1815', fontFamily: "'Lato', sans-serif", padding: '40px 20px', lineHeight: 1.6 },
     container: { maxWidth: 920, margin: '0 auto' },
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid rgba(26, 24, 21, 0.1)' },
-    brand: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#1a1815' },
-    brandSub: { fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#8b6f3e', marginTop: 4 },
-    internalToggle: { fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', background: 'transparent', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#5a4a2a', padding: '6px 12px', cursor: 'pointer', fontFamily: 'inherit' },
-    h1: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' },
-    h2: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 },
-    h3: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 },
-    eyebrow: { fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#8b6f3e', marginBottom: 12 },
-    bodyP: { fontSize: 16, marginBottom: 16, color: '#2a2720' },
-    lead: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, lineHeight: 1.5, color: '#2a2720', marginBottom: 28, fontWeight: 400, fontStyle: 'italic' },
-    card: { background: '#fdfbf6', border: '1px solid rgba(139, 111, 62, 0.2)', padding: 24, marginBottom: 16, cursor: 'pointer', transition: 'all 0.2s' },
-    cardSelected: { borderColor: '#5a4a2a', background: '#f7efdf', boxShadow: '0 2px 8px rgba(90, 74, 42, 0.08)' },
-    cardTitle: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, marginBottom: 4, color: '#1a1815' },
-    cardDesc: { fontSize: 13, color: '#5a4a2a', lineHeight: 1.5 },
-    button: { background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' },
-    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid rgba(26, 24, 21, 0.3)', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' },
-    buttonGold: { background: '#5a4a2a', color: '#f5f1ea', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' },
-    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' },
-    label: { display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#5a4a2a', marginBottom: 6, marginTop: 16 },
+    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid #e5e7eb' },
+    brand: { fontFamily: "'Poppins', sans-serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#0e4f51' },
+    brandSub: { fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginTop: 4 },
+    internalToggle: { fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', background: 'transparent', border: '1px solid #e5e7eb', color: '#0e4f51', padding: '6px 12px', cursor: 'pointer', fontFamily: 'inherit' },
+    h1: { fontFamily: "'Poppins', sans-serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' },
+    h2: { fontFamily: "'Poppins', sans-serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 },
+    h3: { fontFamily: "'Poppins', sans-serif", fontSize: 22, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 },
+    eyebrow: { fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 12 },
+    bodyP: { fontSize: 16, marginBottom: 16, color: '#1a1815' },
+    lead: { fontFamily: "'Poppins', sans-serif", fontWeight: 300, fontSize: 20, lineHeight: 1.55, color: '#6b7280', marginBottom: 28 },
+    card: { background: '#F9F8F5', border: '1px solid #e5e7eb', padding: 24, marginBottom: 16, cursor: 'pointer', transition: 'all 0.2s', borderRadius: 8 },
+    cardSelected: { borderColor: '#0e4f51', background: '#F9F8F5', boxShadow: '0 2px 8px rgba(14, 79, 81, 0.08)' },
+    cardTitle: { fontFamily: "'Poppins', sans-serif", fontSize: 20, fontWeight: 400, marginBottom: 4, color: '#1a1815' },
+    cardDesc: { fontSize: 13, color: '#6b7280', lineHeight: 1.5 },
+    button: { background: '#0e4f51', color: '#ffffff', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s', borderRadius: 8 },
+    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid #e5e7eb', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 },
+    buttonGold: { background: '#c8aa4a', color: '#ffffff', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 },
+    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' },
+    label: { display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#0e4f51', marginBottom: 6, marginTop: 16 },
     grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 },
-    tierBadge: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', padding: '3px 8px', marginLeft: 10, background: '#1a1815', color: '#f5f1ea' },
-    tierBadgeOut: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', padding: '3px 8px', marginLeft: 10, background: 'transparent', color: '#8b6f3e', border: '1px solid #8b6f3e' },
-    priceBand: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, padding: '12px 0', borderBottom: '1px dashed rgba(139, 111, 62, 0.2)', fontSize: 14 },
-    bandLabel: { color: '#5a4a2a', fontWeight: 500 },
-    bandValue: { fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: '#1a1815' },
+    tierBadge: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', padding: '3px 8px', marginLeft: 10, background: '#0e4f51', color: '#ffffff' },
+    tierBadgeOut: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', padding: '3px 8px', marginLeft: 10, background: 'transparent', color: '#c8aa4a', border: '1px solid #c8aa4a' },
+    priceBand: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8, padding: '12px 0', borderBottom: '1px dashed #e5e7eb', fontSize: 14 },
+    bandLabel: { color: '#0e4f51', fontWeight: 500 },
+    bandValue: { fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 13, color: '#1a1815' },
     list: { paddingLeft: 0, listStyle: 'none' },
-    listItem: { padding: '6px 0 6px 20px', position: 'relative', fontSize: 14, color: '#2a2720', lineHeight: 1.55 },
-    dash: { color: '#8b6f3e', position: 'absolute', left: 0 },
+    listItem: { padding: '6px 0 6px 20px', position: 'relative', fontSize: 14, color: '#1a1815', lineHeight: 1.55 },
+    dash: { color: '#c8aa4a', position: 'absolute', left: 0 },
     progress: { display: 'flex', gap: 4, marginBottom: 36 },
-    progressDot: { height: 2, flex: 1, background: 'rgba(26, 24, 21, 0.15)' },
-    progressDotActive: { height: 2, flex: 1, background: '#5a4a2a' },
-    draftNotice: { position: 'fixed', bottom: 20, right: 20, background: '#1a1815', color: '#f5f1ea', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 },
-    internalPanel: { background: '#1a1815', color: '#f5f1ea', padding: 20, margin: '24px 0', borderLeft: '3px solid #8b6f3e', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, lineHeight: 1.7 },
+    progressDot: { height: 2, flex: 1, background: '#e5e7eb' },
+    progressDotActive: { height: 2, flex: 1, background: '#0e4f51' },
+    draftNotice: { position: 'fixed', bottom: 20, right: 20, background: '#0e4f51', color: '#ffffff', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 },
+    internalPanel: { background: '#0e4f51', color: '#ffffff', padding: 20, margin: '24px 0', borderLeft: '3px solid #c8aa4a', fontFamily: "'Lato', sans-serif", fontSize: 12, lineHeight: 1.7 },
   }
 
   // Progress indicator
@@ -1035,7 +1035,7 @@ The Gatekeepers Club - thegatekeepersclub.com
           return (
             <div key={tier} style={{ marginBottom: 36 }}>
               <div style={styles.eyebrow}>Tier {tier} — {tierLabels[tier].title}</div>
-              <p style={{ fontSize: 13, color: '#5a4a2a', marginBottom: 16, fontStyle: 'italic' }}>{tierLabels[tier].subtitle}</p>
+              <p style={{ fontSize: 13, color: '#0e4f51', marginBottom: 16 }}>{tierLabels[tier].subtitle}</p>
               <div style={styles.grid2}>
                 {tierGroups[tier].map(m => (
                   <div key={m.id} style={{ ...styles.card, ...(marketId === m.id ? styles.cardSelected : {}), marginBottom: 0 }}
@@ -1126,9 +1126,9 @@ The Gatekeepers Club - thegatekeepersclub.com
         At your budget and in {jurisdiction?.label}, structuring is half the cost of ownership. We want a short honest conversation before the property search, not a remedial one after completion.
       </p>
 
-      <div style={{ ...styles.card, background: '#f7efdf', cursor: 'default', marginBottom: 24 }}>
+      <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginBottom: 24 }}>
         <div style={styles.eyebrow}>{jurisdiction?.label} · Jurisdiction headline</div>
-        <p style={{ fontSize: 15, color: '#2a2720', margin: '4px 0 12px', lineHeight: 1.55 }}>{jurisdiction?.headline}</p>
+        <p style={{ fontSize: 15, color: '#1a1815', margin: '4px 0 12px', lineHeight: 1.55 }}>{jurisdiction?.headline}</p>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Default vehicle</div>
           <div style={styles.bandValue}>{jurisdiction?.defaultVehicle}</div>
@@ -1145,7 +1145,7 @@ The Gatekeepers Club - thegatekeepersclub.com
           <div style={styles.bandLabel}>Capital gains</div>
           <div style={styles.bandValue}>{jurisdiction?.capitalGains}</div>
         </div>
-        <p style={{ fontSize: 14, color: '#5a4a2a', marginTop: 16, fontStyle: 'italic', lineHeight: 1.55 }}>{jurisdiction?.honestAdvice}</p>
+        <p style={{ fontSize: 14, color: '#0e4f51', marginTop: 16, lineHeight: 1.55 }}>{jurisdiction?.honestAdvice}</p>
       </div>
 
       <label style={styles.label}>Proposed ownership vehicle</label>
@@ -1175,7 +1175,7 @@ The Gatekeepers Club - thegatekeepersclub.com
         <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(showStructuringScreen ? 'structuring' : 'brief')}>Back</button>
         <div style={styles.eyebrow}>Our honest view · {market.name}</div>
         <h2 style={styles.h2}>{market.name}</h2>
-        <p style={{ fontSize: 14, color: '#5a4a2a', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <p style={{ fontSize: 14, color: '#0e4f51', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           {market.subLabel}
           {market.tier === 1 && <span style={styles.tierBadge}>Tier 1, Heartland</span>}
           {market.tier === 2 && <span style={styles.tierBadge}>Tier 2, Active</span>}
@@ -1186,9 +1186,9 @@ The Gatekeepers Club - thegatekeepersclub.com
         <p style={styles.lead}>{market.editorial}</p>
 
         {market.criticalContext && (
-          <div style={{ background: '#fdf6e9', borderLeft: '3px solid #8b6f3e', padding: 20, marginBottom: 24 }}>
+          <div style={{ background: '#F9F8F5', borderLeft: '3px solid #c8aa4a', padding: 20, marginBottom: 24 }}>
             <div style={styles.eyebrow}>Critical context</div>
-            <p style={{ fontSize: 15, color: '#2a2720', margin: 0, lineHeight: 1.6 }}>{market.criticalContext}</p>
+            <p style={{ fontSize: 15, color: '#1a1815', margin: 0, lineHeight: 1.6 }}>{market.criticalContext}</p>
           </div>
         )}
 
@@ -1211,12 +1211,12 @@ The Gatekeepers Club - thegatekeepersclub.com
         <h3 style={styles.h3}>Realistic price bands (2026)</h3>
         <div style={{ marginBottom: 28 }}>
           {Object.entries(market.priceBands).map(([label, bands]) => (
-            <div key={label} style={{ padding: '14px 0', borderBottom: '1px dashed rgba(139, 111, 62, 0.2)' }}>
+            <div key={label} style={{ padding: '14px 0', borderBottom: '1px dashed #e5e7eb' }}>
               <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1815', marginBottom: 8 }}>{label}</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, fontSize: 13 }}>
-                {bands.entry && <div><div style={{ color: '#8b6f3e', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Entry</div><div style={{ fontFamily: "'JetBrains Mono', monospace", color: '#1a1815' }}>{fmtBand(bands.entry)}</div></div>}
-                {bands.realistic && <div><div style={{ color: '#8b6f3e', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Realistic</div><div style={{ fontFamily: "'JetBrains Mono', monospace", color: '#1a1815' }}>{fmtBand(bands.realistic)}</div></div>}
-                {bands.trophy && <div><div style={{ color: '#8b6f3e', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Trophy</div><div style={{ fontFamily: "'JetBrains Mono', monospace", color: '#1a1815' }}>{fmtBand(bands.trophy)}</div></div>}
+                {bands.entry && <div><div style={{ color: '#c8aa4a', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Entry</div><div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, color: '#1a1815' }}>{fmtBand(bands.entry)}</div></div>}
+                {bands.realistic && <div><div style={{ color: '#c8aa4a', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Realistic</div><div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, color: '#1a1815' }}>{fmtBand(bands.realistic)}</div></div>}
+                {bands.trophy && <div><div style={{ color: '#c8aa4a', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Trophy</div><div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, color: '#1a1815' }}>{fmtBand(bands.trophy)}</div></div>}
               </div>
             </div>
           ))}
@@ -1229,7 +1229,7 @@ The Gatekeepers Club - thegatekeepersclub.com
 
         {internalView && (
           <div style={styles.internalPanel}>
-            <div style={{ color: '#8b6f3e', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.15em' }}>// INTERNAL VIEW, TGC GATEKEEPER ONLY</div>
+            <div style={{ color: '#c8aa4a', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.15em' }}>// INTERNAL VIEW, TGC GATEKEEPER ONLY</div>
             <div>TGC coverage: {market.coverage}</div>
             <div>ICP relevance: {market.icpRelevance}</div>
             <div>Structuring jurisdiction: {market.structuringJurisdiction} / {jurisdiction?.label}</div>
@@ -1257,14 +1257,14 @@ The Gatekeepers Club - thegatekeepersclub.com
           For a {direction === 'sell' ? 'disposal' : direction === 'let' ? 'rental search' : 'buy-side'} mandate on {market.name} ({market.tier === 1 ? 'Tier 1' : market.tier === 2 ? 'Tier 2' : market.tier === 3 ? 'Tier 3' : 'Tier 4'} coverage), our standard opening looks like this.
         </p>
 
-        <div style={{ ...styles.card, background: '#f7efdf', cursor: 'default', marginTop: 20 }}>
+        <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginTop: 20 }}>
           {direction !== 'sell' && direction !== 'let' && (
             <>
               <div style={styles.priceBand}>
                 <div style={styles.bandLabel}>Retainer</div>
                 <div style={styles.bandValue}>EUR {commercial?.retainer?.toLocaleString()}</div>
               </div>
-              <p style={{ fontSize: 13, color: '#5a4a2a', marginTop: 8, fontStyle: 'italic' }}>Covers active search: off-market sourcing, shortlist, viewings coordination, legal introductions. 6-12 month active period.</p>
+              <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 8 }}>Covers active search: off-market sourcing, shortlist, viewings coordination, legal introductions. 6-12 month active period.</p>
             </>
           )}
           {direction === 'sell' && commercial?.retainer > 0 && (
@@ -1326,7 +1326,7 @@ The Gatekeepers Club - thegatekeepersclub.com
       <label style={styles.label}>Current tax residence</label>
       <input type="text" style={styles.input} value={client.taxResidence} placeholder="e.g., UK / France / Monaco" onChange={e => setClient({ ...client, taxResidence: e.target.value })} />
 
-      <p style={{ fontSize: 12, color: '#5a4a2a', marginTop: 24, fontStyle: 'italic', lineHeight: 1.6 }}>
+      <p style={{ fontSize: 12, color: '#6b7280', marginTop: 24, lineHeight: 1.6 }}>
         We will contact you within four hours to acknowledge receipt, within twenty-four hours with a full considered response, and arrange a discovery call within seventy-two hours. Your mandate details are visible only to the specific Gatekeeper assigned to you.
       </p>
 
@@ -1346,9 +1346,9 @@ The Gatekeepers Club - thegatekeepersclub.com
         Your brief is with us. A Gatekeeper has it in hand now.
       </p>
 
-      <div style={{ ...styles.card, background: '#f7efdf', cursor: 'default' }}>
+      <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default' }}>
         <div style={styles.eyebrow}>Mandate reference</div>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{mandateId}</div>
+        <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{mandateId}</div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Direction</div>
           <div style={styles.bandValue}>{direction?.toUpperCase()}</div>
@@ -1389,9 +1389,9 @@ The Gatekeepers Club - thegatekeepersclub.com
         <button style={styles.buttonSecondary} onClick={resetAll}>Start another mandate</button>
       </div>
 
-      <div style={{ marginTop: 48, padding: 20, background: '#fdf6e9', borderLeft: '3px solid #8b6f3e' }}>
+      <div style={{ marginTop: 48, padding: 20, background: '#F9F8F5', borderLeft: '3px solid #c8aa4a' }}>
         <div style={styles.eyebrow}>While you wait, illustrative of your brief</div>
-        <p style={{ fontSize: 14, color: '#2a2720', marginTop: 8, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 14, color: '#1a1815', marginTop: 8, lineHeight: 1.6 }}>
           Based on your brief, the kind of property we would shortlist for you in {market?.name} typically sits in the <strong>{
             budget < (market?.priceBands[Object.keys(market?.priceBands || {})[0]]?.realistic?.[0] || 5)
               ? 'entry'
@@ -1422,11 +1422,11 @@ The Gatekeepers Club - thegatekeepersclub.com
   return (
     <div style={styles.root}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #5a4a2a; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0e4f51; }
         button:hover:not(:disabled) { opacity: 0.85; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a4a2a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%230e4f51' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
       `}</style>
 
       <div style={styles.container}>

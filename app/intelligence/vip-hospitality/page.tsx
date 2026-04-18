@@ -561,46 +561,46 @@ function TGCVIPHospitality() {
     : EVENTS.filter(e => e.category === categoryFilter)
 
   const s = {
-    root: { minHeight: '100vh', background: '#f5f1ea', color: '#1a1815', fontFamily: "'Inter', system-ui, sans-serif", padding: '40px 20px', lineHeight: 1.6 } as React.CSSProperties,
+    root: { minHeight: '100vh', background: '#F9F8F5', color: '#1a1815', fontFamily: "'Lato', sans-serif", padding: '40px 20px', lineHeight: 1.6 } as React.CSSProperties,
     container: { maxWidth: 960, margin: '0 auto' } as React.CSSProperties,
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid rgba(26, 24, 21, 0.1)' } as React.CSSProperties,
-    brand: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#1a1815' } as React.CSSProperties,
-    brandSub: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#8b6f3e', marginTop: 4 },
-    h1: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' } as React.CSSProperties,
-    h2: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 } as React.CSSProperties,
-    h3: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 } as React.CSSProperties,
-    eyebrow: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#8b6f3e', marginBottom: 12 },
-    bodyP: { fontSize: 16, marginBottom: 16, color: '#2a2720' } as React.CSSProperties,
-    lead: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, lineHeight: 1.5, color: '#2a2720', marginBottom: 28, fontWeight: 400, fontStyle: 'italic' as const } as React.CSSProperties,
-    card: { background: '#fdfbf6', border: '1px solid rgba(139, 111, 62, 0.2)', padding: 24, marginBottom: 12, cursor: 'pointer', transition: 'all 0.2s' } as React.CSSProperties,
-    cardSelected: { borderColor: '#5a4a2a', background: '#f7efdf', boxShadow: '0 2px 8px rgba(90, 74, 42, 0.08)' } as React.CSSProperties,
-    cardTitle: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 400, marginBottom: 2, color: '#1a1815' } as React.CSSProperties,
-    cardDesc: { fontSize: 13, color: '#5a4a2a', lineHeight: 1.5 } as React.CSSProperties,
-    button: { background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' } as React.CSSProperties,
-    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid rgba(26, 24, 21, 0.3)', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    buttonGold: { background: '#5a4a2a', color: '#f5f1ea', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    buttonSmall: { background: 'transparent', color: '#5a4a2a', border: '1px solid rgba(139, 111, 62, 0.4)', padding: '6px 14px', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    buttonSmallActive: { background: '#1a1815', color: '#f5f1ea', border: '1px solid #1a1815', padding: '6px 14px', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
-    textarea: { width: '100%', padding: '14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const, resize: 'vertical' as const, minHeight: 80, lineHeight: 1.55 } as React.CSSProperties,
-    label: { display: 'block', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', color: '#5a4a2a', marginBottom: 6, marginTop: 16 } as React.CSSProperties,
-    select: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
+    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid #e5e7eb' } as React.CSSProperties,
+    brand: { fontFamily: "'Poppins', sans-serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#1a1815' } as React.CSSProperties,
+    brandSub: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#c8aa4a', marginTop: 4 },
+    h1: { fontFamily: "'Poppins', sans-serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' } as React.CSSProperties,
+    h2: { fontFamily: "'Poppins', sans-serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 } as React.CSSProperties,
+    h3: { fontFamily: "'Poppins', sans-serif", fontSize: 22, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 } as React.CSSProperties,
+    eyebrow: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 12 },
+    bodyP: { fontSize: 16, marginBottom: 16, color: '#1a1815' } as React.CSSProperties,
+    lead: { fontFamily: "'Poppins', sans-serif", fontSize: 22, lineHeight: 1.5, color: '#1a1815', marginBottom: 28, fontWeight: 400 } as React.CSSProperties,
+    card: { background: '#F9F8F5', border: '1px solid #e5e7eb', padding: 24, marginBottom: 12, cursor: 'pointer', transition: 'all 0.2s', borderRadius: 8 } as React.CSSProperties,
+    cardSelected: { borderColor: '#0e4f51', background: '#F9F8F5', boxShadow: '0 2px 8px rgba(14,79,81,0.08)' } as React.CSSProperties,
+    cardTitle: { fontFamily: "'Poppins', sans-serif", fontSize: 20, fontWeight: 400, marginBottom: 2, color: '#1a1815' } as React.CSSProperties,
+    cardDesc: { fontSize: 13, color: '#0e4f51', lineHeight: 1.5 } as React.CSSProperties,
+    button: { background: '#0e4f51', color: '#ffffff', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s', borderRadius: 8 } as React.CSSProperties,
+    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid #e5e7eb', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 } as React.CSSProperties,
+    buttonGold: { background: '#c8aa4a', color: '#ffffff', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 } as React.CSSProperties,
+    buttonSmall: { background: 'transparent', color: '#0e4f51', border: '1px solid #e5e7eb', padding: '6px 14px', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 4 } as React.CSSProperties,
+    buttonSmallActive: { background: '#0e4f51', color: '#ffffff', border: '1px solid #0e4f51', padding: '6px 14px', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 4 } as React.CSSProperties,
+    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
+    textarea: { width: '100%', padding: '14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const, resize: 'vertical' as const, minHeight: 80, lineHeight: 1.55 } as React.CSSProperties,
+    label: { display: 'block', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', color: '#0e4f51', marginBottom: 6, marginTop: 16 } as React.CSSProperties,
+    select: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
     list: { paddingLeft: 0, listStyle: 'none' } as React.CSSProperties,
-    listItem: { padding: '6px 0 6px 20px', position: 'relative' as const, fontSize: 14, color: '#2a2720', lineHeight: 1.55 } as React.CSSProperties,
-    dash: { color: '#8b6f3e', position: 'absolute' as const, left: 0 },
+    listItem: { padding: '6px 0 6px 20px', position: 'relative' as const, fontSize: 14, color: '#1a1815', lineHeight: 1.55 } as React.CSSProperties,
+    dash: { color: '#c8aa4a', position: 'absolute' as const, left: 0 },
     progress: { display: 'flex', gap: 4, marginBottom: 36 } as React.CSSProperties,
     progressDot: { height: 2, flex: 1, background: 'rgba(26, 24, 21, 0.15)' } as React.CSSProperties,
-    progressDotActive: { height: 2, flex: 1, background: '#5a4a2a' } as React.CSSProperties,
-    draftNotice: { position: 'fixed' as const, bottom: 20, right: 20, background: '#1a1815', color: '#f5f1ea', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 } as React.CSSProperties,
-    activeBadge: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase' as const, letterSpacing: '0.2em', padding: '3px 8px', background: '#5a4a2a', color: '#f5f1ea', marginLeft: 8 } as React.CSSProperties,
-    primaryQuote: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, lineHeight: 1.35, color: '#1a1815', fontStyle: 'italic' as const, padding: '28px 36px', background: '#fdf6e9', borderLeft: '3px solid #8b6f3e', marginBottom: 32 } as React.CSSProperties,
+    progressDotActive: { height: 2, flex: 1, background: '#0e4f51' } as React.CSSProperties,
+    draftNotice: { position: 'fixed' as const, bottom: 20, right: 20, background: '#0e4f51', color: '#ffffff', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 } as React.CSSProperties,
+    activeBadge: { display: 'inline-block', fontSize: 9, textTransform: 'uppercase' as const, letterSpacing: '0.2em', padding: '3px 8px', background: '#0e4f51', color: '#ffffff', marginLeft: 8 } as React.CSSProperties,
+    primaryQuote: { fontFamily: "'Poppins', sans-serif", fontSize: 26, lineHeight: 1.35, color: '#1a1815', padding: '28px 36px', background: '#F9F8F5', borderLeft: '3px solid #c8aa4a', marginBottom: 32 } as React.CSSProperties,
     statRow: { display: 'flex', gap: 32, marginBottom: 28, flexWrap: 'wrap' as const },
     statBlock: { display: 'flex', flexDirection: 'column' as const, gap: 4 },
-    statLabel: { fontSize: 10, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#8b6f3e' },
-    statValue: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 18, color: '#1a1815' } as React.CSSProperties,
-    tgcOfferBox: { background: '#1a1815', color: '#f5f1ea', padding: '24px 28px', marginBottom: 24 } as React.CSSProperties,
-    priorityChip: { display: 'inline-block', padding: '8px 16px', fontSize: 12, border: '1px solid rgba(26,24,21,0.25)', cursor: 'pointer', margin: '4px', fontFamily: 'inherit', background: 'transparent', color: '#1a1815' } as React.CSSProperties,
-    priorityChipActive: { display: 'inline-block', padding: '8px 16px', fontSize: 12, border: '1px solid #5a4a2a', cursor: 'pointer', margin: '4px', fontFamily: 'inherit', background: '#5a4a2a', color: '#f5f1ea' } as React.CSSProperties,
+    statLabel: { fontSize: 10, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#c8aa4a' },
+    statValue: { fontFamily: "'Poppins', sans-serif", fontSize: 18, color: '#1a1815' } as React.CSSProperties,
+    tgcOfferBox: { background: '#0e4f51', color: '#ffffff', padding: '24px 28px', marginBottom: 24, borderRadius: 8 } as React.CSSProperties,
+    priorityChip: { display: 'inline-block', padding: '8px 16px', fontSize: 12, border: '1px solid #e5e7eb', cursor: 'pointer', margin: '4px', fontFamily: 'inherit', background: 'transparent', color: '#1a1815', borderRadius: 4 } as React.CSSProperties,
+    priorityChipActive: { display: 'inline-block', padding: '8px 16px', fontSize: 12, border: '1px solid #0e4f51', cursor: 'pointer', margin: '4px', fontFamily: 'inherit', background: '#0e4f51', color: '#ffffff', borderRadius: 4 } as React.CSSProperties,
   }
 
   const screens = ['welcome', 'browse', 'event-detail', 'brief', 'client', 'confirmation']
@@ -614,22 +614,22 @@ function TGCVIPHospitality() {
         "Anyone can attend Monaco, Wimbledon, or Art Basel. A ticket, a hotel, and an itinerary will get you there. The question is whether you are inside the event or observing it. These are not the same experience."
       </div>
       <p style={s.bodyP}>
-        Twenty curated events across motorsport, polo, horse racing, tennis, sailing, art, performance, golf, and film. For each, TGC maps the difference between attending and accessing — and where we have a specific offer, we'll tell you exactly what it is.
+        Twenty curated events across motorsport, polo, horse racing, tennis, sailing, art, performance, golf, and film. For each, TGC maps the difference between attending and accessing. Where we have a specific offer, we'll tell you exactly what it is.
       </p>
 
       {/* TGC Active events */}
       <div style={{ marginTop: 36, marginBottom: 36 }}>
-        <div style={s.eyebrow}>TGC Active — events where we have a direct offer</div>
+        <div style={s.eyebrow}>TGC Active: events where we have a direct offer</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12, marginTop: 16 }}>
           {EVENTS.filter(e => e.tgcActive).map(ev => (
-            <div key={ev.id} style={{ ...s.card, borderColor: '#5a4a2a', background: '#fdf6e9', cursor: 'pointer' }}
+            <div key={ev.id} style={{ ...s.card, borderColor: '#0e4f51', background: '#F9F8F5', cursor: 'pointer' }}
               onClick={() => { setSelectedEvent(ev); setScreen('event-detail') }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, color: '#1a1815' }}>{ev.name}</div>
+                <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 20, fontWeight: 400, color: '#0e4f51' }}>{ev.name}</div>
                 <span style={s.activeBadge}>TGC Active</span>
               </div>
-              <div style={{ fontSize: 12, color: '#8b6f3e', marginTop: 6 }}>{ev.location} · {ev.dates}</div>
-              <div style={{ fontSize: 13, color: '#5a4a2a', marginTop: 8, lineHeight: 1.5 }}>{ev.tgcOffer?.slice(0, 120)}…</div>
+              <div style={{ fontSize: 12, color: '#c8aa4a', marginTop: 6 }}>{ev.location} · {ev.dates}</div>
+              <div style={{ fontSize: 13, color: '#6b7280', marginTop: 8, lineHeight: 1.5 }}>{ev.tgcOffer?.slice(0, 120)}…</div>
             </div>
           ))}
         </div>
@@ -666,12 +666,12 @@ function TGCVIPHospitality() {
                 <span style={s.cardTitle}>{ev.name}</span>
                 {ev.tgcActive && <span style={s.activeBadge}>TGC Active</span>}
               </div>
-              <div style={{ fontSize: 11, color: '#8b6f3e', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+              <div style={{ fontSize: 11, color: '#c8aa4a', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
                 {CATEGORIES.find(c => c.id === ev.category)?.label}
               </div>
             </div>
-            <div style={{ fontSize: 12, color: '#8b6f3e', marginTop: 4 }}>{ev.location} · {ev.dates}</div>
-            <div style={{ fontSize: 13, color: '#5a4a2a', marginTop: 8, lineHeight: 1.5 }}>{ev.accessStatement.slice(0, 100)}…</div>
+            <div style={{ fontSize: 12, color: '#c8aa4a', marginTop: 4 }}>{ev.location} · {ev.dates}</div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginTop: 8, lineHeight: 1.5 }}>{ev.accessStatement.slice(0, 100)}…</div>
           </div>
         ))}
       </div>
@@ -709,14 +709,14 @@ function TGCVIPHospitality() {
           </div>
         </div>
 
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 19, lineHeight: 1.6, color: '#2a2720', fontStyle: 'italic', marginBottom: 28 }}>
+        <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: 17, lineHeight: 1.7, color: '#6b7280', marginBottom: 28 }}>
           {selectedEvent.accessStatement}
         </p>
 
         {selectedEvent.tgcActive && selectedEvent.tgcOffer && (
           <div style={s.tgcOfferBox}>
-            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c9a870', marginBottom: 10 }}>TGC Active — Our specific offer</div>
-            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 17, lineHeight: 1.65, margin: 0 }}>{selectedEvent.tgcOffer}</p>
+            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 10 }}>TGC Active. Our specific offer.</div>
+            <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: 15, lineHeight: 1.65, margin: 0 }}>{selectedEvent.tgcOffer}</p>
           </div>
         )}
 
@@ -724,11 +724,11 @@ function TGCVIPHospitality() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
           <div>
             <div style={s.eyebrow}>The loud version (to avoid)</div>
-            <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.6 }}>{selectedEvent.loud}</p>
+            <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.6 }}>{selectedEvent.loud}</p>
           </div>
           <div>
             <div style={s.eyebrow}>The quiet version (what we'll build)</div>
-            <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.6 }}>{selectedEvent.quiet}</p>
+            <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.6 }}>{selectedEvent.quiet}</p>
           </div>
         </div>
 
@@ -740,10 +740,10 @@ function TGCVIPHospitality() {
         </ul>
 
         <h3 style={s.h3}>Commercial framing</h3>
-        <div style={{ ...s.card, cursor: 'default', background: '#f7efdf' }}>
-          <p style={{ fontSize: 15, color: '#2a2720', margin: 0, lineHeight: 1.6 }}>{selectedEvent.scale}</p>
-          <p style={{ fontSize: 13, color: '#5a4a2a', marginTop: 12, marginBottom: 0, fontStyle: 'italic', lineHeight: 1.55 }}>
-            TGC's fee covers facilitation, introductions, and access management — not tickets or hospitality costs, which are passed through at cost.
+        <div style={{ ...s.card, cursor: 'default', background: '#F9F8F5' }}>
+          <p style={{ fontSize: 15, color: '#1a1815', margin: 0, lineHeight: 1.6 }}>{selectedEvent.scale}</p>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
+            TGC's fee covers facilitation, introductions, and access management. Tickets and hospitality costs are passed through at cost.
           </p>
         </div>
 
@@ -829,7 +829,7 @@ function TGCVIPHospitality() {
           <option value="">Select…</option>
           {budgetOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <p style={{ fontSize: 12, color: '#8b6f3e', marginTop: 6, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 12, color: '#6b7280', marginTop: 6 }}>
           Budget is a starting point for the conversation, not a commitment. Ticket and hospitality costs are passed through at cost.
         </p>
 
@@ -864,7 +864,7 @@ function TGCVIPHospitality() {
       <label style={s.label}>Phone (with country code)</label>
       <input type="tel" style={s.input} value={client.phone} placeholder="+33 6 XX XX XX XX" onChange={e => setClient({ ...client, phone: e.target.value })} />
 
-      <p style={{ fontSize: 12, color: '#5a4a2a', marginTop: 24, fontStyle: 'italic', lineHeight: 1.6 }}>
+      <p style={{ fontSize: 12, color: '#6b7280', marginTop: 24, lineHeight: 1.6 }}>
         Your brief is seen only by the Gatekeeper assigned to your event. We don't share details with hospitality providers before a mandate is agreed.
       </p>
 
@@ -882,10 +882,10 @@ function TGCVIPHospitality() {
       <h2 style={s.h2}>Thank you, {client.name?.split(' ')[0]}.</h2>
       <p style={s.lead}>Your brief for {selectedEvent?.name} is with us.</p>
 
-      <div style={{ ...s.card, background: '#f7efdf', cursor: 'default' }}>
+      <div style={{ ...s.card, background: '#F9F8F5', cursor: 'default' }}>
         <div style={s.eyebrow}>Reference</div>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{refId}</div>
-        <div style={{ fontSize: 14, color: '#5a4a2a' }}>
+        <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 15, color: '#0e4f51', letterSpacing: '0.05em', margin: '4px 0 16px' }}>{refId}</div>
+        <div style={{ fontSize: 14, color: '#6b7280' }}>
           <strong style={{ color: '#1a1815' }}>{selectedEvent?.name}</strong> · {selectedEvent?.location} · {brief.party} · {brief.occasion}
         </div>
       </div>
@@ -896,7 +896,7 @@ function TGCVIPHospitality() {
         <li style={s.listItem}><span style={s.dash}>—</span><strong>Within 72 hours:</strong> a discovery call to confirm the approach and any timing constraints</li>
         <li style={s.listItem}><span style={s.dash}>—</span><strong>Once agreed:</strong> TGC manages the access, logistics, and any programme around the event</li>
         {selectedEvent?.tgcActive && (
-          <li style={s.listItem}><span style={s.dash}>—</span><strong>TGC Active event:</strong> your Gatekeeper has direct relationships here — expect a faster and more specific response</li>
+          <li style={s.listItem}><span style={s.dash}>—</span><strong>TGC Active event:</strong> your Gatekeeper has direct relationships here. Expect a faster and more specific response.</li>
         )}
       </ul>
 
@@ -925,11 +925,11 @@ function TGCVIPHospitality() {
   return (
     <div style={s.root}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #5a4a2a; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0e4f51; }
         button:hover:not(:disabled) { opacity: 0.85; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a4a2a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%230e4f51' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
       `}</style>
       <div style={s.container}>
         <div style={s.header}>

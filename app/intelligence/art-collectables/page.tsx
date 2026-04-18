@@ -299,40 +299,40 @@ function TGCArtCollectables() {
     : []
 
   const s = {
-    root: { minHeight: '100vh', background: '#f5f1ea', color: '#1a1815', fontFamily: "'Inter', system-ui, sans-serif", padding: '40px 20px', lineHeight: 1.6 } as React.CSSProperties,
+    root: { minHeight: '100vh', background: '#F9F8F5', color: '#1a1815', fontFamily: "'Lato', sans-serif", padding: '40px 20px', lineHeight: 1.6 } as React.CSSProperties,
     container: { maxWidth: 920, margin: '0 auto' } as React.CSSProperties,
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid rgba(26, 24, 21, 0.1)' } as React.CSSProperties,
-    brand: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#1a1815' } as React.CSSProperties,
-    brandSub: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#8b6f3e', marginTop: 4 },
-    h1: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' } as React.CSSProperties,
-    h2: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 } as React.CSSProperties,
-    h3: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 } as React.CSSProperties,
-    eyebrow: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#8b6f3e', marginBottom: 12 },
-    bodyP: { fontSize: 16, marginBottom: 16, color: '#2a2720', lineHeight: 1.65 } as React.CSSProperties,
-    lead: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, lineHeight: 1.55, color: '#2a2720', marginBottom: 28, fontWeight: 400, fontStyle: 'italic' as const } as React.CSSProperties,
-    card: { background: '#fdfbf6', border: '1px solid rgba(139, 111, 62, 0.2)', padding: 24, marginBottom: 12, cursor: 'pointer', transition: 'all 0.2s' } as React.CSSProperties,
-    cardSelected: { borderColor: '#5a4a2a', background: '#f7efdf' } as React.CSSProperties,
-    cardTitle: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, marginBottom: 4, color: '#1a1815' } as React.CSSProperties,
-    cardDesc: { fontSize: 13, color: '#5a4a2a', lineHeight: 1.55 } as React.CSSProperties,
-    button: { background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid rgba(26, 24, 21, 0.3)', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    buttonGold: { background: '#5a4a2a', color: '#f5f1ea', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit' } as React.CSSProperties,
-    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
-    textarea: { width: '100%', padding: '14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const, resize: 'vertical' as const, minHeight: 80, lineHeight: 1.55 } as React.CSSProperties,
-    select: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#fdfbf6', border: '1px solid rgba(26, 24, 21, 0.2)', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
-    label: { display: 'block', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', color: '#5a4a2a', marginBottom: 6, marginTop: 16 } as React.CSSProperties,
+    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48, paddingBottom: 16, borderBottom: '1px solid #e5e7eb' } as React.CSSProperties,
+    brand: { fontFamily: "'Poppins', sans-serif", fontSize: 26, fontWeight: 400, letterSpacing: '0.02em', color: '#0e4f51' } as React.CSSProperties,
+    brandSub: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#c8aa4a', marginTop: 4 },
+    h1: { fontFamily: "'Poppins', sans-serif", fontSize: 48, fontWeight: 400, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.01em' } as React.CSSProperties,
+    h2: { fontFamily: "'Poppins', sans-serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 } as React.CSSProperties,
+    h3: { fontFamily: "'Poppins', sans-serif", fontSize: 20, fontWeight: 400, lineHeight: 1.3, marginTop: 28, marginBottom: 10 } as React.CSSProperties,
+    eyebrow: { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 12 },
+    bodyP: { fontSize: 16, marginBottom: 16, color: '#1a1815', lineHeight: 1.65 } as React.CSSProperties,
+    lead: { fontFamily: "'Poppins', sans-serif", fontSize: 20, lineHeight: 1.55, color: '#6b7280', marginBottom: 28, fontWeight: 300 } as React.CSSProperties,
+    card: { background: '#F9F8F5', border: '1px solid #e5e7eb', padding: 24, marginBottom: 12, cursor: 'pointer', transition: 'all 0.2s', borderRadius: 8 } as React.CSSProperties,
+    cardSelected: { borderColor: '#0e4f51', background: '#F9F8F5', boxShadow: '0 2px 8px rgba(14,79,81,0.08)' } as React.CSSProperties,
+    cardTitle: { fontFamily: "'Poppins', sans-serif", fontSize: 20, fontWeight: 400, marginBottom: 4, color: '#1a1815' } as React.CSSProperties,
+    cardDesc: { fontSize: 13, color: '#6b7280', lineHeight: 1.55 } as React.CSSProperties,
+    button: { background: '#0e4f51', color: '#ffffff', border: 'none', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s', borderRadius: 8 } as React.CSSProperties,
+    buttonSecondary: { background: 'transparent', color: '#1a1815', border: '1px solid #e5e7eb', padding: '14px 28px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 } as React.CSSProperties,
+    buttonGold: { background: '#c8aa4a', color: '#ffffff', border: 'none', padding: '16px 32px', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: '0.1em', cursor: 'pointer', fontFamily: 'inherit', borderRadius: 8 } as React.CSSProperties,
+    input: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
+    textarea: { width: '100%', padding: '14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const, resize: 'vertical' as const, minHeight: 80, lineHeight: 1.55 } as React.CSSProperties,
+    select: { width: '100%', padding: '12px 14px', fontSize: 15, fontFamily: 'inherit', background: '#F9F8F5', border: '1px solid #e5e7eb', color: '#1a1815', boxSizing: 'border-box' as const } as React.CSSProperties,
+    label: { display: 'block', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.15em', color: '#0e4f51', marginBottom: 6, marginTop: 16 } as React.CSSProperties,
     list: { paddingLeft: 0, listStyle: 'none' } as React.CSSProperties,
-    listItem: { padding: '6px 0 6px 20px', position: 'relative' as const, fontSize: 14, color: '#2a2720', lineHeight: 1.6 } as React.CSSProperties,
-    dash: { color: '#8b6f3e', position: 'absolute' as const, left: 0 },
+    listItem: { padding: '6px 0 6px 20px', position: 'relative' as const, fontSize: 14, color: '#1a1815', lineHeight: 1.6 } as React.CSSProperties,
+    dash: { color: '#c8aa4a', position: 'absolute' as const, left: 0 },
     progress: { display: 'flex', gap: 4, marginBottom: 36 } as React.CSSProperties,
-    progressDot: { height: 2, flex: 1, background: 'rgba(26, 24, 21, 0.15)' } as React.CSSProperties,
-    progressDotActive: { height: 2, flex: 1, background: '#5a4a2a' } as React.CSSProperties,
-    draftNotice: { position: 'fixed' as const, bottom: 20, right: 20, background: '#1a1815', color: '#f5f1ea', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 } as React.CSSProperties,
-    primaryQuote: { fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, lineHeight: 1.35, color: '#1a1815', fontStyle: 'italic' as const, padding: '28px 36px', background: '#fdf6e9', borderLeft: '3px solid #8b6f3e', marginBottom: 32 } as React.CSSProperties,
-    structuringCard: { padding: '20px 24px', marginBottom: 12, borderLeft: '3px solid rgba(139, 111, 62, 0.3)', background: '#fdfbf6' } as React.CSSProperties,
-    structuringCardMaterial: { padding: '20px 24px', marginBottom: 12, borderLeft: '3px solid #5a4a2a', background: '#f7efdf' } as React.CSSProperties,
-    tgcNoteBox: { background: '#1a1815', color: '#f5f1ea', padding: '16px 20px', marginTop: 10, fontSize: 13, lineHeight: 1.65 } as React.CSSProperties,
-    chroniclesBox: { background: 'transparent', border: '1px solid rgba(139, 111, 62, 0.4)', padding: '16px 20px', marginTop: 24, marginBottom: 8 } as React.CSSProperties,
+    progressDot: { height: 2, flex: 1, background: '#e5e7eb' } as React.CSSProperties,
+    progressDotActive: { height: 2, flex: 1, background: '#0e4f51' } as React.CSSProperties,
+    draftNotice: { position: 'fixed' as const, bottom: 20, right: 20, background: '#0e4f51', color: '#ffffff', padding: '12px 20px', fontSize: 12, letterSpacing: '0.1em', zIndex: 100 } as React.CSSProperties,
+    primaryQuote: { fontFamily: "'Poppins', sans-serif", fontWeight: 300, fontSize: 22, lineHeight: 1.45, color: '#1a1815', padding: '28px 36px', background: '#F9F8F5', borderLeft: '3px solid #c8aa4a', marginBottom: 32 } as React.CSSProperties,
+    structuringCard: { padding: '20px 24px', marginBottom: 12, borderLeft: '3px solid #e5e7eb', background: '#F9F8F5', borderRadius: 8 } as React.CSSProperties,
+    structuringCardMaterial: { padding: '20px 24px', marginBottom: 12, borderLeft: '3px solid #0e4f51', background: '#F9F8F5', borderRadius: 8 } as React.CSSProperties,
+    tgcNoteBox: { background: '#0e4f51', color: '#ffffff', padding: '16px 20px', marginTop: 10, fontSize: 13, lineHeight: 1.65, borderRadius: 4 } as React.CSSProperties,
+    chroniclesBox: { background: 'transparent', border: '1px solid #e5e7eb', padding: '16px 20px', marginTop: 24, marginBottom: 8, borderRadius: 8 } as React.CSSProperties,
   }
 
   const screens = ['welcome', 'category', 'market', 'direction', 'structuring', 'brief', 'client', 'confirmation']
@@ -352,11 +352,11 @@ function TGCArtCollectables() {
         {CATEGORIES.map(cat => (
           <div key={cat.id} style={{ ...s.card, ...(selectedCategory?.id === cat.id ? s.cardSelected : {}) }}
             onClick={() => { setSelectedCategory(cat); setScreen('category') }}>
-            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#8b6f3e', marginBottom: 8 }}>
+            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 8 }}>
               {cat.number}
             </div>
             <div style={s.cardTitle}>{cat.name}</div>
-            <div style={{ fontSize: 13, color: '#5a4a2a', marginTop: 6, lineHeight: 1.5, fontStyle: 'italic' }}>{cat.tagline}</div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginTop: 6, lineHeight: 1.5 }}>{cat.tagline}</div>
           </div>
         ))}
       </div>
@@ -376,8 +376,8 @@ function TGCArtCollectables() {
             <div key={cat.id}
               style={{ ...s.card, ...(selectedCategory.id === cat.id ? s.cardSelected : {}), padding: 16 }}
               onClick={() => setSelectedCategory(cat)}>
-              <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#8b6f3e', marginBottom: 4 }}>{cat.number}</div>
-              <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 17, color: '#1a1815' }}>{cat.name}</div>
+              <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#c8aa4a', marginBottom: 4 }}>{cat.number}</div>
+              <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: 17, fontWeight: 400, color: '#1a1815' }}>{cat.name}</div>
             </div>
           ))}
         </div>
@@ -402,11 +402,11 @@ function TGCArtCollectables() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
           <div>
             <div style={s.eyebrow}>The loud version (to avoid)</div>
-            <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.65 }}>{selectedCategory.loud}</p>
+            <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.65 }}>{selectedCategory.loud}</p>
           </div>
           <div>
             <div style={s.eyebrow}>The quiet version (what TGC builds toward)</div>
-            <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.65 }}>{selectedCategory.quiet}</p>
+            <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.65 }}>{selectedCategory.quiet}</p>
           </div>
         </div>
 
@@ -417,24 +417,24 @@ function TGCArtCollectables() {
           ))}
         </ul>
 
-        <div style={{ background: '#1a1815', color: '#f5f1ea', padding: '24px 28px', marginTop: 32, marginBottom: 8 }}>
-          <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c9a870', marginBottom: 10 }}>TGC's positioning</div>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 17, lineHeight: 1.65, margin: 0 }}>
+        <div style={{ background: '#0e4f51', color: '#ffffff', padding: '24px 28px', marginTop: 32, marginBottom: 8, borderRadius: 8 }}>
+          <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 10 }}>TGC's positioning</div>
+          <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: 15, lineHeight: 1.65, margin: 0 }}>
             {selectedCategory.tgcAngle}
           </p>
         </div>
 
         {selectedCategory.chroniclesNote && (
           <div style={s.chroniclesBox}>
-            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#8b6f3e', marginBottom: 8 }}>Concierge Chronicles</div>
-            <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.65, margin: 0, fontStyle: 'italic' }}>
+            <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#c8aa4a', marginBottom: 8 }}>Concierge Chronicles</div>
+            <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.65, margin: 0 }}>
               {selectedCategory.chroniclesNote}
             </p>
           </div>
         )}
 
         <div style={{ marginTop: 32 }}>
-          <button style={s.button} onClick={() => setScreen('direction')}>Continue — your mandate →</button>
+          <button style={s.button} onClick={() => setScreen('direction')}>Continue: your mandate →</button>
         </div>
       </div>
     )
@@ -513,12 +513,12 @@ function TGCArtCollectables() {
             <div style={{ ...s.eyebrow, marginTop: 8, marginBottom: 16 }}>Material considerations</div>
             {materialFlags.map(flag => (
               <div key={flag.id} style={s.structuringCardMaterial}>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 19, color: '#1a1815', marginBottom: 8 }}>
+                <div style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 17, color: '#1a1815', marginBottom: 8 }}>
                   {flag.title}
                 </div>
-                <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.65, margin: 0 }}>{flag.explanation}</p>
+                <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.65, margin: 0 }}>{flag.explanation}</p>
                 <div style={s.tgcNoteBox}>
-                  <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#c9a870', marginBottom: 6 }}>TGC note</div>
+                  <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#c8aa4a', marginBottom: 6 }}>TGC note</div>
                   <p style={{ fontSize: 13, margin: 0, lineHeight: 1.65 }}>{flag.tgcNote}</p>
                 </div>
               </div>
@@ -531,12 +531,12 @@ function TGCArtCollectables() {
             <div style={{ ...s.eyebrow, marginTop: 28, marginBottom: 16 }}>Practical considerations</div>
             {practicalFlags.map(flag => (
               <div key={flag.id} style={s.structuringCard}>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 19, color: '#1a1815', marginBottom: 8 }}>
+                <div style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400, fontSize: 17, color: '#1a1815', marginBottom: 8 }}>
                   {flag.title}
                 </div>
-                <p style={{ fontSize: 14, color: '#2a2720', lineHeight: 1.65, margin: 0 }}>{flag.explanation}</p>
-                <div style={{ ...s.tgcNoteBox, background: '#f0ebe0', color: '#2a2720', marginTop: 10 }}>
-                  <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#8b6f3e', marginBottom: 6 }}>TGC note</div>
+                <p style={{ fontSize: 14, color: '#1a1815', lineHeight: 1.65, margin: 0 }}>{flag.explanation}</p>
+                <div style={{ ...s.tgcNoteBox, background: '#F9F8F5', color: '#1a1815', marginTop: 10 }}>
+                  <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#c8aa4a', marginBottom: 6 }}>TGC note</div>
                   <p style={{ fontSize: 13, margin: 0, lineHeight: 1.65 }}>{flag.tgcNote}</p>
                 </div>
               </div>
@@ -544,8 +544,8 @@ function TGCArtCollectables() {
           </>
         )}
 
-        <div style={{ background: '#fdf6e9', borderLeft: '3px solid #8b6f3e', padding: '16px 20px', marginTop: 24 }}>
-          <p style={{ fontSize: 14, color: '#2a2720', margin: 0, lineHeight: 1.65 }}>
+        <div style={{ background: '#F9F8F5', borderLeft: '3px solid #e5e7eb', padding: '16px 20px', marginTop: 24, borderRadius: 4 }}>
+          <p style={{ fontSize: 14, color: '#1a1815', margin: 0, lineHeight: 1.65 }}>
             None of the above replaces specialist legal, tax, or financial advice — which TGC can introduce you to in France, the UK, or Switzerland. The purpose of this analysis is to ensure you ask the right questions before any transaction, not to answer them definitively.
           </p>
         </div>
@@ -630,7 +630,7 @@ function TGCArtCollectables() {
       <label style={s.label}>Phone (with country code)</label>
       <input type="tel" style={s.input} value={client.phone} placeholder="+33 6 XX XX XX XX" onChange={e => setClient({ ...client, phone: e.target.value })} />
 
-      <p style={{ fontSize: 12, color: '#5a4a2a', marginTop: 24, fontStyle: 'italic', lineHeight: 1.6 }}>
+      <p style={{ fontSize: 12, color: '#6b7280', marginTop: 24, lineHeight: 1.6 }}>
         Your brief is seen only by the Gatekeeper handling your category. TGC does not share interest with any seller, gallery, or auction house before a mandate is agreed and confidentiality terms are in place.
       </p>
 
@@ -648,10 +648,10 @@ function TGCArtCollectables() {
       <h2 style={s.h2}>Thank you, {client.name?.split(' ')[0]}.</h2>
       <p style={s.lead}>Your brief is with us.</p>
 
-      <div style={{ ...s.card, background: '#f7efdf', cursor: 'default' }}>
+      <div style={{ ...s.card, background: '#F9F8F5', cursor: 'default' }}>
         <div style={s.eyebrow}>Reference</div>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{refId}</div>
-        <div style={{ fontSize: 14, color: '#5a4a2a' }}>
+        <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 15, color: '#0e4f51', letterSpacing: '0.05em', margin: '4px 0 16px' }}>{refId}</div>
+        <div style={{ fontSize: 14, color: '#6b7280' }}>
           <strong style={{ color: '#1a1815' }}>{selectedCategory?.name}</strong>
           {direction && <> · {direction}</>}
           {budget && <> · {budget}</>}
@@ -693,11 +693,11 @@ function TGCArtCollectables() {
   return (
     <div style={s.root}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #5a4a2a; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #0e4f51; }
         button:hover:not(:disabled) { opacity: 0.85; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a4a2a' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%230e4f51' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
       `}</style>
       <div style={s.container}>
         <div style={s.header}>

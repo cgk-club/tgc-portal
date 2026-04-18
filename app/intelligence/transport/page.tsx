@@ -416,31 +416,30 @@ const TGCTransportIntelligence = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#f5f1ea',
-      backgroundImage: 'radial-gradient(circle at 20% 10%, rgba(139, 111, 62, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 90%, rgba(139, 111, 62, 0.03) 0%, transparent 50%)',
+      background: '#F9F8F5',
       color: '#1a1815',
-      fontFamily: 'Georgia, "Cormorant Garamond", serif',
+      fontFamily: "'Lato', sans-serif",
       padding: '2rem 1.5rem',
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        .tgc-font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .tgc-font-sans { font-family: 'Inter', sans-serif; font-weight: 300; }
-        .tgc-font-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+        .tgc-font-serif { font-family: 'Poppins', sans-serif; font-weight: 400; }
+        .tgc-font-sans { font-family: 'Lato', sans-serif; font-weight: 300; }
+        .tgc-font-mono { font-family: 'Lato', sans-serif; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
         .tgc-fade-in { animation: tgcFade 0.6s ease forwards; }
         @keyframes tgcFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .tgc-option:hover { background: rgba(139, 111, 62, 0.06) !important; border-color: #8b6f3e !important; }
+        .tgc-option:hover { background: rgba(14, 79, 81, 0.06) !important; border-color: #0e4f51 !important; }
         .tgc-btn { transition: all 0.2s ease; }
-        .tgc-btn:hover:not(:disabled) { background: #1a1815; color: #f5f1ea; }
+        .tgc-btn:hover:not(:disabled) { background: #0e4f51; color: #ffffff; }
         .tgc-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .tgc-progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #d8d0c0; transition: all 0.3s ease; }
-        .tgc-progress-dot.active { background: #1a1815; width: 28px; border-radius: 3px; }
-        .tgc-progress-dot.done { background: #8b6f3e; }
-        input[type="range"] { width: 100%; height: 4px; background: #d8d0c0; outline: none; appearance: none; -webkit-appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #1a1815; cursor: pointer; }
-        input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #1a1815; cursor: pointer; border: none; }
-        .tgc-input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #d8d0c0; background: white; font-size: 1rem; font-family: 'Cormorant Garamond', Georgia, serif; outline: none; transition: border-color 0.2s; }
-        .tgc-input:focus { border-color: #5a4a2a; }
+        .tgc-progress-dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; transition: all 0.3s ease; }
+        .tgc-progress-dot.active { background: #0e4f51; width: 28px; border-radius: 3px; }
+        .tgc-progress-dot.done { background: #c8aa4a; }
+        input[type="range"] { width: 100%; height: 4px; background: #e5e7eb; outline: none; appearance: none; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #0e4f51; cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #0e4f51; cursor: pointer; border: none; }
+        .tgc-input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #e5e7eb; background: #F9F8F5; font-size: 1rem; font-family: 'Lato', sans-serif; outline: none; transition: border-color 0.2s; }
+        .tgc-input:focus { border-color: #0e4f51; }
       `}</style>
 
       <div style={{ maxWidth: '1040px', margin: '0 auto' }}>
@@ -449,12 +448,12 @@ const TGCTransportIntelligence = () => {
         <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div
             className="tgc-font-serif"
-            style={{ fontStyle: 'italic', fontSize: '1.1rem', color: '#3a352e', cursor: 'pointer' }}
+            style={{ fontSize: '1.1rem', color: '#0e4f51', cursor: 'pointer' }}
             onClick={() => setScreen('welcome')}
           >
             The Gatekeepers Club
           </div>
-          <div className="tgc-font-mono" style={{ color: '#6b645a' }}>
+          <div className="tgc-font-mono" style={{ color: '#c8aa4a' }}>
             Transport Intelligence · v.2
           </div>
         </div>
@@ -463,36 +462,34 @@ const TGCTransportIntelligence = () => {
         {screen === 'welcome' && (
           <div className="tgc-fade-in">
             <h1 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.8rem, 6vw, 4.8rem)', lineHeight: 1.03, letterSpacing: '-0.01em', marginBottom: '1.5rem' }}>
-              Getting there,<br /><em style={{ color: '#5a4a2a' }}>considered.</em>
+              Getting there,<br /><em style={{ color: '#0e4f51' }}>considered.</em>
             </h1>
-            <p className="tgc-font-serif" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', fontStyle: 'italic', color: '#6b645a', maxWidth: '640px', lineHeight: 1.5, marginBottom: '3rem' }}>
-              Choose a route. Answer six questions. We will tell you the right way to travel — honestly — and quote it. Or model whether to book, lease, share, or own.
+            <p className="tgc-font-sans" style={{ fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', color: '#6b7280', maxWidth: '640px', lineHeight: 1.6, marginBottom: '3rem' }}>
+              Choose a route. Answer six questions. We will tell you the right way to travel, honestly, and quote it. Or model whether to book, lease, share, or own.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
               <button
                 onClick={() => setScreen('corridor-select')}
-                style={{ background: '#1a1815', color: '#f5f1ea', padding: '2.5rem 2rem', border: 'none', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s ease' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#5a4a2a'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#1a1815'}
+                style={{ background: '#0e4f51', color: '#ffffff', padding: '2.5rem 2rem', border: 'none', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s ease', borderRadius: 8 }}
               >
-                <div className="tgc-font-mono" style={{ color: '#c9a870', marginBottom: '1rem' }}>Tool 01 · The Journey</div>
+                <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Tool 01 · The Journey</div>
                 <div className="tgc-font-serif" style={{ fontSize: '1.8rem', marginBottom: '0.6rem', lineHeight: 1.15 }}>
                   Plan a <em>specific route</em>
                 </div>
                 <div style={{ fontSize: '0.92rem', opacity: 0.75, lineHeight: 1.5 }}>
                   Choose from 60 curated corridors across the US, UK/Europe, and transatlantic. We'll tell you the right way to travel it.
                 </div>
-                <div className="tgc-font-mono" style={{ marginTop: '1.5rem', color: '#c9a870' }}>Select corridor →</div>
+                <div className="tgc-font-mono" style={{ marginTop: '1.5rem', color: '#c8aa4a' }}>Select corridor →</div>
               </button>
 
               <button
                 onClick={() => setScreen('calculator')}
-                style={{ background: 'transparent', color: '#1a1815', padding: '2.5rem 2rem', border: '1.5px solid #1a1815', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s ease' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#1a1815'; e.currentTarget.style.color = '#f5f1ea'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#1a1815'; }}
+                style={{ background: 'transparent', color: '#1a1815', padding: '2.5rem 2rem', border: '1.5px solid #e5e7eb', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s ease', borderRadius: 8 }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#0e4f51'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = '#0e4f51'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#1a1815'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
               >
-                <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Tool 02 · The Asset</div>
+                <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Tool 02 · The Asset</div>
                 <div className="tgc-font-serif" style={{ fontSize: '1.8rem', marginBottom: '0.6rem', lineHeight: 1.15 }}>
                   Book, share, or <em>own</em>?
                 </div>
@@ -504,13 +501,13 @@ const TGCTransportIntelligence = () => {
             </div>
 
             {savedJourneys.length > 0 && (
-              <div style={{ marginTop: '3rem', padding: '1.5rem', border: '1px solid #d8d0c0', background: '#faf7f1' }}>
-                <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Your saved journeys</div>
+              <div style={{ marginTop: '3rem', padding: '1.5rem', border: '1px solid #e5e7eb', background: '#F9F8F5' }}>
+                <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Your saved journeys</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {savedJourneys.map(j => (
-                    <div key={j.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0', borderBottom: '1px solid #e6dfd0' }}>
-                      <button onClick={() => loadJourney(j)} className="tgc-font-serif" style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '1.05rem', fontStyle: 'italic', color: '#1a1815', flex: 1 }}>
-                        {j.name} <span style={{ color: '#8b6f3e', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif', fontStyle: 'normal' }}>· {j.corridorName}</span>
+                    <div key={j.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0', borderBottom: '1px solid #e5e7eb' }}>
+                      <button onClick={() => loadJourney(j)} className="tgc-font-serif" style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '1.05rem', color: '#1a1815', flex: 1 }}>
+                        {j.name} <span style={{ color: '#c8aa4a', fontSize: '0.85rem', fontFamily: "'Lato', sans-serif", fontStyle: 'normal' }}>· {j.corridorName}</span>
                       </button>
                       <button onClick={() => deleteJourney(j.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a63a2a', padding: '0.3rem' }}>
                         <X size={16} />
@@ -527,21 +524,21 @@ const TGCTransportIntelligence = () => {
         {screen === 'corridor-select' && (
           <div className="tgc-fade-in">
             <div style={{ marginBottom: '2rem' }}>
-              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
+              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
                 <ChevronLeft size={14} /> Home
               </button>
             </div>
 
-            <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Step 1 of 3 · Choose your route</div>
+            <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Step 1 of 3 · Choose your route</div>
             <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05, marginBottom: '0.8rem', letterSpacing: '-0.01em' }}>
-              Where are you <em style={{ color: '#5a4a2a' }}>going</em>?
+              Where are you <em style={{ color: '#0e4f51' }}>going</em>?
             </h2>
-            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6b645a', marginBottom: '2rem', maxWidth: '640px' }}>
+            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', color: '#6b7280', marginBottom: '2rem', maxWidth: '640px' }}>
               60 corridors, grouped by region. Or search by city — London, Monaco, Aspen, Hamptons.
             </p>
 
             <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
-              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#8b6f3e' }} />
+              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#c8aa4a' }} />
               <input
                 type="text"
                 placeholder="Search corridors..."
@@ -557,10 +554,10 @@ const TGCTransportIntelligence = () => {
               if (corridors.length === 0) return null;
               return (
                 <div key={region.id} style={{ marginBottom: '2.5rem' }}>
-                  <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.9rem' }}>{regionIcon(region.id)}</span>
                     <span>{region.label}</span>
-                    <span style={{ color: '#6b645a' }}>· {corridors.length}</span>
+                    <span style={{ color: '#6b7280' }}>· {corridors.length}</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.8rem' }}>
                     {corridors.map((c: any) => (
@@ -568,14 +565,14 @@ const TGCTransportIntelligence = () => {
                         key={c.id}
                         onClick={() => { setSelectedCorridor(c); setScreen('planner'); setPlannerStep(0); }}
                         className="tgc-option"
-                        style={{ background: 'transparent', border: '1px solid #d8d0c0', padding: '1rem 1.2rem', textAlign: 'left', cursor: 'pointer', color: '#1a1815', transition: 'all 0.2s ease', position: 'relative' }}
+                        style={{ background: 'transparent', border: '1px solid #e5e7eb', padding: '1rem 1.2rem', textAlign: 'left', cursor: 'pointer', color: '#1a1815', transition: 'all 0.2s ease', position: 'relative' }}
                       >
                         <div className="tgc-font-serif" style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '0.2rem' }}>{c.name}</div>
-                        <div style={{ fontSize: '0.82rem', color: '#6b645a', fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
-                          {c.distanceKm} km · <em style={{ color: '#8b6f3e', fontStyle: 'italic' }}>{c.defaultMode}</em>
+                        <div style={{ fontSize: '0.82rem', color: '#6b7280', fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
+                          {c.distanceKm} km · <em style={{ color: '#c8aa4a' }}>{c.defaultMode}</em>
                         </div>
                         {c.tgcCoverage === 'active' && (
-                          <div style={{ position: 'absolute', top: '0.6rem', right: '0.6rem', background: '#5a4a2a', color: '#f5f1ea', fontSize: '0.6rem', padding: '0.15rem 0.4rem', letterSpacing: '0.1em', fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase' }}>
+                          <div style={{ position: 'absolute', top: '0.6rem', right: '0.6rem', background: '#0e4f51', color: '#ffffff', fontSize: '0.6rem', padding: '0.15rem 0.4rem', letterSpacing: '0.1em', fontFamily: "'Lato', sans-serif", fontWeight: 700, textTransform: 'uppercase' }}>
                             TGC
                           </div>
                         )}
@@ -594,7 +591,7 @@ const TGCTransportIntelligence = () => {
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button
                 onClick={() => { if (plannerStep === 0) setScreen('corridor-select'); else setPlannerStep(plannerStep - 1); }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                 className="tgc-font-mono"
               >
                 <ChevronLeft size={14} /> Back
@@ -606,19 +603,19 @@ const TGCTransportIntelligence = () => {
               </div>
             </div>
 
-            <div style={{ marginBottom: '2rem', padding: '1rem 1.2rem', background: '#faf7f1', border: '1px solid #d8d0c0' }}>
-              <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '0.3rem' }}>Your route</div>
-              <div className="tgc-font-serif" style={{ fontSize: '1.4rem', fontStyle: 'italic' }}>{selectedCorridor.name}</div>
+            <div style={{ marginBottom: '2rem', padding: '1rem 1.2rem', background: '#F9F8F5', border: '1px solid #e5e7eb' }}>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '0.3rem' }}>Your route</div>
+              <div className="tgc-font-serif" style={{ fontSize: '1.4rem' }}>{selectedCorridor.name}</div>
             </div>
 
             <div key={plannerStep} className="tgc-fade-in">
-              <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '0.8rem' }}>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '0.8rem' }}>
                 Step 2 of 3 · Question {String(plannerStep + 1).padStart(2, '0')} of {String(plannerSteps.length).padStart(2, '0')}
               </div>
               <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', lineHeight: 1.1, marginBottom: '0.8rem', letterSpacing: '-0.01em' }}>
                 {currentStep.question}
               </h2>
-              <p className="tgc-font-serif" style={{ fontSize: '1.15rem', fontStyle: 'italic', color: '#6b645a', marginBottom: '2.5rem', maxWidth: '600px' }}>
+              <p className="tgc-font-serif" style={{ fontSize: '1.15rem', color: '#6b7280', marginBottom: '2.5rem', maxWidth: '600px' }}>
                 {currentStep.subtitle}
               </p>
 
@@ -631,18 +628,18 @@ const TGCTransportIntelligence = () => {
                       key={opt.value}
                       onClick={() => handleAnswer(currentStep.key, opt.value)}
                       className="tgc-option"
-                      style={{ background: selected ? 'rgba(139, 111, 62, 0.1)' : 'transparent', border: `1px solid ${selected ? '#5a4a2a' : '#d8d0c0'}`, padding: '1.3rem 1.5rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1.2rem', transition: 'all 0.2s ease', color: '#1a1815' }}
+                      style={{ background: selected ? 'rgba(14, 79, 81, 0.08)' : 'transparent', border: `1px solid ${selected ? '#0e4f51' : '#e5e7eb'}`, padding: '1.3rem 1.5rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1.2rem', transition: 'all 0.2s ease', color: '#1a1815', borderRadius: 8 }}
                     >
                       {Icon && (
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: selected ? '#5a4a2a' : '#ede7db', color: selected ? '#f5f1ea' : '#8b6f3e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: selected ? '#0e4f51' : '#e5e7eb', color: selected ? '#ffffff' : '#c8aa4a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <Icon size={18} />
                         </div>
                       )}
                       <div style={{ flex: 1 }}>
                         <div className="tgc-font-serif" style={{ fontSize: '1.25rem', fontWeight: 500, marginBottom: '0.2rem' }}>{opt.label}</div>
-                        <div style={{ fontSize: '0.9rem', color: '#6b645a', fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>{opt.desc}</div>
+                        <div style={{ fontSize: '0.9rem', color: '#6b7280', fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>{opt.desc}</div>
                       </div>
-                      {selected && <Check size={18} style={{ color: '#5a4a2a' }} />}
+                      {selected && <Check size={18} style={{ color: '#0e4f51' }} />}
                     </button>
                   );
                 })}
@@ -655,75 +652,75 @@ const TGCTransportIntelligence = () => {
         {screen === 'result' && selectedCorridor && allPlannerAnswered && (
           <div className="tgc-fade-in">
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
+              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
                 <ChevronLeft size={14} /> Home
               </button>
-              <button onClick={resetAll} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
+              <button onClick={resetAll} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
                 <RotateCcw size={14} /> Start over
               </button>
             </div>
 
-            <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Your route · answered</div>
+            <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Your route · answered</div>
 
             <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05, marginBottom: '0.6rem', letterSpacing: '-0.01em' }}>
-              <em style={{ color: '#5a4a2a' }}>{selectedCorridor.name}</em>
+              <em style={{ color: '#0e4f51' }}>{selectedCorridor.name}</em>
             </h2>
-            <p className="tgc-font-serif" style={{ fontSize: '1.35rem', fontStyle: 'italic', color: '#6b645a', marginBottom: '2rem' }}>
+            <p className="tgc-font-serif" style={{ fontSize: '1.35rem', color: '#6b7280', marginBottom: '2rem' }}>
               {selectedCorridor.defaultTag}
             </p>
 
-            <div style={{ background: '#1a1815', color: '#f5f1ea', padding: '2.5rem 2rem', marginBottom: '2rem' }}>
-              <div className="tgc-font-mono" style={{ color: '#c9a870', marginBottom: '1rem' }}>Our recommendation</div>
+            <div style={{ background: '#0e4f51', color: '#ffffff', padding: '2.5rem 2rem', marginBottom: '2rem' }}>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Our recommendation</div>
               <div className="tgc-font-serif" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 400, lineHeight: 1.1, marginBottom: '0.4rem' }}>
                 {selectedCorridor.defaultMode}
               </div>
-              <div className="tgc-font-serif" style={{ fontStyle: 'italic', color: 'rgba(245, 241, 234, 0.7)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
+              <div className="tgc-font-serif" style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
                 {selectedCorridor.timeDefault}
               </div>
-              <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(245, 241, 234, 0.15)', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+              <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 <div>
-                  <div className="tgc-font-mono" style={{ color: 'rgba(245, 241, 234, 0.5)', marginBottom: '0.4rem' }}>Indicative</div>
-                  <div className="tgc-font-serif" style={{ fontSize: '1.05rem', color: '#c9a870' }}>{selectedCorridor.price}</div>
+                  <div className="tgc-font-mono" style={{ color: 'rgba(255, 255, 255, 0.6)', marginBottom: '0.4rem' }}>Indicative</div>
+                  <div className="tgc-font-serif" style={{ fontSize: '1.05rem', color: '#c8aa4a' }}>{selectedCorridor.price}</div>
                 </div>
                 <div>
-                  <div className="tgc-font-mono" style={{ color: 'rgba(245, 241, 234, 0.5)', marginBottom: '0.4rem' }}>Season</div>
-                  <div className="tgc-font-serif" style={{ fontSize: '1.05rem', color: '#c9a870' }}>{selectedCorridor.seasonality}</div>
+                  <div className="tgc-font-mono" style={{ color: 'rgba(255, 255, 255, 0.6)', marginBottom: '0.4rem' }}>Season</div>
+                  <div className="tgc-font-serif" style={{ fontSize: '1.05rem', color: '#c8aa4a' }}>{selectedCorridor.seasonality}</div>
                 </div>
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem' }}>
-              <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Why this, specifically</div>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Why this, specifically</div>
               {selectedCorridor.reasons.map((r: string, i: number) => (
-                <div key={i} style={{ display: 'flex', gap: '1.2rem', padding: '1.2rem 0', borderBottom: i < selectedCorridor.reasons.length - 1 ? '1px solid #d8d0c0' : 'none' }}>
-                  <div className="tgc-font-mono" style={{ color: '#8b6f3e', paddingTop: '0.25rem' }}>{String(i + 1).padStart(2, '0')}</div>
-                  <div className="tgc-font-serif" style={{ fontSize: '1.1rem', lineHeight: 1.55, color: '#3a352e' }}>{r}</div>
+                <div key={i} style={{ display: 'flex', gap: '1.2rem', padding: '1.2rem 0', borderBottom: i < selectedCorridor.reasons.length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                  <div className="tgc-font-mono" style={{ color: '#c8aa4a', paddingTop: '0.25rem' }}>{String(i + 1).padStart(2, '0')}</div>
+                  <div className="tgc-font-serif" style={{ fontSize: '1.1rem', lineHeight: 1.55, color: '#0e4f51' }}>{r}</div>
                 </div>
               ))}
             </div>
 
             {selectedCorridor.alternative && (
-              <div style={{ background: '#faf7f1', border: '1px solid #d8d0c0', padding: '1.5rem', marginBottom: '2rem' }}>
-                <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '0.6rem' }}>If you want to trade something</div>
-                <div className="tgc-font-serif" style={{ fontSize: '1.08rem', fontStyle: 'italic', color: '#3a352e', lineHeight: 1.55 }}>
+              <div style={{ background: '#F9F8F5', border: '1px solid #e5e7eb', padding: '1.5rem', marginBottom: '2rem' }}>
+                <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '0.6rem' }}>If you want to trade something</div>
+                <div className="tgc-font-serif" style={{ fontSize: '1.08rem', color: '#0e4f51', lineHeight: 1.55 }}>
                   {selectedCorridor.alternative}
                 </div>
               </div>
             )}
 
             {(answers.frequency === 'frequent' || answers.frequency === 'daily') && (
-              <div style={{ background: '#ede7db', border: '1px solid #8b6f3e', padding: '1.8rem', marginBottom: '2rem', display: 'flex', gap: '1.2rem', alignItems: 'flex-start' }}>
-                <TrendingUp size={22} style={{ color: '#5a4a2a', flexShrink: 0, marginTop: '0.2rem' }} />
+              <div style={{ background: '#e5e7eb', border: '1px solid #c8aa4a', padding: '1.8rem', marginBottom: '2rem', display: 'flex', gap: '1.2rem', alignItems: 'flex-start' }}>
+                <TrendingUp size={22} style={{ color: '#0e4f51', flexShrink: 0, marginTop: '0.2rem' }} />
                 <div style={{ flex: 1 }}>
-                  <div className="tgc-font-mono" style={{ color: '#5a4a2a', marginBottom: '0.5rem' }}>Asset question triggered</div>
+                  <div className="tgc-font-mono" style={{ color: '#0e4f51', marginBottom: '0.5rem' }}>Asset question triggered</div>
                   <div className="tgc-font-serif" style={{ fontSize: '1.1rem', color: '#1a1815', lineHeight: 1.5, marginBottom: '1rem' }}>
                     At this frequency, a jet card, fractional share, or retained structure may cost less than on-demand charter. Worth modelling.
                   </div>
                   <button
                     onClick={() => { setCalcMode('jet-light'); setScreen('calculator'); }}
-                    style={{ background: '#1a1815', color: '#f5f1ea', padding: '0.6rem 1.2rem', border: 'none', cursor: 'pointer' }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#5a4a2a'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = '#1a1815'}
+                    style={{ background: '#0e4f51', color: '#ffffff', padding: '0.6rem 1.2rem', border: 'none', cursor: 'pointer' }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.85'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                   >
                     <span className="tgc-font-mono">Model the economics →</span>
                   </button>
@@ -739,9 +736,7 @@ const TGCTransportIntelligence = () => {
               <button
                 onClick={() => setScreen('submit')}
                 className="tgc-btn"
-                style={{ background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#5a4a2a'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#1a1815'}
+                style={{ background: '#0e4f51', color: '#ffffff', border: 'none', padding: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', borderRadius: 8 }}
               >
                 <span className="tgc-font-mono">Have us quote this</span>
                 <Send size={16} />
@@ -754,51 +749,51 @@ const TGCTransportIntelligence = () => {
         {screen === 'submit' && selectedCorridor && !submitted && (
           <div className="tgc-fade-in">
             <div style={{ marginBottom: '2rem' }}>
-              <button onClick={() => setScreen('result')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
+              <button onClick={() => setScreen('result')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
                 <ChevronLeft size={14} /> Back to recommendation
               </button>
             </div>
 
-            <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Step 3 of 3 · Send the brief</div>
+            <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Step 3 of 3 · Send the brief</div>
             <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05, marginBottom: '0.8rem' }}>
-              Let us <em style={{ color: '#5a4a2a' }}>quote this</em>.
+              Let us <em style={{ color: '#0e4f51' }}>quote this</em>.
             </h2>
-            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6b645a', marginBottom: '2.5rem', maxWidth: '640px', lineHeight: 1.5 }}>
+            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', color: '#6b7280', marginBottom: '2.5rem', maxWidth: '640px', lineHeight: 1.5 }}>
               A gatekeeper will come back to you within the hour with a firm quote. No templated responses.
             </p>
 
-            <div style={{ padding: '1.5rem', background: '#faf7f1', border: '1px solid #d8d0c0', marginBottom: '2rem' }}>
-              <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '0.6rem' }}>Your brief</div>
-              <div className="tgc-font-serif" style={{ fontSize: '1.15rem', fontStyle: 'italic' }}>{selectedCorridor.name}</div>
-              <div style={{ fontSize: '0.88rem', color: '#6b645a', marginTop: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ padding: '1.5rem', background: '#F9F8F5', border: '1px solid #e5e7eb', marginBottom: '2rem' }}>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '0.6rem' }}>Your brief</div>
+              <div className="tgc-font-serif" style={{ fontSize: '1.15rem' }}>{selectedCorridor.name}</div>
+              <div style={{ fontSize: '0.88rem', color: '#6b7280', marginTop: '0.5rem', fontFamily: "'Lato', sans-serif" }}>
                 {answers.purpose} · {answers.travellers} · {answers.luggage} luggage · priority: {answers.priority}
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               <div>
-                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#8b6f3e' }}>Name</label>
+                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#c8aa4a' }}>Name</label>
                 <input type="text" className="tgc-input" value={clientDetails.name} onChange={(e) => setClientDetails({ ...clientDetails, name: e.target.value })} placeholder="Your name" />
               </div>
               <div>
-                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#8b6f3e' }}>Email</label>
+                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#c8aa4a' }}>Email</label>
                 <input type="email" className="tgc-input" value={clientDetails.email} onChange={(e) => setClientDetails({ ...clientDetails, email: e.target.value })} placeholder="email@example.com" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               <div>
-                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#8b6f3e' }}>Phone (optional)</label>
+                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#c8aa4a' }}>Phone (optional)</label>
                 <input type="tel" className="tgc-input" value={clientDetails.phone} onChange={(e) => setClientDetails({ ...clientDetails, phone: e.target.value })} placeholder="+33 ..." />
               </div>
               <div>
-                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#8b6f3e' }}>Travel date</label>
+                <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#c8aa4a' }}>Travel date</label>
                 <input type="date" className="tgc-input" value={clientDetails.travelDate} onChange={(e) => setClientDetails({ ...clientDetails, travelDate: e.target.value })} />
               </div>
             </div>
 
             <div style={{ marginBottom: '2rem' }}>
-              <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#8b6f3e' }}>Anything else we should know?</label>
+              <label className="tgc-font-mono" style={{ display: 'block', marginBottom: '0.5rem', color: '#c8aa4a' }}>Anything else we should know?</label>
               <textarea
                 className="tgc-input"
                 rows={4}
@@ -813,7 +808,7 @@ const TGCTransportIntelligence = () => {
               onClick={submitJourney}
               disabled={!clientDetails.name || !clientDetails.email || !clientDetails.travelDate || submitting}
               className="tgc-btn"
-              style={{ width: '100%', background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}
+              style={{ width: '100%', background: '#0e4f51', color: '#ffffff', border: 'none', padding: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}
             >
               {submitting ? <span className="tgc-font-mono">Sending...</span> : (
                 <>
@@ -823,7 +818,7 @@ const TGCTransportIntelligence = () => {
               )}
             </button>
 
-            <div className="tgc-font-serif" style={{ fontStyle: 'italic', color: '#6b645a', fontSize: '0.9rem', marginTop: '1.5rem', textAlign: 'center' }}>
+            <div className="tgc-font-serif" style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '1.5rem', textAlign: 'center' }}>
               Response inside the hour. No automated templates.
             </div>
           </div>
@@ -832,16 +827,16 @@ const TGCTransportIntelligence = () => {
         {/* ============ SUBMITTED CONFIRMATION ============ */}
         {submitted && (
           <div className="tgc-fade-in" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#ede7db', color: '#5a4a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#e5e7eb', color: '#0e4f51', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
               <CheckCircle size={36} />
             </div>
             <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2rem, 4vw, 3rem)', marginBottom: '1rem' }}>
-              Received. In good <em style={{ color: '#5a4a2a' }}>hands.</em>
+              Received. In good <em style={{ color: '#0e4f51' }}>hands.</em>
             </h2>
-            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6b645a', maxWidth: '520px', margin: '0 auto 2.5rem', lineHeight: 1.5 }}>
+            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', color: '#6b7280', maxWidth: '520px', margin: '0 auto 2.5rem', lineHeight: 1.5 }}>
               A gatekeeper has your brief. You'll receive a first response from a named person within the hour, with a firm quote to follow.
             </p>
-            <button onClick={resetAll} className="tgc-btn" style={{ background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '1rem 2rem', cursor: 'pointer' }}>
+            <button onClick={resetAll} className="tgc-btn" style={{ background: '#0e4f51', color: '#ffffff', border: 'none', padding: '1rem 2rem', cursor: 'pointer' }}>
               <span className="tgc-font-mono">Plan another journey</span>
             </button>
           </div>
@@ -851,21 +846,21 @@ const TGCTransportIntelligence = () => {
         {screen === 'calculator' && (
           <div className="tgc-fade-in">
             <div style={{ marginBottom: '2rem' }}>
-              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b645a', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
+              <button onClick={() => setScreen('welcome')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="tgc-font-mono">
                 <ChevronLeft size={14} /> Home
               </button>
             </div>
 
-            <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Asset Intelligence</div>
+            <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Asset Intelligence</div>
             <h2 className="tgc-font-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.05, marginBottom: '0.8rem' }}>
-              Book, share, <em style={{ color: '#5a4a2a' }}>or own</em>?
+              Book, share, <em style={{ color: '#0e4f51' }}>or own</em>?
             </h2>
-            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6b645a', marginBottom: '3rem', maxWidth: '640px', lineHeight: 1.5 }}>
+            <p className="tgc-font-serif" style={{ fontSize: '1.2rem', color: '#6b7280', marginBottom: '3rem', maxWidth: '640px', lineHeight: 1.5 }}>
               Every mode of transport has a break-even point where booking stops being cheapest and ownership stops being absurd.
             </p>
 
             <div style={{ marginBottom: '2.5rem' }}>
-              <div className="tgc-font-mono" style={{ color: '#6b645a', marginBottom: '1rem' }}>What are you considering?</div>
+              <div className="tgc-font-mono" style={{ color: '#6b7280', marginBottom: '1rem' }}>What are you considering?</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' }}>
                 {[
                   { v: 'chauffeur', l: 'Chauffeur service' },
@@ -880,10 +875,10 @@ const TGCTransportIntelligence = () => {
                     <button
                       key={opt.v}
                       onClick={() => { setCalcMode(opt.v); setCalcInputs({ ...calcInputs, mode: opt.v }); }}
-                      style={{ padding: '1rem', background: selected ? '#1a1815' : 'transparent', color: selected ? '#f5f1ea' : '#1a1815', border: `1px solid ${selected ? '#1a1815' : '#d8d0c0'}`, cursor: 'pointer', transition: 'all 0.2s ease' }}
+                      style={{ padding: '1rem', background: selected ? '#1a1815' : 'transparent', color: selected ? '#F9F8F5' : '#1a1815', border: `1px solid ${selected ? '#1a1815' : '#e5e7eb'}`, cursor: 'pointer', transition: 'all 0.2s ease' }}
                       className="tgc-font-serif"
                     >
-                      <span style={{ fontSize: '1.05rem', fontStyle: 'italic' }}>{opt.l}</span>
+                      <span style={{ fontSize: '1.05rem' }}>{opt.l}</span>
                     </button>
                   );
                 })}
@@ -902,13 +897,13 @@ const TGCTransportIntelligence = () => {
 
               return (
                 <>
-                  <div style={{ background: '#faf7f1', border: '1px solid #d8d0c0', padding: '2rem', marginBottom: '2rem' }}>
-                    <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Your {label}</div>
+                  <div style={{ background: '#F9F8F5', border: '1px solid #e5e7eb', padding: '2rem', marginBottom: '2rem' }}>
+                    <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Your {label}</div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem' }}>
                       <div className="tgc-font-serif" style={{ fontSize: 'clamp(3rem, 7vw, 5rem)', fontWeight: 400, color: '#1a1815', lineHeight: 1 }}>
                         {calcInputs.hoursPerYear}
                       </div>
-                      <div className="tgc-font-serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', color: '#6b645a' }}>{unit}</div>
+                      <div className="tgc-font-serif" style={{ fontSize: '1.3rem', color: '#6b7280' }}>{unit}</div>
                     </div>
                     <input
                       type="range"
@@ -921,12 +916,12 @@ const TGCTransportIntelligence = () => {
                   </div>
 
                   {result && (
-                    <div style={{ background: '#1a1815', color: '#f5f1ea', padding: '2.5rem 2rem', marginBottom: '2rem' }}>
-                      <div className="tgc-font-mono" style={{ color: '#c9a870', marginBottom: '1rem' }}>At {calcInputs.hoursPerYear} {unit}, the answer is</div>
+                    <div style={{ background: '#0e4f51', color: '#ffffff', padding: '2.5rem 2rem', marginBottom: '2rem' }}>
+                      <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>At {calcInputs.hoursPerYear} {unit}, the answer is</div>
                       <div className="tgc-font-serif" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 400, lineHeight: 1.1, marginBottom: '1.5rem' }}>
-                        <em style={{ color: '#c9a870' }}>{result.verdict}</em>
+                        <em style={{ color: '#c8aa4a' }}>{result.verdict}</em>
                       </div>
-                      <div className="tgc-font-serif" style={{ fontSize: '1.12rem', lineHeight: 1.55, color: 'rgba(245, 241, 234, 0.82)' }}>
+                      <div className="tgc-font-serif" style={{ fontSize: '1.12rem', lineHeight: 1.55, color: 'rgba(255, 255, 255, 0.85)' }}>
                         {result.rationale}
                       </div>
                     </div>
@@ -934,27 +929,27 @@ const TGCTransportIntelligence = () => {
 
                   {result && result.costs && (
                     <div style={{ marginBottom: '2.5rem' }}>
-                      <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>The annual cost picture</div>
-                      <div style={{ background: '#faf7f1', border: '1px solid #d8d0c0', padding: '1.5rem' }}>
+                      <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>The annual cost picture</div>
+                      <div style={{ background: '#F9F8F5', border: '1px solid #e5e7eb', padding: '1.5rem' }}>
                         {Object.entries(result.costs).map(([key, value]) => {
                           const labels: Record<string, string> = { onDemand: 'On-demand / charter', retained: 'Retained network', dedicated: 'Dedicated contracted', inHouse: 'Fully in-house', card: 'Jet card', fractional: 'Fractional ownership', owned: 'Full ownership', lease: 'Long-term lease' };
                           const maxVal = Math.max(...Object.values(result.costs) as number[]);
                           const pct = Math.max(5, ((value as number) / maxVal) * 100);
                           return (
-                            <div key={key} style={{ padding: '1rem 0', borderBottom: '1px solid #e6dfd0' }}>
+                            <div key={key} style={{ padding: '1rem 0', borderBottom: '1px solid #e5e7eb' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5rem' }}>
-                                <div className="tgc-font-serif" style={{ fontSize: '1.02rem', fontStyle: 'italic', color: '#1a1815' }}>{labels[key] || key}</div>
+                                <div className="tgc-font-serif" style={{ fontSize: '1.02rem', color: '#1a1815' }}>{labels[key] || key}</div>
                                 <div className="tgc-font-serif" style={{ fontSize: '1.02rem', fontWeight: 500, color: '#1a1815' }}>
-                                  {formatCurrency(value as number)}<span style={{ fontSize: '0.78rem', color: '#6b645a', fontWeight: 300 }}> / yr</span>
+                                  {formatCurrency(value as number)}<span style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 300 }}> / yr</span>
                                 </div>
                               </div>
-                              <div style={{ height: '4px', background: '#e6dfd0', position: 'relative' }}>
-                                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: '#8b6f3e', transition: 'width 0.5s ease' }} />
+                              <div style={{ height: '4px', background: '#e5e7eb', position: 'relative' }}>
+                                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: '#c8aa4a', transition: 'width 0.5s ease' }} />
                               </div>
                             </div>
                           );
                         })}
-                        <div className="tgc-font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: '#6b645a', marginTop: '1rem', lineHeight: 1.5 }}>
+                        <div className="tgc-font-serif" style={{ fontSize: '0.88rem', color: '#6b7280', marginTop: '1rem', lineHeight: 1.5 }}>
                           Indicative annual costs. Real quotes account for aircraft type, routes, home base, crew, hangarage, insurance, and — for yachts and aircraft — chartering-back programmes that can offset ownership costs meaningfully.
                         </div>
                       </div>
@@ -964,7 +959,7 @@ const TGCTransportIntelligence = () => {
                   <button
                     onClick={() => setScreen('submit')}
                     className="tgc-btn"
-                    style={{ width: '100%', background: '#1a1815', color: '#f5f1ea', border: 'none', padding: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}
+                    style={{ width: '100%', background: '#0e4f51', color: '#ffffff', border: 'none', padding: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}
                   >
                     <Send size={16} />
                     <span className="tgc-font-mono">Have us structure this</span>
@@ -978,10 +973,10 @@ const TGCTransportIntelligence = () => {
         {/* ============ SAVE MODAL ============ */}
         {showSaveModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(26, 24, 21, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', zIndex: 100 }} onClick={() => setShowSaveModal(false)}>
-            <div style={{ background: '#f5f1ea', padding: '2.5rem', maxWidth: '480px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
-              <div className="tgc-font-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Save this journey</div>
+            <div style={{ background: '#F9F8F5', padding: '2.5rem', maxWidth: '480px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+              <div className="tgc-font-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Save this journey</div>
               <h3 className="tgc-font-serif" style={{ fontSize: '1.8rem', fontWeight: 400, marginBottom: '1.5rem', lineHeight: 1.15 }}>
-                Give it a <em style={{ color: '#5a4a2a' }}>name</em>
+                Give it a <em style={{ color: '#0e4f51' }}>name</em>
               </h3>
               <input
                 type="text"
@@ -991,11 +986,11 @@ const TGCTransportIntelligence = () => {
                 placeholder="e.g. The Monaco run"
                 autoFocus
                 className="tgc-input"
-                style={{ marginBottom: '1.5rem', fontStyle: 'italic' }}
+                style={{ marginBottom: '1.5rem' }}
               />
               <div style={{ display: 'flex', gap: '0.8rem' }}>
                 <button onClick={() => setShowSaveModal(false)} style={{ flex: 1, padding: '0.9rem', background: 'transparent', border: '1px solid #1a1815', cursor: 'pointer', color: '#1a1815' }} className="tgc-font-mono">Cancel</button>
-                <button onClick={saveJourney} disabled={!saveName.trim()} className="tgc-btn" style={{ flex: 1, padding: '0.9rem', background: '#1a1815', color: '#f5f1ea', border: 'none', cursor: saveName.trim() ? 'pointer' : 'not-allowed', opacity: saveName.trim() ? 1 : 0.4 }}>
+                <button onClick={saveJourney} disabled={!saveName.trim()} className="tgc-btn" style={{ flex: 1, padding: '0.9rem', background: '#0e4f51', color: '#ffffff', border: 'none', cursor: saveName.trim() ? 'pointer' : 'not-allowed', opacity: saveName.trim() ? 1 : 0.4 }}>
                   <span className="tgc-font-mono">Save</span>
                 </button>
               </div>
@@ -1004,11 +999,11 @@ const TGCTransportIntelligence = () => {
         )}
 
         {/* ============ FOOTER ============ */}
-        <div style={{ marginTop: '5rem', paddingTop: '2rem', borderTop: '1px solid #d8d0c0', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-          <div className="tgc-font-serif" style={{ fontStyle: 'italic', color: '#6b645a', fontSize: '0.95rem' }}>
+        <div style={{ marginTop: '5rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+          <div className="tgc-font-serif" style={{ color: '#6b7280', fontSize: '0.95rem' }}>
             60 corridors. One thinking tool.
           </div>
-          <div className="tgc-font-mono" style={{ color: '#6b645a' }}>
+          <div className="tgc-font-mono" style={{ color: '#6b7280' }}>
             The Gatekeepers Club · South of France · Global
           </div>
         </div>

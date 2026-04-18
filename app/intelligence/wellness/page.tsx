@@ -602,25 +602,24 @@ const TGCWellnessIntelligence = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#f5f1ea',
-      backgroundImage: 'radial-gradient(circle at 20% 10%, rgba(139,111,62,0.04) 0%, transparent 50%)',
+      background: '#F9F8F5',
       color: '#1a1815',
-      fontFamily: 'Georgia, "Cormorant Garamond", serif',
+      fontFamily: "'Lato', sans-serif",
       padding: '2rem 1.5rem',
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        .tgc-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .tgc-sans { font-family: 'Inter', sans-serif; font-weight: 300; }
-        .tgc-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+        .tgc-serif { font-family: 'Poppins', sans-serif; }
+        .tgc-sans { font-family: 'Lato', sans-serif; }
+        .tgc-mono { font-family: 'Lato', sans-serif; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
         .tgc-fade { animation: tgcFade 0.55s ease forwards; }
         @keyframes tgcFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tgc-option:hover { background: rgba(139,111,62,0.06) !important; border-color: #8b6f3e !important; }
-        .tgc-input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #d8d0c0; background: white; font-size: 1rem; font-family: 'Cormorant Garamond', Georgia, serif; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
-        .tgc-input:focus { border-color: #5a4a2a; }
-        .tgc-dot { width: 6px; height: 6px; border-radius: 50%; background: #d8d0c0; transition: all 0.3s ease; }
-        .tgc-dot.active { background: #1a1815; width: 28px; border-radius: 3px; }
-        .tgc-dot.done { background: #8b6f3e; }
+        .tgc-option:hover { background: rgba(200,170,74,0.06) !important; border-color: #c8aa4a !important; }
+        .tgc-input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #e5e7eb; background: white; font-size: 1rem; font-family: 'Lato', sans-serif; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+        .tgc-input:focus { border-color: #0e4f51; }
+        .tgc-dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; transition: all 0.3s ease; }
+        .tgc-dot.active { background: #0e4f51; width: 28px; border-radius: 3px; }
+        .tgc-dot.done { background: #c8aa4a; }
       `}</style>
 
       <div style={{ maxWidth: '1040px', margin: '0 auto' }}>
@@ -628,51 +627,51 @@ const TGCWellnessIntelligence = () => {
         {/* Header */}
         <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <a href="/intelligence" style={{ textDecoration: 'none' }}>
-            <span className="tgc-serif" style={{ fontStyle: 'italic', fontSize: '1.1rem', color: '#3a352e' }}>
+            <span className="tgc-serif" style={{ fontSize: '1.1rem', color: '#0e4f51' }}>
               The Gatekeepers Club
             </span>
           </a>
-          <span className="tgc-mono" style={{ color: '#6b645a' }}>Wellness Intelligence · v.1</span>
+          <span className="tgc-mono" style={{ color: '#6b7280' }}>Wellness Intelligence · v.1</span>
         </div>
 
         {/* ── WELCOME ─────────────────────────────────────────────────── */}
         {screen === 'welcome' && (
           <div className="tgc-fade">
             <h1 className="tgc-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.8rem, 6vw, 4.8rem)', lineHeight: 1.03, letterSpacing: '-0.01em', marginBottom: '1.5rem' }}>
-              The right clinic,<br /><em style={{ color: '#5a4a2a' }}>for the right reason.</em>
+              The right clinic, for the right reason.
             </h1>
-            <p className="tgc-serif" style={{ fontSize: 'clamp(1.15rem, 2vw, 1.45rem)', fontStyle: 'italic', color: '#6b645a', maxWidth: '620px', lineHeight: 1.55, marginBottom: '3rem' }}>
+            <p className="tgc-sans" style={{ fontSize: 'clamp(1.15rem, 2vw, 1.45rem)', color: '#6b7280', maxWidth: '620px', lineHeight: 1.55, marginBottom: '3rem' }}>
               Most retreats are bought on reputation. The right one depends on what you actually need. Answer six questions and we will tell you which clinic matches your brief, with the realities they do not put in the brochure.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
               <button
                 onClick={() => setScreen('questions')}
-                style={{ background: '#1a1815', color: '#f5f1ea', padding: '2.5rem 2rem', border: 'none', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#5a4a2a'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#1a1815'}
+                style={{ background: '#0e4f51', color: '#ffffff', padding: '2.5rem 2rem', border: 'none', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s', borderRadius: '8px' }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
-                <div className="tgc-mono" style={{ color: '#c9a870', marginBottom: '1rem' }}>Tool 01 · The Brief</div>
+                <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Tool 01 · The Brief</div>
                 <div className="tgc-serif" style={{ fontSize: '1.8rem', marginBottom: '0.6rem', lineHeight: 1.15 }}>
-                  Match me to a <em>clinic</em>
+                  Match me to a clinic
                 </div>
-                <div style={{ fontSize: '0.9rem', opacity: 0.75, lineHeight: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+                <div style={{ fontSize: '0.9rem', opacity: 0.85, lineHeight: 1.5, fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
                   Six questions. An honest recommendation from twelve carefully selected clinics.
                 </div>
-                <div className="tgc-mono" style={{ marginTop: '1.5rem', color: '#c9a870' }}>Begin →</div>
+                <div className="tgc-mono" style={{ marginTop: '1.5rem', color: '#c8aa4a' }}>Begin →</div>
               </button>
 
               <button
                 onClick={() => setScreen('programmes')}
-                style={{ background: 'transparent', color: '#1a1815', padding: '2.5rem 2rem', border: '1.5px solid #1a1815', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#1a1815'; e.currentTarget.style.color = '#f5f1ea' }}
+                style={{ background: 'transparent', color: '#1a1815', padding: '2.5rem 2rem', border: '1.5px solid #e5e7eb', textAlign: 'left', cursor: 'pointer', transition: 'all 0.25s', borderRadius: '8px' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#0e4f51'; e.currentTarget.style.color = '#ffffff' }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#1a1815' }}
               >
-                <div className="tgc-mono" style={{ color: '#8b6f3e', marginBottom: '1rem' }}>Tool 02 · The Programme</div>
+                <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Tool 02 · The Programme</div>
                 <div className="tgc-serif" style={{ fontSize: '1.8rem', marginBottom: '0.6rem', lineHeight: 1.15 }}>
-                  How often, <em>at what cost?</em>
+                  How often, at what cost?
                 </div>
-                <div style={{ fontSize: '0.9rem', lineHeight: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+                <div style={{ fontSize: '0.9rem', lineHeight: 1.5, fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
                   Model the annual economics of single visits, biannual programmes, or full memberships.
                 </div>
                 <div className="tgc-mono" style={{ marginTop: '1.5rem' }}>Calculate →</div>
@@ -680,7 +679,7 @@ const TGCWellnessIntelligence = () => {
             </div>
 
             {/* The honest framing */}
-            <div style={{ borderTop: '1px solid #d8d0c0', paddingTop: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
               {[
                 { label: 'Diagnostic', clinics: 'Lanserhof, Clinique La Prairie, Prevention Medical' },
                 { label: 'Detox', clinics: 'Buchinger Wilhelmi, Lanserhof, SHA, Viva Mayr' },
@@ -688,8 +687,8 @@ const TGCWellnessIntelligence = () => {
                 { label: 'Longevity', clinics: 'CLP, Lanserhof, SHA, Ananda' },
               ].map((item) => (
                 <div key={item.label}>
-                  <div className="tgc-mono" style={{ color: '#8b6f3e', marginBottom: '0.4rem' }}>{item.label}</div>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.8rem', color: '#6b645a', lineHeight: 1.5 }}>{item.clinics}</div>
+                  <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '0.4rem' }}>{item.label}</div>
+                  <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.5 }}>{item.clinics}</div>
                 </div>
               ))}
             </div>
@@ -704,7 +703,7 @@ const TGCWellnessIntelligence = () => {
               {questions.map((_, i) => (
                 <div key={i} className={`tgc-dot ${i === step ? 'active' : i < step ? 'done' : ''}`} />
               ))}
-              <span style={{ marginLeft: '1rem', fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.78rem', color: '#8b6f3e' }}>
+              <span style={{ marginLeft: '1rem', fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: '#c8aa4a' }}>
                 {step + 1} of {questions.length}
               </span>
             </div>
@@ -712,7 +711,7 @@ const TGCWellnessIntelligence = () => {
             <h2 className="tgc-serif" style={{ fontWeight: 400, fontSize: 'clamp(2rem, 4vw, 3.2rem)', lineHeight: 1.1, marginBottom: '0.7rem' }}>
               {currentQ.question}
             </h2>
-            <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#6b645a', fontSize: '1.1rem', marginBottom: '2rem' }}>
+            <p className="tgc-sans" style={{ color: '#6b7280', fontSize: '1.1rem', marginBottom: '2rem' }}>
               {currentQ.subtitle}
             </p>
 
@@ -726,19 +725,20 @@ const TGCWellnessIntelligence = () => {
                     className="tgc-option"
                     onClick={() => handleAnswer(currentQ.key, opt.value)}
                     style={{
-                      background: isSelected ? 'rgba(139,111,62,0.08)' : '#faf7f1',
-                      border: isSelected ? '1.5px solid #8b6f3e' : '1.5px solid #d8d0c0',
+                      background: isSelected ? 'rgba(200,170,74,0.08)' : '#F9F8F5',
+                      border: isSelected ? '1.5px solid #c8aa4a' : '1.5px solid #e5e7eb',
                       padding: '1.2rem 1.4rem',
                       textAlign: 'left',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
+                      borderRadius: '8px',
                     }}
                   >
-                    {Icon && <Icon size={18} style={{ color: '#8b6f3e', marginBottom: '0.6rem', display: 'block' }} />}
+                    {Icon && <Icon size={18} style={{ color: '#c8aa4a', marginBottom: '0.6rem', display: 'block' }} />}
                     <div className="tgc-serif" style={{ fontSize: '1.15rem', marginBottom: '0.3rem', fontWeight: isSelected ? 500 : 400 }}>
                       {opt.label}
                     </div>
-                    <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.82rem', color: '#6b645a', lineHeight: 1.5 }}>
+                    <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.5 }}>
                       {opt.desc}
                     </div>
                   </button>
@@ -748,7 +748,7 @@ const TGCWellnessIntelligence = () => {
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               {step > 0 && (
-                <button onClick={() => setStep(step - 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#8b6f3e', fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+                <button onClick={() => setStep(step - 1)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#c8aa4a', fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
                   <ChevronLeft size={16} /> Back
                 </button>
               )}
@@ -759,7 +759,7 @@ const TGCWellnessIntelligence = () => {
         {/* ── RESULT ─────────────────────────────────────────────────── */}
         {screen === 'result' && (
           <div className="tgc-fade">
-            <div className="tgc-mono" style={{ color: '#8b6f3e', marginBottom: '1.2rem' }}>Your recommendation</div>
+            <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1.2rem' }}>Your recommendation</div>
             <h2 className="tgc-serif" style={{ fontWeight: 400, fontSize: 'clamp(2rem, 4vw, 3rem)', lineHeight: 1.1, marginBottom: '0.6rem' }}>
               {matches.length > 0 ? (
                 <>
@@ -769,13 +769,13 @@ const TGCWellnessIntelligence = () => {
                 'Tell us more and we will find the right match.'
               )}
             </h2>
-            <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#6b645a', fontSize: '1.05rem', marginBottom: '2.5rem', lineHeight: 1.5 }}>
+            <p className="tgc-sans" style={{ color: '#6b7280', fontSize: '1.05rem', marginBottom: '2.5rem', lineHeight: 1.5 }}>
               Below is our honest assessment. No brochure language.
             </p>
 
             {matches.length === 0 && (
-              <div style={{ padding: '2rem', background: '#faf7f1', border: '1px solid #d8d0c0', marginBottom: '2rem' }}>
-                <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#6b645a' }}>
+              <div style={{ padding: '2rem', background: '#F9F8F5', border: '1px solid #e5e7eb', marginBottom: '2rem', borderRadius: '8px' }}>
+                <p className="tgc-sans" style={{ color: '#6b7280' }}>
                   Your brief is specific enough that a direct conversation will serve better than a filtered list. Submit your brief below and your Gatekeeper will be in touch.
                 </p>
               </div>
@@ -783,15 +783,15 @@ const TGCWellnessIntelligence = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
               {matches.map((clinic, index) => (
-                <div key={clinic.id} style={{ background: index === 0 ? '#1a1815' : '#faf7f1', color: index === 0 ? '#f5f1ea' : '#1a1815', padding: '2rem' }}>
+                <div key={clinic.id} style={{ background: index === 0 ? '#0e4f51' : '#F9F8F5', color: index === 0 ? '#ffffff' : '#1a1815', padding: '2rem', borderRadius: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>
                     <div>
-                      <div className="tgc-mono" style={{ color: index === 0 ? '#c9a870' : '#8b6f3e', marginBottom: '0.4rem' }}>
+                      <div className="tgc-mono" style={{ color: index === 0 ? '#c8aa4a' : '#c8aa4a', marginBottom: '0.4rem' }}>
                         {index === 0 ? 'Primary recommendation' : `Alternative ${index}`}
                         {clinic.tgcActive ? ' · TGC Active' : ''}
                       </div>
                       <h3 className="tgc-serif" style={{ fontWeight: 400, fontSize: '1.8rem', lineHeight: 1.1 }}>{clinic.name}</h3>
-                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.85rem', opacity: 0.7, marginTop: '0.25rem' }}>{clinic.location}</p>
+                      <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.85rem', opacity: 0.7, marginTop: '0.25rem' }}>{clinic.location}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       {clinic.priceNightFrom > 0 && (
@@ -803,14 +803,14 @@ const TGCWellnessIntelligence = () => {
                     </div>
                   </div>
 
-                  <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.9rem', lineHeight: 1.65, opacity: index === 0 ? 0.85 : 0.75, marginBottom: '1.2rem' }}>
+                  <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.9rem', lineHeight: 1.65, opacity: index === 0 ? 0.85 : 0.75, marginBottom: '1.2rem' }}>
                     {clinic.summary}
                   </p>
 
                   {clinic.loudQuiet && (
                     <div style={{ background: index === 0 ? 'rgba(255,255,255,0.07)' : 'rgba(26,24,21,0.04)', padding: '1rem', marginBottom: '1.2rem' }}>
-                      <div className="tgc-mono" style={{ color: index === 0 ? '#c9a870' : '#8b6f3e', marginBottom: '0.5rem', fontSize: '0.62rem' }}>Loud vs quiet</div>
-                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.82rem', lineHeight: 1.6, opacity: 0.8 }}>
+                      <div className="tgc-mono" style={{ color: index === 0 ? '#c8aa4a' : '#c8aa4a', marginBottom: '0.5rem', fontSize: '0.62rem' }}>Loud vs quiet</div>
+                      <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.82rem', lineHeight: 1.6, opacity: 0.8 }}>
                         <strong>Louder:</strong> {clinic.loudQuiet.loud}<br />
                         <strong>Quieter:</strong> {clinic.loudQuiet.quiet}
                       </p>
@@ -818,12 +818,12 @@ const TGCWellnessIntelligence = () => {
                   )}
 
                   <div>
-                    <div className="tgc-mono" style={{ color: index === 0 ? '#c9a870' : '#8b6f3e', marginBottom: '0.6rem', fontSize: '0.62rem' }}>
+                    <div className="tgc-mono" style={{ color: index === 0 ? '#c8aa4a' : '#c8aa4a', marginBottom: '0.6rem', fontSize: '0.62rem' }}>
                       What the brochure won&apos;t tell you
                     </div>
                     <ul style={{ margin: 0, padding: '0 0 0 1.2rem', listStyle: 'disc' }}>
                       {clinic.brochureRealities.slice(0, 3).map((r, i) => (
-                        <li key={i} style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.82rem', lineHeight: 1.65, opacity: 0.8, marginBottom: '0.2rem' }}>
+                        <li key={i} style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.82rem', lineHeight: 1.65, opacity: 0.8, marginBottom: '0.2rem' }}>
                           {r}
                         </li>
                       ))}
@@ -835,15 +835,15 @@ const TGCWellnessIntelligence = () => {
 
             {/* Brief submission */}
             {!submitted ? (
-              <div style={{ padding: '2rem', background: '#faf7f1', border: '1px solid #d8d0c0' }}>
-                <div className="tgc-mono" style={{ color: '#8b6f3e', marginBottom: '1.2rem' }}>Submit your brief</div>
-                <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#6b645a', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              <div style={{ padding: '2rem', background: '#F9F8F5', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+                <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1.2rem' }}>Submit your brief</div>
+                <p className="tgc-sans" style={{ color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.5 }}>
                   Your Gatekeeper will review the recommendation and be in touch to discuss timing, availability, and how to structure the visit.
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
                   {(['name', 'email', 'phone', 'targetMonth'] as const).map((field) => (
                     <div key={field}>
-                      <label className="tgc-mono" style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.62rem', color: '#8b6f3e' }}>
+                      <label className="tgc-mono" style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.62rem', color: '#c8aa4a' }}>
                         {field === 'targetMonth' ? 'Target month' : field}
                       </label>
                       <input
@@ -857,7 +857,7 @@ const TGCWellnessIntelligence = () => {
                   ))}
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label className="tgc-mono" style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.62rem', color: '#8b6f3e' }}>
+                  <label className="tgc-mono" style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.62rem', color: '#c8aa4a' }}>
                     Any other context (optional)
                   </label>
                   <textarea
@@ -873,10 +873,10 @@ const TGCWellnessIntelligence = () => {
                   onClick={submitBrief}
                   disabled={submitting || !clientDetails.name || !clientDetails.email}
                   style={{
-                    background: '#1a1815', color: '#f5f1ea', border: 'none',
+                    background: '#0e4f51', color: '#ffffff', border: 'none',
                     padding: '1rem 2.5rem', cursor: 'pointer',
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem',
-                    letterSpacing: '0.15em', textTransform: 'uppercase',
+                    fontFamily: "'Lato', sans-serif", fontSize: '0.72rem',
+                    letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600,
                     opacity: (submitting || !clientDetails.name || !clientDetails.email) ? 0.4 : 1,
                     transition: 'opacity 0.2s',
                   }}
@@ -885,22 +885,22 @@ const TGCWellnessIntelligence = () => {
                 </button>
               </div>
             ) : (
-              <div style={{ padding: '2.5rem 2rem', background: '#1a1815', color: '#f5f1ea', textAlign: 'center' }}>
-                <div className="tgc-mono" style={{ color: '#c9a870', marginBottom: '1rem' }}>Brief received</div>
+              <div style={{ padding: '2.5rem 2rem', background: '#0e4f51', color: '#ffffff', textAlign: 'center', borderRadius: '8px' }}>
+                <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1rem' }}>Brief received</div>
                 <h3 className="tgc-serif" style={{ fontWeight: 400, fontSize: '2rem', marginBottom: '0.75rem' }}>
                   Thank you, {clientDetails.name.split(' ')[0]}.
                 </h3>
-                <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#c9a870', lineHeight: 1.6 }}>
+                <p className="tgc-sans" style={{ color: '#c8aa4a', lineHeight: 1.6 }}>
                   Your Gatekeeper will be in touch shortly to discuss the recommendation and next steps.
                 </p>
               </div>
             )}
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-              <button onClick={reset} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#8b6f3e', fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.9rem' }}>
+              <button onClick={reset} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#c8aa4a', fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.9rem' }}>
                 <RotateCcw size={14} /> Start again
               </button>
-              <button onClick={() => setScreen('programmes')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#8b6f3e', fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.9rem' }}>
+              <button onClick={() => setScreen('programmes')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#c8aa4a', fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.9rem' }}>
                 <ChevronRight size={14} /> Programme economics
               </button>
             </div>
@@ -910,11 +910,11 @@ const TGCWellnessIntelligence = () => {
         {/* ── PROGRAMMES ECONOMICS ────────────────────────────────────── */}
         {screen === 'programmes' && (
           <div className="tgc-fade">
-            <div className="tgc-mono" style={{ color: '#8b6f3e', marginBottom: '1.2rem' }}>Programme economics</div>
+            <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1.2rem' }}>Programme economics</div>
             <h2 className="tgc-serif" style={{ fontWeight: 400, fontSize: 'clamp(2rem, 4vw, 3.2rem)', lineHeight: 1.1, marginBottom: '0.6rem' }}>
-              Once, twice, or<br /><em style={{ color: '#5a4a2a' }}>annual commitment?</em>
+              Once, twice, or annual commitment?
             </h2>
-            <p className="tgc-serif" style={{ fontStyle: 'italic', color: '#6b645a', marginBottom: '2.5rem', lineHeight: 1.5, fontSize: '1.05rem' }}>
+            <p className="tgc-sans" style={{ color: '#6b7280', marginBottom: '2.5rem', lineHeight: 1.5, fontSize: '1.05rem' }}>
               Most serious wellness clients settle into a biannual cadence after their first visit. The body responds better with regularity.
             </p>
 
@@ -931,28 +931,29 @@ const TGCWellnessIntelligence = () => {
                   className="tgc-option"
                   onClick={() => setProgrammeMode(opt.value)}
                   style={{
-                    background: programmeMode === opt.value ? 'rgba(139,111,62,0.08)' : '#faf7f1',
-                    border: programmeMode === opt.value ? '1.5px solid #8b6f3e' : '1.5px solid #d8d0c0',
+                    background: programmeMode === opt.value ? 'rgba(200,170,74,0.08)' : '#F9F8F5',
+                    border: programmeMode === opt.value ? '1.5px solid #c8aa4a' : '1.5px solid #e5e7eb',
                     padding: '1.2rem',
                     textAlign: 'left',
                     cursor: 'pointer',
+                    borderRadius: '8px',
                   }}
                 >
                   <div className="tgc-serif" style={{ fontSize: '1.05rem', fontWeight: programmeMode === opt.value ? 500 : 400, marginBottom: '0.2rem' }}>{opt.label}</div>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.78rem', color: '#8b6f3e' }}>{opt.sub}</div>
+                  <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: '#c8aa4a' }}>{opt.sub}</div>
                 </button>
               ))}
             </div>
 
             {/* Verdict */}
-            <div style={{ background: '#1a1815', color: '#f5f1ea', padding: '2.5rem 2rem', marginBottom: '2rem', maxWidth: '640px' }}>
-              <div className="tgc-mono" style={{ color: '#c9a870', marginBottom: '0.8rem' }}>Verdict</div>
+            <div style={{ background: '#0e4f51', color: '#ffffff', padding: '2.5rem 2rem', marginBottom: '2rem', maxWidth: '640px', borderRadius: '8px' }}>
+              <div className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '0.8rem' }}>Verdict</div>
               <h3 className="tgc-serif" style={{ fontWeight: 400, fontSize: '1.8rem', marginBottom: '0.6rem' }}>{economics.verdict}</h3>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, lineHeight: 1.65, opacity: 0.82, marginBottom: '1.2rem' }}>
+              <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, lineHeight: 1.65, opacity: 0.9, marginBottom: '1.2rem' }}>
                 {economics.rationale}
               </p>
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '1rem' }}>
-                <div className="tgc-mono" style={{ color: '#c9a870', fontSize: '0.62rem', marginBottom: '0.4rem' }}>Annual investment range</div>
+                <div className="tgc-mono" style={{ color: '#c8aa4a', fontSize: '0.62rem', marginBottom: '0.4rem' }}>Annual investment range</div>
                 <div className="tgc-serif" style={{ fontSize: '1.5rem' }}>{economics.estimatedAnnual}</div>
               </div>
             </div>
@@ -961,16 +962,17 @@ const TGCWellnessIntelligence = () => {
               <button
                 onClick={() => setScreen('questions')}
                 style={{
-                  background: '#1a1815', color: '#f5f1ea', border: 'none',
+                  background: '#0e4f51', color: '#ffffff', border: 'none',
                   padding: '1rem 2rem', cursor: 'pointer',
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.72rem',
-                  letterSpacing: '0.15em', textTransform: 'uppercase',
+                  fontFamily: "'Lato', sans-serif", fontSize: '0.72rem',
+                  letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600,
                   transition: 'all 0.2s',
+                  borderRadius: '8px',
                 }}
               >
                 Match me to a clinic →
               </button>
-              <button onClick={reset} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#8b6f3e', fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+              <button onClick={reset} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#c8aa4a', fontFamily: "'Lato', sans-serif", fontWeight: 300 }}>
                 <RotateCcw size={14} /> Reset
               </button>
             </div>
@@ -978,11 +980,11 @@ const TGCWellnessIntelligence = () => {
         )}
 
         {/* Footer */}
-        <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid #d8d0c0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <a href="/intelligence" className="tgc-mono" style={{ color: '#8b6f3e', textDecoration: 'none', marginRight: '1.5rem' }}>← All tools</a>
+            <a href="/intelligence" className="tgc-mono" style={{ color: '#c8aa4a', textDecoration: 'none', marginRight: '1.5rem' }}>← All tools</a>
           </div>
-          <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, fontSize: '0.75rem', color: '#aaa' }}>
+          <span style={{ fontFamily: "'Lato', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: '#6b7280' }}>
             The Gatekeepers Club · Wellness Intelligence v.1 · 12 clinics
           </span>
         </div>
