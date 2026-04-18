@@ -800,7 +800,218 @@ const COMMERCIAL_DEFAULTS: Record<string, Record<number, { retainer: number; suc
 // COMPONENT
 // ──────────────────────────────────────────────────────────────────────────────
 
-type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial'
+// ──────────────────────────────────────────────────────────────────────────────
+// MARKET MATCH PROFILES — scoring dimensions per market
+// ──────────────────────────────────────────────────────────────────────────────
+
+type MClimate = 'med' | 'atlantic' | 'alpine' | 'capital' | 'africa' | 'island'
+type MPropType = 'villa' | 'apartment' | 'estate' | 'chalet' | 'invest' | 'land'
+type MTaxDriver = 'uk-nondom' | 'italy-flat' | 'golden-visa' | 'monaco' | 'swiss-lump' | 'spain-zero-wealth' | 'portugal-ifici' | 'andorra'
+type MAppreciation = 'strong' | 'moderate' | 'flat' | 'speculative'
+interface MProfile { climates:MClimate[]; props:MPropType[]; bMin:number; bMax:number; privacy:number; tax:MTaxDriver[]; investScore:number; yield:string; appreciation:MAppreciation; liquidity:number; timelines:string[]; whyTGC:string }
+
+const MATCH_PROFILES: Record<string, MProfile> = {
+  'french-riviera':     { climates:['med','island'],   props:['villa','apartment','estate'],  bMin:3,   bMax:100, privacy:8,  tax:['monaco'],               investScore:5, yield:'2-3%',  appreciation:'flat',        liquidity:6, timelines:['12-24','patient'],          whyTGC:'Off-market owner network; notaires in Cap Ferrat, Mougins, Ramatuelle' },
+  'occitanie':          { climates:['med'],             props:['villa','estate','land'],        bMin:0.3, bMax:8,   privacy:9,  tax:[],                        investScore:7, yield:'3-5%',  appreciation:'moderate',    liquidity:4, timelines:['12-24','patient'],          whyTGC:'TGC home market; exclusive mandates; off-market access unavailable elsewhere' },
+  'provence-paca':      { climates:['med'],             props:['villa','estate'],               bMin:1,   bMax:20,  privacy:8,  tax:[],                        investScore:4, yield:'2-3%',  appreciation:'flat',        liquidity:5, timelines:['12-24','patient'],          whyTGC:'Luberon and Alpilles notaire network; architect relationships for heritage renovation' },
+  'paris':              { climates:['capital'],         props:['apartment','invest'],           bMin:0.5, bMax:100, privacy:5,  tax:[],                        investScore:8, yield:'3-4%',  appreciation:'flat',        liquidity:9, timelines:['immediate','6-12'],         whyTGC:'6e/7e/8e/16e notaire network; Bâtiments de France architect access' },
+  'london-prime':       { climates:['capital','atlantic'],props:['apartment','invest'],         bMin:2,   bMax:80,  privacy:5,  tax:['uk-nondom'],             investScore:8, yield:'3-4%',  appreciation:'moderate',    liquidity:9, timelines:['immediate','6-12'],         whyTGC:'PCL agency partnerships; FIG tax barrister relationships; genuine 2026 buyer window' },
+  'tuscany-umbria':     { climates:['med'],             props:['villa','estate'],               bMin:0.6, bMax:15,  privacy:9,  tax:['italy-flat'],            investScore:4, yield:'2-3%',  appreciation:'moderate',    liquidity:4, timelines:['12-24','patient'],          whyTGC:'Chianti/Val d\'Orcia partnerships; Umbria specialist; Italian flat-tax coordination' },
+  'balearics':          { climates:['island','med'],    props:['villa'],                        bMin:0.8, bMax:60,  privacy:7,  tax:[],                        investScore:5, yield:'3-4%',  appreciation:'flat',        liquidity:6, timelines:['6-12','12-24'],            whyTGC:'Island specialist each of Ibiza, Mallorca, Menorca' },
+  'andalusia':          { climates:['med'],             props:['villa','estate'],               bMin:0.5, bMax:50,  privacy:8,  tax:['spain-zero-wealth'],     investScore:7, yield:'3-5%',  appreciation:'moderate',    liquidity:6, timelines:['6-12','12-24'],            whyTGC:'Keith Kirwen Marbella/Sotogrande; Seville network; La Zagaleta direct access' },
+  'cote-basque-aquitaine':{ climates:['atlantic'],      props:['villa','apartment','estate'],  bMin:0.6, bMax:30,  privacy:6,  tax:[],                        investScore:5, yield:'3%',    appreciation:'moderate',    liquidity:5, timelines:['6-12','12-24'],            whyTGC:'Biarritz specialist; Bordeaux notaire direct; wine-industry advisors for châteaux' },
+  'auvergne-rhone-alpes':{ climates:['alpine','capital'],props:['apartment','villa'],          bMin:0.5, bMax:10,  privacy:6,  tax:[],                        investScore:5, yield:'3-4%',  appreciation:'moderate',    liquidity:6, timelines:['6-12','12-24'],            whyTGC:'Lyon direct notaire; Annecy local advisor; Lake Bourget' },
+  'alpine-ski':         { climates:['alpine'],          props:['chalet'],                      bMin:1.5, bMax:200, privacy:7,  tax:['swiss-lump'],            investScore:4, yield:'2%',    appreciation:'flat',        liquidity:5, timelines:['12-24','patient'],          whyTGC:'Courchevel/Méribel specialist; St Moritz and Gstaad Swiss partners' },
+  'geneva-lake':        { climates:['alpine','capital'],props:['villa','apartment'],           bMin:2,   bMax:150, privacy:7,  tax:['swiss-lump'],            investScore:6, yield:'2.5%',  appreciation:'moderate',    liquidity:6, timelines:['12-24','patient'],          whyTGC:'Swiss private-client advisor; Lavaux vigneron-house network; French-side notaire' },
+  'croatia':            { climates:['med','island'],    props:['villa','estate','land'],        bMin:0.3, bMax:12,  privacy:7,  tax:[],                        investScore:6, yield:'3-4%',  appreciation:'moderate',    liquidity:4, timelines:['12-24','patient'],          whyTGC:'Dubrovnik firm; Istria contrarian coverage; Dalmatian island network' },
+  'montenegro':         { climates:['med','island'],    props:['villa','apartment','land'],     bMin:0.4, bMax:10,  privacy:7,  tax:['golden-visa'],           investScore:9, yield:'3-4%',  appreciation:'speculative',  liquidity:3, timelines:['patient'],                  whyTGC:'Porto Montenegro/Kotor specialist; highest-conviction EU-accession play 2028' },
+  'greece':             { climates:['med','island'],    props:['villa','apartment','estate'],   bMin:0.5, bMax:50,  privacy:7,  tax:['golden-visa'],           investScore:7, yield:'3-5%',  appreciation:'moderate',    liquidity:4, timelines:['12-24','patient'],          whyTGC:'Athens Riviera firm; quiet Cyclades network; Peloponnese specialist' },
+  'western-cape':       { climates:['africa'],          props:['estate','villa'],               bMin:0.3, bMax:8,   privacy:8,  tax:[],                        investScore:6, yield:'4-5%',  appreciation:'moderate',    liquidity:4, timelines:['12-24','patient'],          whyTGC:'Winelands partner firm; SARB clearance specialists; Constantia and Franschhoek direct' },
+  'namibia':            { climates:['africa'],          props:['land','estate'],                bMin:0.15,bMax:50,  privacy:10, tax:[],                        investScore:3, yield:'2%',    appreciation:'flat',        liquidity:2, timelines:['patient'],                  whyTGC:'Windhoek attorney; conservation-advisory for private reserve M&A' },
+  'pyrenees':           { climates:['alpine','atlantic'],props:['villa','chalet','land'],       bMin:0.3, bMax:8,   privacy:8,  tax:['andorra'],               investScore:3, yield:'2%',    appreciation:'flat',        liquidity:3, timelines:['12-24','patient'],          whyTGC:'Pau-based French lawyer; Val d\'Aran Catalan specialist; Andorra tax advisory' },
+  'miami-palm-beach':   { climates:['atlantic','island'],props:['apartment','villa','invest'],  bMin:2,   bMax:100, privacy:6,  tax:[],                        investScore:7, yield:'3-4%',  appreciation:'flat',        liquidity:8, timelines:['6-12','12-24'],            whyTGC:'Knight Frank Miami; Palm Beach Sotheby\'s partnerships; US tax advisor' },
+  'new-york-hamptons':  { climates:['capital','island'],props:['apartment','villa','invest'],   bMin:3,   bMax:100, privacy:5,  tax:[],                        investScore:7, yield:'3-4%',  appreciation:'flat',        liquidity:9, timelines:['6-12','12-24'],            whyTGC:'New York partner firms; US tax advisor for cross-border FIRPTA' },
+  'amsterdam':          { climates:['capital'],         props:['apartment','invest'],           bMin:0.5, bMax:5,   privacy:4,  tax:[],                        investScore:8, yield:'3-4%',  appreciation:'flat',        liquidity:8, timelines:['immediate','6-12'],         whyTGC:'Benelux relocation-specialist partner; tight rental market intelligence' },
+  'lisbon-porto':       { climates:['atlantic'],        props:['apartment','villa','invest'],   bMin:0.5, bMax:12,  privacy:5,  tax:['portugal-ifici'],        investScore:7, yield:'3-5%',  appreciation:'moderate',    liquidity:6, timelines:['6-12','12-24'],            whyTGC:'Lisbon and Porto relocation partners; IFICI coordination; Estoril corridor' },
+  'barcelona-city':     { climates:['med','capital'],   props:['apartment','villa','invest'],   bMin:0.8, bMax:20,  privacy:5,  tax:[],                        investScore:6, yield:'3-4%',  appreciation:'flat',        liquidity:7, timelines:['6-12','12-24'],            whyTGC:'Sarrià/Pedralbes family network; regulated rental market navigation' },
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// ACQUISITION PROFILE — collected from guided questions
+// ──────────────────────────────────────────────────────────────────────────────
+
+interface AcqProfile {
+  driver: string       // 'lifestyle'|'relocation'|'investment'|'tax'|'development'
+  climate: string      // 'med'|'atlantic'|'alpine'|'capital'|'africa'|'island'|'any'
+  propType: string     // 'villa'|'apartment'|'estate'|'chalet'|'invest'|'land'
+  budget: string       // 'under-1'|'1-3'|'3-8'|'8-20'|'over-20'
+  privacy: string      // 'essential'|'high'|'moderate'|'any'
+  taxSituation: string // 'uk-nondom'|'us-citizen'|'planning-relocation'|'invest-focus'|'none'
+  timeline: string     // 'immediate'|'6-12'|'12-24'|'patient'
+  investObj: string    // 'yield'|'capital'|'both'|'trophy'|'commercial'|'dev' (investment track only)
+}
+
+const ACQ_QUESTIONS = [
+  { key:'driver', question:"What's driving this?", subtitle:'The motivation shapes everything — the markets, the questions, and the honest advice.',
+    options:[
+      { value:'lifestyle', label:'Lifestyle · second home', desc:'A base in another climate. Summer, winter, or year-round rotation.' },
+      { value:'relocation', label:'Primary relocation', desc:'Moving somewhere properly. Residency, schools, full life infrastructure.' },
+      { value:'tax', label:'Tax-motivated relocation', desc:'A tax regime change is the primary reason. Destination is partly driven by the structure.' },
+      { value:'investment', label:'Investment', desc:'Yield, capital appreciation, development, or tax-efficient vehicle. Not primarily a lifestyle decision.' },
+      { value:'development', label:'Development · land', desc:'A plot, a ruin, or an opportunity. Value-add, planning gain, or conservation.' },
+    ]},
+  { key:'climate', question:'Which world are you drawn to?', subtitle:'Climate and geography are honest filters. Preference rarely changes.',
+    options:[
+      { value:'med', label:'Mediterranean', desc:'Sun, heat, sea. France, Italy, Spain, Greece, Croatia.' },
+      { value:'atlantic', label:'Atlantic · Northern Europe', desc:'Mild, green, connected. Portugal, Basque, London, Amsterdam.' },
+      { value:'alpine', label:'Alpine · Mountain', desc:'Altitude, snow, clear air. French Alps, Switzerland, Pyrenees.' },
+      { value:'capital', label:'Capital city', desc:'Urban, cultural density, infrastructure. Paris, London, Amsterdam, New York.' },
+      { value:'island', label:'Island', desc:'Genuine separation. Balearics, Greek islands, Sicily, Sardinia.' },
+      { value:'africa', label:'African lifestyle', desc:'Space, light, wine, wildlife. Western Cape and beyond.' },
+      { value:'any', label:'Open to guidance', desc:"No strong preference. We'll tell you where fits best." },
+    ]},
+  { key:'propType', question:'What type of property?', subtitle:'The asset class narrows the market list significantly.',
+    options:[
+      { value:'villa', label:'Villa · standalone house', desc:'Stand-alone, outdoor space, a property with a life of its own.' },
+      { value:'apartment', label:'Apartment · pied-à-terre', desc:'Urban base. Lock-and-leave. Possibly leasehold.' },
+      { value:'estate', label:'Estate · domain · farmhouse', desc:'Land, outbuildings, probably a project. Scale matters.' },
+      { value:'chalet', label:'Chalet', desc:'Alpine, seasonal or year-round. The mountain-specific product.' },
+      { value:'invest', label:'Investment asset', desc:'Revenue-producing from day one, or structured for capital return. Tenant, not owner, occupies.' },
+      { value:'land', label:'Land · development plot', desc:'Raw land, planning opportunity, or ruin with possibility.' },
+    ]},
+  { key:'budget', question:'Budget range (purchase price, all-in)?', subtitle:'Including acquisition costs and any immediate works. Honest figures narrow the shortlist.',
+    options:[
+      { value:'under-1', label:'Under €1M', desc:'Entry and emerging markets, quieter zones in core markets.' },
+      { value:'1-3', label:'€1M – €3M', desc:'The realistic middle band across most of our markets.' },
+      { value:'3-8', label:'€3M – €8M', desc:'Trophy product in tier-2 markets; entry in tier-1.' },
+      { value:'8-20', label:'€8M – €20M', desc:'Realistic in prime French Riviera, London PCL, Alpine trophy.' },
+      { value:'over-20', label:'Over €20M', desc:'Trophy-only. Cap Ferrat, Monaco, Gstaad, Mayfair.' },
+    ]},
+  { key:'privacy', question:'How important is privacy?', subtitle:'This is a genuine filter, not a formality. It changes the location and property type significantly.',
+    options:[
+      { value:'essential', label:'Essential', desc:'Completely out of sight. No passers-by, no shared approaches, no adjacent development.' },
+      { value:'high', label:'High', desc:'Not a development. Private grounds. Neighbours exist but are discreet.' },
+      { value:'moderate', label:'Moderate', desc:'Normal discretion. Village house, town apartment, gated estate.' },
+      { value:'any', label:'Not a priority', desc:'Proximity and convenience matter more.' },
+    ]},
+  { key:'taxSituation', question:'Is tax situation shaping this decision?', subtitle:'One honest question here changes the entire structuring conversation — and sometimes the market.',
+    options:[
+      { value:'uk-nondom', label:'UK non-dom leaving or recently left', desc:'Post-April 2025 abolition. Planning or already in the process of relocating.' },
+      { value:'us-citizen', label:'US citizen anywhere', desc:'FATCA, worldwide reporting, cross-border complexity — it is always relevant.' },
+      { value:'planning-relocation', label:'Planning a tax residence change', desc:'Actively considering which regime to move to. Italy flat-tax, Andalusia, Monaco, Switzerland on the table.' },
+      { value:'invest-focus', label:'Investment-focused, no relocation', desc:'Buying as a non-resident. Structuring matters, but not residency.' },
+      { value:'none', label:'No specific tax driver', desc:'Lifestyle or investment purchase without a regime-change motivation.' },
+    ]},
+  { key:'timeline', question:'What is the realistic timeline?', subtitle:'Patience unlocks better opportunities. Urgency narrows the field.',
+    options:[
+      { value:'immediate', label:'Immediate (0-3 months)', desc:'Something specific is in view, or a deadline is real.' },
+      { value:'6-12', label:'6-12 months', desc:'Active search, prepared to move on the right thing.' },
+      { value:'12-24', label:'12-24 months', desc:'Considered. The brief needs to be right before the search begins.' },
+      { value:'patient', label:'Patient capital (3+ years)', desc:'Only if the right thing appears. Capital is patient.' },
+    ]},
+  { key:'investObj', question:'What is the investment objective?', subtitle:'Only relevant when capital return is the primary driver.',
+    options:[
+      { value:'yield', label:'Rental yield', desc:'Income from day one. Tenant in place or ready-to-let.' },
+      { value:'capital', label:'Capital appreciation', desc:'Patient. Long-term compounding. Exit at the right cycle.' },
+      { value:'both', label:'Both — balanced return', desc:'Yield covers running costs; appreciation is the exit.' },
+      { value:'trophy', label:'Trophy asset', desc:'Lifestyle value plus long-term store of wealth. Not primarily a yield play.' },
+      { value:'commercial', label:'Commercial or mixed-use', desc:'Offices, retail, mixed-use income streams. TGC coordinates via commercial advisory network.' },
+      { value:'dev', label:'Development gain', desc:'Buy below, add value, exit. Planning gain, conversion, or ground-up.' },
+    ]},
+]
+
+// ──────────────────────────────────────────────────────────────────────────────
+// MARKET MATCHING ENGINE
+// ──────────────────────────────────────────────────────────────────────────────
+
+function budgetOverlaps(band: string, bMin: number, bMax: number): boolean {
+  const r: Record<string,[number,number]> = { 'under-1':[0,1], '1-3':[0.5,3.5], '3-8':[2,9], '8-20':[6,22], 'over-20':[15,9999] }
+  const [lo,hi] = r[band] || [0,9999]
+  return bMin <= hi && bMax >= lo
+}
+
+function computeMarketMatch(profile: AcqProfile): { marketId:string; score:number; reasons:string[]; tradeoff:string }[] {
+  const results = Object.entries(MATCH_PROFILES).map(([id, mp]) => {
+    let score = 0
+
+    // Climate (weight 25)
+    if (!profile.climate || profile.climate === 'any') score += 15
+    else if (mp.climates.includes(profile.climate as MClimate)) score += 25
+    else score += 0
+
+    // Property type (weight 20)
+    if (!profile.propType || mp.props.includes(profile.propType as MPropType)) score += 20
+
+    // Budget (weight 25)
+    if (!profile.budget || budgetOverlaps(profile.budget, mp.bMin, mp.bMax)) score += 25
+
+    // Privacy (weight 15)
+    const privRequired: Record<string,number> = { essential:8, high:6, moderate:3, any:0 }
+    const minPriv = privRequired[profile.privacy] || 0
+    if (mp.privacy >= minPriv) score += 15
+
+    // Tax alignment (weight 10)
+    const taxMap: Record<string,MTaxDriver[]> = {
+      'uk-nondom': ['uk-nondom','italy-flat','monaco','spain-zero-wealth','swiss-lump'],
+      'planning-relocation': ['italy-flat','monaco','swiss-lump','spain-zero-wealth','portugal-ifici','andorra'],
+      'invest-focus': ['golden-visa','portugal-ifici'],
+      'us-citizen': [],
+      'none': [],
+    }
+    const relevantTax = taxMap[profile.taxSituation] || []
+    if (relevantTax.length === 0 || mp.tax.some(t => relevantTax.includes(t))) score += 10
+
+    // Investment score for investment driver (weight up to 15)
+    if (profile.driver === 'investment') {
+      score += mp.investScore * 1.5
+      if (profile.investObj === 'yield' && ['strong','moderate'].includes(mp.appreciation)) score += 5
+      if (profile.investObj === 'capital' && ['speculative','moderate','strong'].includes(mp.appreciation)) score += 5
+      if (profile.investObj === 'commercial') score -= 10 // penalise non-commercial markets slightly
+    }
+
+    // Timeline (weight 5)
+    if (!profile.timeline || mp.timelines.includes(profile.timeline)) score += 5
+
+    return { marketId: id, score, reasons: [], tradeoff: '' }
+  })
+
+  const sorted = results.sort((a,b) => b.score - a.score).slice(0,3)
+
+  // Generate reasons per match
+  return sorted.map((r, idx) => {
+    const mp = MATCH_PROFILES[r.marketId]
+    const market = MARKETS[r.marketId]
+    const reasons: string[] = []
+
+    if (profile.climate !== 'any' && mp.climates.includes(profile.climate as MClimate)) {
+      const ct: Record<string,string> = { med:'Mediterranean climate, close match', atlantic:'Atlantic setting matches your brief', alpine:'Alpine environment — the right world', capital:'Capital city density and infrastructure', island:'Island setting with genuine separation', africa:'African lifestyle at meaningful scale' }
+      reasons.push(ct[profile.climate] || 'Climate match')
+    }
+    if (profile.privacy === 'essential' && mp.privacy >= 8) reasons.push(`Privacy score ${mp.privacy}/10 — among the highest in our network`)
+    else if (profile.privacy === 'high' && mp.privacy >= 7) reasons.push(`Strong privacy position (${mp.privacy}/10) without isolation`)
+    if (profile.taxSituation === 'uk-nondom' && mp.tax.includes('uk-nondom')) reasons.push('London PCL: 2026 buyer window post-non-dom; best selection in five years')
+    if (profile.taxSituation === 'uk-nondom' && mp.tax.includes('italy-flat')) reasons.push('Italian flat-tax (€200k cap on foreign income) is the dominant driver of UK non-dom movement right now')
+    if (profile.taxSituation === 'uk-nondom' && mp.tax.includes('spain-zero-wealth')) reasons.push('Andalusia eliminated wealth tax — structurally competitive with Monaco for the right profile')
+    if (profile.taxSituation === 'planning-relocation' && mp.tax.includes('monaco')) reasons.push('Monaco: no income tax, no CGT, no wealth tax for non-French. Residency is the gate, not the property.')
+    if (profile.taxSituation === 'planning-relocation' && mp.tax.includes('swiss-lump')) reasons.push('Swiss lump-sum taxation: available to non-working non-Swiss in key cantons. 6-18 month structuring exercise.')
+    if (profile.taxSituation === 'planning-relocation' && mp.tax.includes('portugal-ifici')) reasons.push('IFICI regime (replaces NHR 2024): qualifying professions receive significant foreign-income relief for 10 years')
+    if (profile.driver === 'investment') {
+      if (mp.appreciation === 'speculative') reasons.push(`Capital appreciation play: EU accession catalyst expected 2028 — highest upside in our network`)
+      else if (mp.investScore >= 8) reasons.push(`Investment score ${mp.investScore}/10 — strong fundamentals for yield and appreciation balanced`)
+      else if (mp.investScore >= 6) reasons.push(`Investment score ${mp.investScore}/10 — solid fundamentals for your stated objective (${mp.yield} yield)`)
+    }
+    if (profile.budget === 'under-1' && mp.bMin <= 0.5) reasons.push(`Entry point from €${mp.bMin}M — one of the few markets where your budget opens real options`)
+    if (reasons.length < 2 && market) reasons.push(market.editorial.split('.')[0] + '.')
+    if (reasons.length < 2) reasons.push(mp.whyTGC)
+
+    const tradeoff = idx === 0 ? '' :
+      `vs. top match: ${sorted[0] && MARKETS[sorted[0].marketId] ? MARKETS[sorted[0].marketId].name : 'first market'} scores higher on ${profile.privacy !== 'any' && MATCH_PROFILES[sorted[0].marketId]?.privacy > mp.privacy ? 'privacy' : profile.driver === 'investment' ? 'investment fundamentals' : 'overall brief fit'}`
+
+    return { ...r, reasons: reasons.slice(0,3), tradeoff }
+  })
+}
+
+type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial' | 'acq-questions' | 'acq-match'
 type FlowFamily = 'acquisition' | 'disposal' | 'retained' | 'rental' | null
 type Direction = 'buy' | 'invest' | 'develop' | 'let' | 'sell' | 'retained' | 'rent-short' | 'rent-mid' | 'rent-long' | null
 
@@ -864,6 +1075,9 @@ function TGCRealEstateIntelligence() {
   })
   const [structuring, setStructuring] = useState<StructuringState>({ vehicle: '', taxResidence: '', considerations: '' })
   const [client, setClient] = useState<ClientState>({ name: '', email: '', phone: '', taxResidence: '' })
+  const [acqProfile, setAcqProfile] = useState<AcqProfile>({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
+  const [acqStep, setAcqStep] = useState(0)
+  const [acqMatches, setAcqMatches] = useState<ReturnType<typeof computeMarketMatch>>([])
   const [rentalBrief, setRentalBrief] = useState<RentalBrief>({
     propertyType: '', groupAdults: '', groupChildren: '', pets: '', budgetWeek: '', budgetMonth: '',
     durationMonths: '', moveInDate: '', flexibility: '', priorities: [], nonNegotiables: '', arrivalDate: '', departureDate: '',
@@ -925,6 +1139,8 @@ function TGCRealEstateIntelligence() {
     setDirection(null)
     setMarketId(null)
     setBrief({ propertyType: '', budgetMin: '', budgetMax: '', sizeMin: '', sizeMax: '', nonNegotiables: '', timeline: '', confidentiality: '', secondaryMarkets: [] })
+    setAcqProfile({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
+    setAcqStep(0); setAcqMatches([])
     setRentalBrief({ propertyType: '', groupAdults: '', groupChildren: '', pets: '', budgetWeek: '', budgetMonth: '', durationMonths: '', moveInDate: '', flexibility: '', priorities: [], nonNegotiables: '', arrivalDate: '', departureDate: '' })
     setStructuring({ vehicle: '', taxResidence: '', considerations: '' })
     setClient({ name: '', email: '', phone: '', taxResidence: '' })
@@ -1073,8 +1289,11 @@ The Gatekeepers Club - thegatekeepersclub.com
 
   // Progress indicator
   const isRentalFlow = flowFamily === 'rental'
+  const isAcqFlow = flowFamily === 'acquisition'
   const screens = (isRentalFlow
     ? ['welcome', 'rental-type', 'market', 'rental-brief', 'rental-verdict', 'rental-commercial', 'client', 'confirmation']
+    : isAcqFlow
+    ? ['welcome', 'acq-questions', 'acq-match', 'verdict', showStructuringScreen ? 'structuring' : null, 'brief', 'commercial', 'client', 'confirmation']
     : ['welcome', 'flow-direction', 'market', 'brief', showStructuringScreen ? 'structuring' : null, 'verdict', 'commercial', 'client', 'confirmation']
   ).filter(Boolean) as Screen[]
   const currentIdx = screens.indexOf(screen)
@@ -1102,9 +1321,9 @@ The Gatekeepers Club - thegatekeepersclub.com
         </div>
         <div
           style={{ ...styles.card, ...(flowFamily === 'acquisition' ? styles.cardSelected : {}) }}
-          onClick={() => { setFlowFamily('acquisition'); setScreen('flow-direction'); }}>
+          onClick={() => { setFlowFamily('acquisition'); setAcqStep(0); setScreen('acq-questions'); }}>
           <div style={styles.cardTitle}>Acquisition</div>
-          <div style={styles.cardDesc}>Buying. Primary residence, second home, pied-à-terre, investment, or development. TGC as exclusive buyer's representative.</div>
+          <div style={styles.cardDesc}>Buying. Primary residence, second home, pied-à-terre, investment — residential or commercial. Seven questions, then we tell you which 2-3 markets fit your brief and why.</div>
         </div>
         <div
           style={{ ...styles.card, ...(flowFamily === 'disposal' ? styles.cardSelected : {}) }}
@@ -1208,7 +1427,7 @@ The Gatekeepers Club - thegatekeepersclub.com
     const confidentialities = ['Open, standard marketing is fine', 'Discreet, no public marketing, private register', 'Ultra-private, specific buyer pursuit only']
     return (
       <div>
-        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('market')}>Back</button>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(isAcqFlow ? 'verdict' : 'market')}>Back</button>
         <div style={styles.eyebrow}>The Brief</div>
         <h2 style={styles.h2}>Tell us about the property.</h2>
         <p style={styles.bodyP}>Six questions. You can come back and refine; we will save as you go.</p>
@@ -1258,10 +1477,169 @@ The Gatekeepers Club - thegatekeepersclub.com
 
         <div style={{ marginTop: 32, display: 'flex', gap: 12 }}>
           <button style={styles.button}
-            onClick={() => setScreen(showStructuringScreen ? 'structuring' : 'verdict')}
-            disabled={!brief.propertyType || !brief.budgetMax || !brief.timeline}>
+            onClick={() => setScreen(isAcqFlow ? 'commercial' : showStructuringScreen ? 'structuring' : 'verdict')}
+            disabled={!brief.propertyType && !acqProfile.propType}>
             Continue
           </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ──────────────────────── ACQUISITION GUIDED QUESTIONS ────────────────────────
+
+  const renderAcqQuestions = () => {
+    const isInvestmentTrack = acqProfile.driver === 'investment'
+    const visibleQuestions = ACQ_QUESTIONS.filter(q => {
+      if (q.key === 'investObj') return isInvestmentTrack
+      return true
+    })
+    const currentQ = visibleQuestions[acqStep]
+    if (!currentQ) return null
+    const totalSteps = visibleQuestions.length
+
+    const handleAcqAnswer = (key: string, value: string) => {
+      const newProfile = { ...acqProfile, [key]: value }
+      if (key === 'driver') {
+        const driverDirectionMap: Record<string,Direction> = { lifestyle:'buy', relocation:'buy', tax:'buy', investment:'invest', development:'develop' }
+        setDirection(driverDirectionMap[value] || 'buy')
+      }
+      setAcqProfile(newProfile)
+      setTimeout(() => {
+        const nextStep = acqStep + 1
+        const newVisible = ACQ_QUESTIONS.filter(q => q.key !== 'investObj' || newProfile.driver === 'investment')
+        if (nextStep < newVisible.length) {
+          setAcqStep(nextStep)
+        } else {
+          const matches = computeMarketMatch(newProfile)
+          setAcqMatches(matches)
+          setScreen('acq-match')
+        }
+      }, 250)
+    }
+
+    return (
+      <div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20, flexWrap:'wrap', gap:8 }}>
+          <button style={styles.buttonSecondary} onClick={() => { if(acqStep > 0) setAcqStep(acqStep-1); else setScreen('welcome') }}>Back</button>
+          <div style={styles.progress}>
+            {Array.from({ length: totalSteps }).map((_,i) => (
+              <div key={i} style={i < acqStep ? styles.progressDotActive : i === acqStep ? { ...styles.progressDotActive, background:'#c8aa4a' } : styles.progressDot}/>
+            ))}
+          </div>
+        </div>
+
+        <div key={acqStep}>
+          <div style={styles.eyebrow}>Acquisition · Question {acqStep+1} of {totalSteps}</div>
+          <h2 style={styles.h2}>{currentQ.question}</h2>
+          <p style={styles.bodyP}>{currentQ.subtitle}</p>
+
+          <div style={{ marginTop:24 }}>
+            {currentQ.options.map(opt => {
+              const selected = (acqProfile as any)[currentQ.key] === opt.value
+              return (
+                <div key={opt.value}
+                  style={{ ...styles.card, ...(selected ? styles.cardSelected : {}), display:'flex', alignItems:'flex-start', gap:16 }}
+                  onClick={() => handleAcqAnswer(currentQ.key, opt.value)}>
+                  <div style={{ width:20, height:20, borderRadius:'50%', border:`2px solid ${selected ? '#0e4f51' : '#e5e7eb'}`, background: selected ? '#0e4f51' : 'transparent', flexShrink:0, marginTop:2, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {selected && <div style={{ width:8, height:8, borderRadius:'50%', background:'#ffffff' }}/>}
+                  </div>
+                  <div>
+                    <div style={styles.cardTitle}>{opt.label}</div>
+                    <div style={styles.cardDesc}>{opt.desc}</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const renderAcqMatch = () => {
+    if (acqMatches.length === 0) return null
+    const appreciationLabel: Record<string,string> = { strong:'Strong', moderate:'Moderate', flat:'Flat', speculative:'Speculative upside' }
+    const appreciationColor: Record<string,string> = { strong:'#0e4f51', moderate:'#0e4f51', flat:'#6b7280', speculative:'#c8aa4a' }
+    const budgetLabel: Record<string,string> = { 'under-1':'Under €1M', '1-3':'€1-3M', '3-8':'€3-8M', '8-20':'€8-20M', 'over-20':'Over €20M' }
+    const budgetPos = (mid: string, bMin: number, bMax: number): string => {
+      const lo = {'under-1':0,'1-3':1,'3-8':3,'8-20':8,'over-20':20}[mid] || 0
+      if (lo <= bMin * 1.2) return 'entry band'
+      if (lo >= bMax * 0.7) return 'trophy band'
+      return 'realistic band'
+    }
+
+    return (
+      <div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20, flexWrap:'wrap', gap:8 }}>
+          <button style={styles.buttonSecondary} onClick={() => { setAcqStep(ACQ_QUESTIONS.filter(q => q.key !== 'investObj' || acqProfile.driver === 'investment').length - 1); setScreen('acq-questions') }}>Adjust brief</button>
+          <button style={{ ...styles.buttonSecondary, fontSize:10 }} onClick={resetAll}>Start over</button>
+        </div>
+
+        <div style={styles.eyebrow}>Market match · Your brief answered</div>
+        <h2 style={styles.h2}>Three markets worth considering.</h2>
+        <p style={styles.bodyP}>
+          Based on your brief — {[acqProfile.driver, acqProfile.climate !== 'any' ? acqProfile.climate : null, budgetLabel[acqProfile.budget], acqProfile.privacy !== 'any' ? acqProfile.privacy + ' privacy' : null].filter(Boolean).join(', ')} — here is where we would look.
+        </p>
+
+        <div style={{ marginTop:28 }}>
+          {acqMatches.map((match, idx) => {
+            const market = MARKETS[match.marketId]
+            const mp = MATCH_PROFILES[match.marketId]
+            if (!market || !mp) return null
+            const isTop = idx === 0
+            return (
+              <div key={match.marketId} style={{ ...styles.card, ...(isTop ? { borderColor:'#0e4f51', borderWidth:2, background:'rgba(14,79,81,0.03)' } : {}), marginBottom:16 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:8, marginBottom:12 }}>
+                  <div>
+                    {isTop && <div style={{ ...styles.eyebrow, color:'#c8aa4a', marginBottom:6 }}>★ Top match</div>}
+                    <div style={styles.cardTitle}>{market.name}</div>
+                    <div style={styles.cardDesc}>{market.subLabel}</div>
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <div style={{ fontSize:11, color:'#6b7280', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:4 }}>Budget position</div>
+                    <div style={{ fontFamily:"'Lato',sans-serif", fontWeight:700, fontSize:13, color:'#1a1815' }}>{budgetPos(acqProfile.budget, mp.bMin, mp.bMax)}</div>
+                  </div>
+                </div>
+
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(120px, 1fr))', gap:12, padding:'12px 0', borderTop:'1px dashed #e5e7eb', borderBottom:'1px dashed #e5e7eb', marginBottom:16 }}>
+                  <div><div style={{ fontSize:10, color:'#c8aa4a', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:3 }}>Yield</div><div style={{ fontWeight:700, fontSize:13 }}>{mp.yield}</div></div>
+                  <div><div style={{ fontSize:10, color:'#c8aa4a', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:3 }}>Appreciation</div><div style={{ fontWeight:700, fontSize:13, color:appreciationColor[mp.appreciation] }}>{appreciationLabel[mp.appreciation]}</div></div>
+                  <div><div style={{ fontSize:10, color:'#c8aa4a', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:3 }}>Privacy</div><div style={{ fontWeight:700, fontSize:13 }}>{mp.privacy}/10</div></div>
+                  <div><div style={{ fontSize:10, color:'#c8aa4a', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:3 }}>Liquidity</div><div style={{ fontWeight:700, fontSize:13 }}>{mp.liquidity}/10</div></div>
+                </div>
+
+                {match.reasons.length > 0 && (
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:11, color:'#0e4f51', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8 }}>Why this fits your brief</div>
+                    <ul style={styles.list}>
+                      {match.reasons.map((r,i) => <li key={i} style={{ ...styles.listItem, fontSize:13 }}><span style={styles.dash}>*</span>{r}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {match.tradeoff && (
+                  <div style={{ fontSize:12, color:'#6b7280', fontStyle:'italic', marginBottom:16, borderLeft:'2px solid #e5e7eb', paddingLeft:10 }}>
+                    {match.tradeoff}
+                  </div>
+                )}
+
+                <div style={{ fontSize:11, color:'#0e4f51', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>TGC advantage in this market</div>
+                <div style={{ fontSize:13, color:'#1a1815', marginBottom:16 }}>{mp.whyTGC}</div>
+
+                <button style={isTop ? styles.button : styles.buttonSecondary}
+                  onClick={() => { setMarketId(match.marketId); setDirection(acqProfile.driver === 'investment' ? 'invest' : acqProfile.driver === 'development' ? 'develop' : 'buy'); setScreen('verdict') }}>
+                  {isTop ? `Open the ${market.name} brief →` : `Explore ${market.name} instead →`}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+
+        <div style={{ marginTop:12, padding:'16px 20px', background:'#F9F8F5', border:'1px solid #e5e7eb' }}>
+          <div style={{ fontSize:12, color:'#6b7280', lineHeight:1.6 }}>
+            Not seeing the right market? <button style={{ background:'none', border:'none', color:'#0e4f51', cursor:'pointer', fontSize:12, padding:0, textDecoration:'underline' }} onClick={() => { setAcqStep(0); setScreen('acq-questions') }}>Adjust your brief</button> — one changed answer can shift the shortlist significantly.
+          </div>
         </div>
       </div>
     )
@@ -1643,7 +2021,7 @@ The Gatekeepers Club - thegatekeepersclub.com
     }
     return (
       <div>
-        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(showStructuringScreen ? 'structuring' : 'brief')}>Back</button>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen(isAcqFlow ? 'acq-match' : showStructuringScreen ? 'structuring' : 'brief')}>Back</button>
         <div style={styles.eyebrow}>Our honest view · {market.name}</div>
         <h2 style={styles.h2}>{market.name}</h2>
         <p style={{ fontSize: 14, color: '#0e4f51', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -1710,8 +2088,11 @@ The Gatekeepers Club - thegatekeepersclub.com
           </div>
         )}
 
-        <div style={{ marginTop: 32 }}>
-          <button style={styles.button} onClick={() => setScreen('commercial')}>See commercial opening</button>
+        <div style={{ marginTop: 32, display:'flex', gap:12, flexWrap:'wrap' }}>
+          <button style={styles.button} onClick={() => setScreen(isAcqFlow && !brief.nonNegotiables ? 'brief' : 'commercial')}>
+            {isAcqFlow && !brief.nonNegotiables ? 'Refine the brief →' : 'See commercial opening'}
+          </button>
+          {isAcqFlow && brief.nonNegotiables && <button style={styles.buttonSecondary} onClick={() => setScreen('brief')}>Adjust brief</button>}
         </div>
       </div>
     )
@@ -1885,6 +2266,8 @@ The Gatekeepers Club - thegatekeepersclub.com
   const renderScreen = () => {
     switch (screen) {
       case 'welcome': return renderWelcome()
+      case 'acq-questions': return renderAcqQuestions()
+      case 'acq-match': return renderAcqMatch()
       case 'flow-direction': return renderFlowDirection()
       case 'rental-type': return renderRentalType()
       case 'market': return renderMarketSelector()
