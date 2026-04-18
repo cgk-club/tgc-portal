@@ -1053,7 +1053,7 @@ function computeMarketMatch(profile: AcqProfile): { marketId:string; score:numbe
   })
 }
 
-type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial' | 'acq-questions' | 'acq-match' | 'disposal-brief' | 'disposal-verdict'
+type Screen = 'welcome' | 'flow-direction' | 'market' | 'brief' | 'structuring' | 'verdict' | 'commercial' | 'client' | 'confirmation' | 'rental-type' | 'rental-brief' | 'rental-verdict' | 'rental-commercial' | 'acq-questions' | 'acq-match' | 'disposal-brief' | 'disposal-verdict' | 'retained-brief' | 'retained-overview' | 'retained-commercial'
 type FlowFamily = 'acquisition' | 'disposal' | 'retained' | 'rental' | null
 type Direction = 'buy' | 'invest' | 'develop' | 'let' | 'sell' | 'retained' | 'rent-short' | 'rent-mid' | 'rent-long' | null
 
@@ -1067,6 +1067,14 @@ interface Brief {
   timeline: string
   confidentiality: string
   secondaryMarkets: string[]
+}
+
+interface RetainedBrief {
+  portfolioSize: string    // number of properties currently held
+  jurisdictions: string    // countries / regions involved
+  primaryFocus: string     // next acquisition / disposal / portfolio review / estate planning / all
+  promptedBy: string       // what triggered this conversation now
+  additionalContext: string
 }
 
 interface SellerBrief {
@@ -1128,6 +1136,8 @@ function TGCRealEstateIntelligence() {
   })
   const [structuring, setStructuring] = useState<StructuringState>({ vehicle: '', taxResidence: '', considerations: '' })
   const [client, setClient] = useState<ClientState>({ name: '', email: '', phone: '', taxResidence: '' })
+  const [retainedBriefState, setRetainedBriefState] = useState<RetainedBrief>({ portfolioSize:'', jurisdictions:'', primaryFocus:'', promptedBy:'', additionalContext:'' })
+  const [retainedSubType, setRetainedSubType] = useState<string>('')
   const [sellerBrief, setSellerBrief] = useState<SellerBrief>({ propertyType:'', sizeM2:'', askingPrice:'', reasonForSale:'', timeline:'', confidentiality:'', keyFeatures:'', currentStatus:'' })
   const [disposalSubType, setDisposalSubType] = useState<string>('')
   const [acqProfile, setAcqProfile] = useState<AcqProfile>({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
@@ -1194,6 +1204,8 @@ function TGCRealEstateIntelligence() {
     setDirection(null)
     setMarketId(null)
     setBrief({ propertyType: '', budgetMin: '', budgetMax: '', sizeMin: '', sizeMax: '', nonNegotiables: '', timeline: '', confidentiality: '', secondaryMarkets: [] })
+    setRetainedBriefState({ portfolioSize:'', jurisdictions:'', primaryFocus:'', promptedBy:'', additionalContext:'' })
+    setRetainedSubType('')
     setSellerBrief({ propertyType:'', sizeM2:'', askingPrice:'', reasonForSale:'', timeline:'', confidentiality:'', keyFeatures:'', currentStatus:'' })
     setDisposalSubType('')
     setAcqProfile({ driver:'', climate:'', propType:'', budget:'', privacy:'', taxSituation:'', timeline:'', investObj:'' })
@@ -1228,6 +1240,8 @@ function TGCRealEstateIntelligence() {
       ? { mandateId: id, flowFamily, direction, client, rentalBrief, market: marketId }
       : isDisposalFlow
       ? { mandateId: id, flowFamily, direction: disposalSubType, client, sellerBrief, market: marketId, commercial }
+      : isRetainedFlow
+      ? { mandateId: id, flowFamily, direction: retainedSubType, client, retainedBrief: retainedBriefState }
       : { mandateId: id, flowFamily, direction, client, brief, structuring, market: marketId, commercial }
     await submitMandate(payload)
     setScreen('confirmation')
@@ -1350,12 +1364,15 @@ The Gatekeepers Club - thegatekeepersclub.com
   const isRentalFlow = flowFamily === 'rental'
   const isAcqFlow = flowFamily === 'acquisition'
   const isDisposalFlow = flowFamily === 'disposal'
+  const isRetainedFlow = flowFamily === 'retained'
   const screens = (isRentalFlow
     ? ['welcome', 'rental-type', 'market', 'rental-brief', 'rental-verdict', 'rental-commercial', 'client', 'confirmation']
     : isAcqFlow
     ? ['welcome', 'acq-questions', 'acq-match', 'verdict', showStructuringScreen ? 'structuring' : null, 'brief', 'commercial', 'client', 'confirmation']
     : isDisposalFlow
     ? ['welcome', 'flow-direction', 'market', 'disposal-brief', 'disposal-verdict', 'commercial', 'client', 'confirmation']
+    : isRetainedFlow
+    ? ['welcome', 'flow-direction', 'retained-brief', 'retained-overview', 'retained-commercial', 'client', 'confirmation']
     : ['welcome', 'flow-direction', 'market', 'brief', showStructuringScreen ? 'structuring' : null, 'verdict', 'commercial', 'client', 'confirmation']
   ).filter(Boolean) as Screen[]
   const currentIdx = screens.indexOf(screen)
@@ -1428,7 +1445,7 @@ The Gatekeepers Club - thegatekeepersclub.com
         <div style={{ marginTop: 24 }}>
           {options.map(o => (
             <div key={o.id} style={{ ...styles.card, ...(disposalSubType === o.id || (direction === o.dir && marketId === null && flowFamily !== 'disposal') ? styles.cardSelected : {}) }}
-                 onClick={() => { setDirection(o.dir); if (flowFamily === 'disposal') setDisposalSubType(o.id); setScreen('market'); }}>
+                 onClick={() => { setDirection(o.dir); if (flowFamily === 'disposal') setDisposalSubType(o.id); if (flowFamily === 'retained') setRetainedSubType(o.id); setScreen(flowFamily === 'retained' ? 'retained-brief' : 'market'); }}>
               <div style={styles.cardTitle}>{o.label}</div>
               <div style={styles.cardDesc}>{o.desc}</div>
             </div>
@@ -1702,6 +1719,194 @@ The Gatekeepers Club - thegatekeepersclub.com
           <div style={{ fontSize:12, color:'#6b7280', lineHeight:1.6 }}>
             Not seeing the right market? <button style={{ background:'none', border:'none', color:'#0e4f51', cursor:'pointer', fontSize:12, padding:0, textDecoration:'underline' }} onClick={() => { setAcqStep(0); setScreen('acq-questions') }}>Adjust your brief</button> — one changed answer can shift the shortlist significantly.
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ──────────────────────── RETAINED SCREENS ────────────────────────
+
+  const renderRetainedBrief = () => {
+    const isFamily = retainedSubType === 'retained-family-office'
+    const portfolioOptions = ['1 property', '2-3 properties', '4-6 properties', '7-10 properties', '10+ properties']
+    const focusOptions = ['Next acquisition', 'Disposal of an existing property', 'Rental management or tenant search', 'Portfolio review and market positioning', 'Estate and structuring planning', 'All of the above — full coordination']
+    const promptedOptions = ['Major life event (relocation, retirement, inheritance)', 'Tax regime change or planning trigger', 'Existing advisor not providing the coordination we need', 'Building the portfolio systematically', 'Introduced by a trusted contact', 'Prefer not to say']
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('flow-direction')}>Back</button>
+        <div style={styles.eyebrow}>Retained Strategy · {isFamily ? 'Family office' : 'Opening conversation'}</div>
+        <h2 style={styles.h2}>{isFamily ? 'Tell us about the portfolio.' : 'Tell us what prompted this.'}</h2>
+        <p style={styles.bodyP}>
+          {isFamily
+            ? 'A retained relationship starts with understanding what already exists and what you are trying to build or resolve. No commitment is required before the first conversation.'
+            : 'An opening conversation is exactly that — no brief, no commitment, no pressure. We just want to understand your situation and whether TGC is the right fit.'}
+        </p>
+
+        {isFamily && (
+          <>
+            <label style={styles.label}>Current portfolio size</label>
+            <select style={styles.input} value={retainedBriefState.portfolioSize} onChange={e => setRetainedBriefState({ ...retainedBriefState, portfolioSize: e.target.value })}>
+              <option value="">Select...</option>
+              {portfolioOptions.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+
+            <label style={styles.label}>Jurisdictions involved (countries or regions)</label>
+            <input type="text" style={styles.input} value={retainedBriefState.jurisdictions}
+              placeholder="e.g., France, UK, Monaco, Spain — or just getting started in one"
+              onChange={e => setRetainedBriefState({ ...retainedBriefState, jurisdictions: e.target.value })} />
+
+            <label style={styles.label}>Primary focus right now</label>
+            <select style={styles.input} value={retainedBriefState.primaryFocus} onChange={e => setRetainedBriefState({ ...retainedBriefState, primaryFocus: e.target.value })}>
+              <option value="">Select...</option>
+              {focusOptions.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+          </>
+        )}
+
+        <label style={styles.label}>What prompted this conversation?</label>
+        <select style={styles.input} value={retainedBriefState.promptedBy} onChange={e => setRetainedBriefState({ ...retainedBriefState, promptedBy: e.target.value })}>
+          <option value="">Select...</option>
+          {promptedOptions.map(o => <option key={o} value={o}>{o}</option>)}
+        </select>
+
+        <label style={styles.label}>Anything else that would help us prepare for the first conversation</label>
+        <textarea rows={4} style={{ ...styles.input, resize: 'vertical' }} value={retainedBriefState.additionalContext}
+          placeholder={isFamily
+            ? "e.g., Existing SCI structures in France, planning a move from UK to Monaco, children need to be factored into estate planning..."
+            : "e.g., We have been looking at the south of France for two years and want a considered view before committing to anything..."}
+          onChange={e => setRetainedBriefState({ ...retainedBriefState, additionalContext: e.target.value })} />
+
+        <div style={{ marginTop: 32 }}>
+          <button style={styles.button}
+            onClick={() => setScreen('retained-overview')}
+            disabled={!retainedBriefState.promptedBy}>
+            See how it works →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderRetainedOverview = () => {
+    const isFamily = retainedSubType === 'retained-family-office'
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('retained-brief')}>Back</button>
+        <div style={styles.eyebrow}>Retained Strategy · How it works</div>
+        <h2 style={styles.h2}>One relationship. Every property.</h2>
+        <p style={styles.lead}>
+          {isFamily
+            ? 'A retained mandate with TGC means one named Gatekeeper coordinates every property decision across every jurisdiction. Acquisitions, disposals, rentals, tenants, structuring — one coherent view, one point of contact.'
+            : 'An opening conversation is forty-five minutes. No slides, no pitch. We listen, we ask honest questions, and we tell you whether and how TGC can add value to your situation. If it is not the right fit, we say so.'}
+        </p>
+
+        {isFamily && (
+          <>
+            <h3 style={styles.h3}>What a retained relationship includes</h3>
+            <ul style={styles.list}>
+              {[
+                'Single named Gatekeeper — not a team, not a rotation, the same person who knows the portfolio',
+                'Acquisition mandates across any of our 34 markets, from identification to completion',
+                'Disposal mandates — discreet or open market, coordinated with the acquisition side when re-allocating',
+                'Rental and tenant search in any market, short or long-term, managed as a single portfolio function',
+                'Annual portfolio review — market conditions, asset positioning, what to hold, what to consider selling',
+                'Structuring context provided; formal tax advice coordinated through your existing counsel or introduced specialists',
+                'Opportunity identification — off-market properties, pre-market opportunities, emerging market calls',
+              ].map((item, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{item}</li>)}
+            </ul>
+
+            <h3 style={styles.h3}>What TGC is not</h3>
+            <ul style={styles.list}>
+              {[
+                'A family office — we do not replace your existing legal, tax, or financial advisors',
+                'A property management company — day-to-day property maintenance is coordinated through specialist managers we introduce',
+                'An agent with a listings inventory — we work off-market and through our network, not from a portal',
+              ].map((item, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{item}</li>)}
+            </ul>
+          </>
+        )}
+
+        <div style={{ background: '#0e4f51', color: '#fff', padding: 24, margin: '28px 0', borderLeft: '3px solid #c8aa4a' }}>
+          <div style={{ ...styles.eyebrow, color: '#c8aa4a', marginBottom: 8 }}>The discovery call</div>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', margin: '0 0 12px', lineHeight: 1.6 }}>
+            Everything starts with a conversation. {isFamily
+              ? 'Your Gatekeeper will come prepared with a reading of your portfolio context and a set of honest questions. The call is typically 45-60 minutes. No commitment on either side.'
+              : 'We will listen more than we speak. If the fit is right, we will propose a retained structure. If it is not, we will say so and point you somewhere that is.'}
+          </p>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.55 }}>
+            Response within four hours of your brief being received.
+          </p>
+        </div>
+
+        <div style={{ marginTop: 8 }}>
+          <button style={styles.button} onClick={() => setScreen('retained-commercial')}>The commercial structure →</button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderRetainedCommercial = () => {
+    const isFamily = retainedSubType === 'retained-family-office'
+    return (
+      <div>
+        <button style={{ ...styles.buttonSecondary, marginBottom: 20 }} onClick={() => setScreen('retained-overview')}>Back</button>
+        <div style={styles.eyebrow}>The commercial structure</div>
+        <h2 style={styles.h2}>How we work together.</h2>
+        <p style={styles.bodyP}>
+          {isFamily
+            ? 'A retained relationship is structured around the volume and complexity of the portfolio. We discuss the specific arrangement on the discovery call — no commitment is required before then.'
+            : 'An opening conversation has no commercial structure. It is simply a conversation.'}
+        </p>
+
+        {isFamily ? (
+          <>
+            <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginTop: 20 }}>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Annual advisory retainer</div>
+                <div style={styles.bandValue}>Agreed at first meeting — portfolio-dependent</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Transaction success fees</div>
+                <div style={styles.bandValue}>Standard TGC rates on each completed mandate</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Rental placement</div>
+                <div style={styles.bandValue}>One month's rent per placement (success-only)</div>
+              </div>
+              <div style={styles.priceBand}>
+                <div style={styles.bandLabel}>Gatekeeper Points</div>
+                <div style={styles.bandValue}>Accrued across all activity at standard TGC rate</div>
+              </div>
+              <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 12, lineHeight: 1.6 }}>
+                The retainer covers advisory, coordination, and portfolio oversight. Transaction success fees are charged separately on each completed mandate. The retainer is credited against success fees in the first year.
+              </p>
+            </div>
+
+            <h3 style={styles.h3}>What the retainer covers</h3>
+            <ul style={styles.list}>
+              {[
+                'Unlimited access to your named Gatekeeper — calls, messages, site visits',
+                'Annual portfolio review with written market positioning summary',
+                'Proactive opportunity identification — off-market and pre-market',
+                'Coordination of legal, notaire, and specialist advisors across all markets',
+                'Quarterly market intelligence briefings on your relevant jurisdictions',
+              ].map((item, i) => <li key={i} style={styles.listItem}><span style={styles.dash}>*</span>{item}</li>)}
+            </ul>
+          </>
+        ) : (
+          <div style={{ ...styles.card, background: '#F9F8F5', cursor: 'default', marginTop: 20 }}>
+            <div style={styles.priceBand}>
+              <div style={styles.bandLabel}>Discovery call</div>
+              <div style={styles.bandValue}>No charge, no commitment</div>
+            </div>
+            <p style={{ fontSize: 13, color: '#0e4f51', marginTop: 12, lineHeight: 1.6 }}>
+              If after the call we agree to work together, we will propose a structure suited to your situation. Nothing is committed before that conversation.
+            </p>
+          </div>
+        )}
+
+        <div style={{ marginTop: 32 }}>
+          <button style={styles.button} onClick={() => setScreen('client')}>Continue, your details</button>
         </div>
       </div>
     )
@@ -2410,7 +2615,7 @@ The Gatekeepers Club - thegatekeepersclub.com
       <label style={styles.label}>Phone (with country code)</label>
       <input type="tel" style={styles.input} value={client.phone} placeholder="+33 6 XX XX XX XX" onChange={e => setClient({ ...client, phone: e.target.value })} />
 
-      <label style={styles.label}>Current tax residence</label>
+      <label style={styles.label}>{isRetainedFlow ? 'Current country of residence' : 'Current tax residence'}</label>
       <input type="text" style={styles.input} value={client.taxResidence} placeholder="e.g., UK / France / Monaco" onChange={e => setClient({ ...client, taxResidence: e.target.value })} />
 
       <p style={{ fontSize: 12, color: '#6b7280', marginTop: 24, lineHeight: 1.6 }}>
@@ -2427,7 +2632,7 @@ The Gatekeepers Club - thegatekeepersclub.com
 
   const renderConfirmation = () => (
     <div>
-      <div style={styles.eyebrow}>{isRentalFlow ? 'Rental brief received' : isDisposalFlow ? 'Disposal mandate received' : 'Mandate received'}</div>
+      <div style={styles.eyebrow}>{isRentalFlow ? 'Rental brief received' : isDisposalFlow ? 'Disposal mandate received' : isRetainedFlow ? 'Brief received' : 'Mandate received'}</div>
       <h2 style={styles.h2}>Thank you, {client.name?.split(' ')[0]}.</h2>
       <p style={styles.lead}>
         Your brief is with us. A Gatekeeper has it in hand now.
@@ -2438,7 +2643,12 @@ The Gatekeepers Club - thegatekeepersclub.com
         <div style={{ fontFamily: "'Lato', sans-serif", fontWeight: 700, fontSize: 16, color: '#1a1815', margin: '4px 0 16px' }}>{mandateId}</div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Type</div>
-          <div style={styles.bandValue}>{isRentalFlow ? (direction === 'rent-short' ? 'Short-term rental' : direction === 'rent-mid' ? 'Mid-term rental' : 'Long-term rental') : isDisposalFlow ? ({ 'sell-open':'Open market sale', 'sell-discreet':'Discreet disposal', 'sell-ultra':'Ultra-private disposal', 'sell-reinvest':'Exit & re-allocate' }[disposalSubType] || 'Disposal') : direction?.toUpperCase()}</div>
+          <div style={styles.bandValue}>{
+            isRentalFlow ? (direction === 'rent-short' ? 'Short-term rental' : direction === 'rent-mid' ? 'Mid-term rental' : 'Long-term rental')
+            : isDisposalFlow ? ({ 'sell-open':'Open market sale', 'sell-discreet':'Discreet disposal', 'sell-ultra':'Ultra-private disposal', 'sell-reinvest':'Exit & re-allocate' }[disposalSubType] || 'Disposal')
+            : isRetainedFlow ? (retainedSubType === 'retained-family-office' ? 'Retained · Family office' : 'Opening conversation')
+            : direction?.toUpperCase()
+          }</div>
         </div>
         <div style={styles.priceBand}>
           <div style={styles.bandLabel}>Market</div>
@@ -2448,6 +2658,18 @@ The Gatekeepers Club - thegatekeepersclub.com
           <div style={styles.bandLabel}>Property type</div>
           <div style={styles.bandValue}>{isRentalFlow ? rentalBrief.propertyType : isDisposalFlow ? sellerBrief.propertyType : brief.propertyType}</div>
         </div>
+        {isRetainedFlow && retainedBriefState.promptedBy && (
+          <div style={styles.priceBand}>
+            <div style={styles.bandLabel}>What prompted this</div>
+            <div style={styles.bandValue}>{retainedBriefState.promptedBy}</div>
+          </div>
+        )}
+        {isRetainedFlow && retainedBriefState.portfolioSize && (
+          <div style={styles.priceBand}>
+            <div style={styles.bandLabel}>Portfolio size</div>
+            <div style={styles.bandValue}>{retainedBriefState.portfolioSize}</div>
+          </div>
+        )}
         {isDisposalFlow && (
           <>
             <div style={styles.priceBand}>
@@ -2496,10 +2718,25 @@ The Gatekeepers Club - thegatekeepersclub.com
 
       <h3 style={styles.h3}>What happens next</h3>
       <ul style={styles.list}>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 4 hours:</strong> your assigned Gatekeeper will acknowledge receipt personally</li>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> {isRentalFlow ? 'first shortlist questions and any clarifications needed to start the search' : 'a full considered response including our first honest view'}</li>
-        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 72 hours:</strong> {isRentalFlow ? 'first property suggestions from the network, including off-market ones' : 'a discovery call to refine the mandate and walk through the draft letter'}</li>
-        {!isRentalFlow && <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 14 days:</strong> signed mandate letter and active search begins</li>}
+        <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 4 hours:</strong> your Gatekeeper will acknowledge receipt personally</li>
+        {isRetainedFlow ? (
+          <>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> a short note confirming we have read your context and are prepared for the call</li>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Discovery call:</strong> 45-60 minutes, no slides, no commitment — we listen and ask honest questions</li>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>After the call:</strong> if the fit is right, we propose a retained structure. If not, we say so.</li>
+          </>
+        ) : isRentalFlow ? (
+          <>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> first shortlist questions and any clarifications needed to begin the search</li>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 72 hours:</strong> first property suggestions from the network, including off-market ones</li>
+          </>
+        ) : (
+          <>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 24 hours:</strong> {isDisposalFlow ? 'an honest first view on positioning and realistic pricing for your property' : 'a full considered response including our first honest view'}</li>
+            <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 72 hours:</strong> a discovery call to refine the mandate and walk through next steps</li>
+            {!isDisposalFlow && <li style={styles.listItem}><span style={styles.dash}>*</span><strong>Within 14 days:</strong> signed mandate letter and active search begins</li>}
+          </>
+        )}
       </ul>
 
       <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -2527,6 +2764,9 @@ The Gatekeepers Club - thegatekeepersclub.com
       case 'welcome': return renderWelcome()
       case 'acq-questions': return renderAcqQuestions()
       case 'acq-match': return renderAcqMatch()
+      case 'retained-brief': return renderRetainedBrief()
+      case 'retained-overview': return renderRetainedOverview()
+      case 'retained-commercial': return renderRetainedCommercial()
       case 'disposal-brief': return renderDisposalBrief()
       case 'disposal-verdict': return renderDisposalVerdict()
       case 'flow-direction': return renderFlowDirection()
