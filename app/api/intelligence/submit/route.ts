@@ -182,6 +182,42 @@ export async function POST(request: NextRequest) {
           <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
         </table>
       `
+    } else if (type === 'art-collectables') {
+      const flagNames = (body.selectedFlags || body.category?.structuringFlags || []).join(', ')
+      subject = `Intelligence brief: Art & Collectables — ${body.category?.name || 'Enquiry'} · ${client?.name || ''}`
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New Art & Collectables Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Reference:</strong> ${body.refId || '-'}</p>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Category</h3>
+        <p style="font-family: Arial, sans-serif;">${body.category?.name || 'Not specified'}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Mandate</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Direction</td><td>${body.direction || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Channel</td><td>${body.channel || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Budget</td><td>${body.budget || '-'}</td></tr>
+        </table>
+
+        ${flagNames ? `<h3 style="font-family: Georgia, serif; color: #5a4a2a;">Structuring flags</h3><p style="font-family: Arial, sans-serif;">${flagNames}</p>` : ''}
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Brief</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Specific interest</td><td>${brief?.specific || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Timeline</td><td>${brief?.timeline || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Existing collection</td><td>${brief?.existingCollection || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Confidentiality</td><td>${brief?.confidentiality || '-'}</td></tr>
+        </table>
+        ${brief?.notes ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${brief.notes}</p>` : ''}
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+        </table>
+      `
     } else {
       subject = `Intelligence brief: ${type} — ${client?.name || 'Enquiry'}`
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`
@@ -229,6 +265,41 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       })
+    }
+
+    // Airtable CRM sync — log as Interaction (non-blocking)
+    if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
+      const today = new Date().toISOString().split('T')[0]
+      const summary = `Intelligence brief: ${type} — ${client?.name || 'Unknown'} (${client?.email || ''})`
+      try {
+        await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Interactions`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{
+              fields: {
+                Summary: summary,
+                Date: today,
+                Subject: subject,
+                Notes: JSON.stringify(body, null, 2),
+                Type: ['Note'],
+                Direction: 'Inbound',
+                Channel: ['Portal'],
+                Purpose: 'Service Request',
+                Status: 'Pending Response',
+                'Created By': 'System',
+                'Follow-up Required': true,
+                Sentiment: 'Neutral',
+              },
+            }],
+          }),
+        })
+      } catch (airtableErr) {
+        console.error('Airtable CRM sync failed (non-blocking):', airtableErr)
+      }
     }
 
     return NextResponse.json({ ok: true })

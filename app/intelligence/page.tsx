@@ -72,12 +72,13 @@ const tools = [
   {
     id: 'art',
     number: '06',
-    href: '#',
+    href: '/intelligence/art-collectables',
     title: 'Art & Collectables Intelligence',
     subtitle: 'Structuring is almost never considered at acquisition.',
     description: 'Contemporary, Old Masters, watches, wine, classic cars. Private sales versus auction. The import VAT, resale rights, freeport and estate planning questions that most buyers never ask.',
-    cta: 'Coming soon',
-    live: false,
+    cta: 'Open a mandate',
+    live: true,
+    tgcActive: false,
   },
 ]
 
