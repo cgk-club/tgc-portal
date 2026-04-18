@@ -116,6 +116,41 @@ export async function POST(request: NextRequest) {
         </table>
         ${client?.message ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${client.message}</p>` : ''}
       `
+    } else if (type === 'events-production') {
+      const flowLabels: Record<string, string> = { private: 'Private', corporate: 'Corporate', mice: 'MICE' }
+      subject = `Intelligence brief: Events Production — ${body.eventType?.replace(/-/g, ' ') || 'Enquiry'} · ${client?.name || ''}`
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New Events Production Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Reference:</strong> ${body.mandateId || '-'}</p>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Event</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Flow family</td><td>${flowLabels[body.flowFamily] || body.flowFamily || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Event type</td><td>${body.eventType?.replace(/-/g, ' ') || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Catchment</td><td>${body.catchment?.replace(/-/g, ' ') || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Guests</td><td>${brief?.guestCount || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Date</td><td>${brief?.date || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Timeline</td><td>${brief?.timeline || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Budget</td><td>${brief?.budget || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Confidentiality</td><td>${brief?.confidentiality || '-'}</td></tr>
+        </table>
+
+        ${body.love ? `<h3 style="font-family: Georgia, serif; color: #5a4a2a;">What they'd love</h3><p style="font-family: Arial, sans-serif;">${body.love}</p>` : ''}
+        ${body.hate ? `<h3 style="font-family: Georgia, serif; color: #5a4a2a;">What they'd hate</h3><p style="font-family: Arial, sans-serif;">${body.hate}</p>` : ''}
+        ${brief?.notes ? `<h3 style="font-family: Georgia, serif; color: #5a4a2a;">Notes</h3><p style="font-family: Arial, sans-serif;">${brief.notes}</p>` : ''}
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Moment Sketch</h3>
+        <pre style="font-family: Georgia, serif; font-size: 14px; white-space: pre-wrap; background: #fdf6e9; padding: 16px; border-left: 3px solid #8b6f3e;">${body.momentSketch || '-'}</pre>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Organisation</td><td>${client?.organisation || '-'}</td></tr>
+        </table>
+      `
     } else {
       subject = `Intelligence brief: ${type} — ${client?.name || 'Enquiry'}`
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`
