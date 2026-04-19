@@ -74,11 +74,11 @@ const tools = [
     number: '06',
     href: '/intelligence/art-collectables',
     title: 'Art & Collectables Intelligence',
-    subtitle: 'Structuring is almost never considered at acquisition.',
-    description: 'Contemporary, Old Masters, watches, wine, classic cars. Private sales versus auction. The import VAT, resale rights, freeport and estate planning questions that most buyers never ask.',
-    cta: 'Open a mandate',
+    subtitle: 'The acquisition question is the wrong question.',
+    description: 'Six collecting categories: contemporary art, old masters, design objects, horology, jewellery, wine. Collector profile matching, collection strategy engine, and a separate commission track for direct maker introductions. Structuring before the wire, not after.',
+    cta: 'Open a brief',
     live: true,
-    tgcActive: false,
+    tgcActive: true,
   },
 ]
 
@@ -131,7 +131,7 @@ export default function IntelligenceLandingPage() {
           maxWidth: '620px',
           lineHeight: 1.6,
         }}>
-          Five intelligence tools for transport, property, wellness, events and collecting. Each one built on the same thesis: quiet beats loud, structuring matters, and time is the real cost.
+          Six intelligence tools for transport, property, wellness, events, VIP access, and collecting. Each one built on the same thesis: quiet beats loud, structuring matters, and time is the real cost.
         </p>
       </section>
 
