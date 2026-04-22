@@ -831,9 +831,14 @@ export default function WellnessIntelligencePage() {
 
         {/* Suite Nav */}
         <div style={{ marginBottom:'1.75rem' }}>
-          <a href="/intelligence" style={{ display:'inline-block', color:'#6b7280', fontSize:'0.75rem', textDecoration:'none', fontFamily:"'Lato',sans-serif", letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem' }}>
-            ← Intelligence Suite
-          </a>
+          <div style={{ display:'flex', gap:'1.5rem', alignItems:'center', marginBottom:'0.75rem' }}>
+            <a href="/intelligence" style={{ color:'#6b7280', fontSize:'0.75rem', textDecoration:'none', fontFamily:"'Lato',sans-serif", letterSpacing:'0.06em', textTransform:'uppercase' }}>
+              ← Intelligence Suite
+            </a>
+            <a href="https://www.thegatekeepers.club" style={{ color:'#c8aa4a', fontSize:'0.75rem', textDecoration:'none', fontFamily:"'Lato',sans-serif", letterSpacing:'0.06em', textTransform:'uppercase' }}>
+              ↩ Website
+            </a>
+          </div>
           <div style={{ display:'flex', gap:'0.4rem', overflowX:'auto', scrollbarWidth:'none' } as React.CSSProperties}>
             {[
               { num:'01', label:'Transport',    href:'/intelligence/transport',        active:false },
