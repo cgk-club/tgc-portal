@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = "force-dynamic";
 
 function generateReference(prefix: string): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   const payLabel = payment_method === "bank_transfer" ? "Bank Transfer" : "Credit Card";
   const amountLabel = total_amount ? `€${total_amount.toLocaleString("fr-FR")}` : "TBC";
 
-  await resend.emails.send({
+  await new Resend(process.env.RESEND_API_KEY).emails.send({
     from: "jeeves@thegatekeepers.club",
     to: "christian@thegatekeepers.club",
     subject: `New Booking — ${event.title} — ${guest_name}`,
