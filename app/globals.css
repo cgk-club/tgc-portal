@@ -2,14 +2,129 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Poppins:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-poppins: 'Poppins', sans-serif;
+}
 
 body {
-  font-family: 'Lato', sans-serif;
-  color: #1a1a1a;
+  font-family: var(--font-inter);
+  color: #1a1a18;
   background-color: #F9F8F5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-poppins);
+}
+
+/* ---------- Shared TGC utilities (aligned with website) ---------- */
+
+.font-display {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+.section-label {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c8aa4a;
+}
+
+.rule {
+  border: none;
+  border-top: 1px solid #e5e2db;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: #0e4f51;
+  color: #F9F8F5;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #0a3a3c;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: transparent;
+  color: #0e4f51;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid #0e4f51;
+  transition: background 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: #0e4f51;
+  color: #F9F8F5;
+}
+
+/* ---------- Nav states (portal variant — always pearl, border on scroll) ---------- */
+
+.nav-portal {
+  background: #F9F8F5;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.nav-portal.scrolled {
+  border-bottom-color: #e5e2db;
+  box-shadow: 0 1px 12px rgba(26, 26, 24, 0.04);
+}
+
+/* ---------- Card hover ---------- */
+
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(14, 79, 81, 0.1);
+}
+
+/* ---------- Mobile nav slide-out ---------- */
+
+.mobile-nav {
+  position: fixed;
+  inset: 0;
+  background: #F9F8F5;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-nav.open {
+  transform: translateX(0);
 }

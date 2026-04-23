@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NotificationBell from "@/components/shared/NotificationBell";
@@ -25,7 +25,19 @@ const NAV_ITEMS = [
 
 export default function PartnerNav({ active }: PartnerNavProps) {
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    function onScroll() { setScrolled(window.scrollY > 8); }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   async function handleLogout() {
     await fetch("/api/partner/session", { method: "DELETE" });
@@ -33,114 +45,125 @@ export default function PartnerNav({ active }: PartnerNavProps) {
   }
 
   return (
-    <header className="border-b border-green/10 bg-white sticky top-0 z-40">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between py-4">
-          <Link
-            href="/partner"
-            className="font-heading text-sm font-semibold tracking-wider text-gold"
-          >
-            TGC PARTNER
-          </Link>
+    <>
+      <header className={`nav-portal sticky top-0 z-40${scrolled ? " scrolled" : ""}`}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-          <div className="flex items-center gap-3">
-            <NotificationBell />
+          {/* Top bar */}
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center gap-3">
+              <Link
+                href="/partner"
+                className="font-heading text-xs font-semibold tracking-[0.18em] text-gold uppercase"
+              >
+                The Gatekeepers Club
+              </Link>
+              <span className="hidden sm:block text-[10px] font-body text-mist tracking-widest uppercase border border-rule px-1.5 py-0.5 rounded">
+                Partner
+              </span>
+            </div>
 
-            {/* Desktop sign out */}
-            <button
-              onClick={handleLogout}
-              className="text-xs text-gray-400 hover:text-gray-600 font-body hidden sm:block"
-            >
-              Sign out
-            </button>
+            <div className="flex items-center gap-4">
+              <NotificationBell />
+
+              {/* Desktop sign out */}
+              <button
+                onClick={handleLogout}
+                className="hidden sm:block text-xs text-mist hover:text-ink font-body transition-colors"
+              >
+                Sign out
+              </button>
+
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="sm:hidden w-8 h-8 flex flex-col justify-center items-center gap-1.5"
+                aria-label="Open menu"
+              >
+                <span className="w-5 h-px bg-ink block" />
+                <span className="w-5 h-px bg-ink block" />
+              </button>
+            </div>
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Desktop tab row */}
+          <nav id="tour-partner-nav" className="hidden sm:flex gap-0.5 overflow-x-auto scrollbar-hide -mb-px">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.key}
+                id={item.tourId}
+                href={item.href}
+                className={`
+                  relative text-xs font-body whitespace-nowrap px-3 py-2.5 transition-colors
+                  ${active === item.key
+                    ? "text-green font-medium"
+                    : "text-mist hover:text-ink"
+                  }
+                `}
+              >
+                {item.label}
+                {active === item.key && (
+                  <span className="absolute bottom-0 left-3 right-3 h-px bg-green" />
+                )}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      {/* Mobile slide-out menu */}
+      <div className={`mobile-nav${mobileOpen ? " open" : ""}`}>
+        <div className="flex items-center justify-between px-6 h-14 border-b border-rule">
+          <div className="flex items-center gap-2">
+            <span className="font-heading text-xs font-semibold tracking-[0.18em] text-gold uppercase">
+              The Gatekeepers Club
+            </span>
+            <span className="text-[9px] font-body text-mist tracking-widest uppercase border border-rule px-1.5 py-0.5 rounded">
+              Partner
+            </span>
+          </div>
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="sm:hidden text-gray-500 hover:text-green p-1"
-            aria-label="Toggle navigation"
+            onClick={() => setMobileOpen(false)}
+            className="w-8 h-8 flex items-center justify-center text-mist hover:text-ink"
+            aria-label="Close menu"
           >
-            {mobileOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            )}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
 
-        {/* Desktop nav */}
-        <nav id="tour-partner-nav" className="hidden sm:flex gap-1 overflow-x-auto pb-2 -mb-px scrollbar-hide">
+        <nav className="flex-1 overflow-y-auto px-4 py-6">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.key}
-              id={item.tourId}
               href={item.href}
-              className={`text-xs font-body whitespace-nowrap px-3 py-2 rounded-sm transition-colors ${
-                active === item.key
+              onClick={() => setMobileOpen(false)}
+              className={`
+                flex items-center justify-between px-3 py-3.5 rounded-md mb-1 text-sm font-body transition-colors
+                ${active === item.key
                   ? "bg-green/5 text-green font-medium"
-                  : "text-gray-500 hover:text-green hover:bg-green/5"
-              }`}
+                  : "text-ink hover:bg-pearl-dark"
+                }
+              `}
             >
               {item.label}
+              {active === item.key && (
+                <span className="w-1.5 h-1.5 rounded-full bg-green" />
+              )}
             </Link>
           ))}
         </nav>
 
-        {/* Mobile nav dropdown */}
-        {mobileOpen && (
-          <nav className="sm:hidden pb-4 border-t border-green/5 mt-2 pt-3">
-            <div className="flex flex-col gap-1">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`text-sm font-body px-3 py-2.5 rounded-md transition-colors ${
-                    active === item.key
-                      ? "bg-green/5 text-green font-medium"
-                      : "text-gray-500 hover:text-green hover:bg-green/5"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-400 hover:text-gray-600 font-body px-3 py-2.5 text-left mt-2 border-t border-green/5 pt-3"
-              >
-                Sign out
-              </button>
-            </div>
-          </nav>
-        )}
+        <div className="px-4 py-6 border-t border-rule">
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-3 py-3 text-sm text-mist hover:text-ink font-body transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
-    </header>
+    </>
   );
 }
