@@ -495,11 +495,34 @@ const QUESTIONS = [
 function CitySearch({label,value,onSelect,placeholder}:{label:string;value:City|null;onSelect:(c:City)=>void;placeholder:string}) {
   const [query,setQuery]=useState('')
   const [open,setOpen]=useState(false)
+  const [liveResults,setLiveResults]=useState<City[]>([])
+  const [fetching,setFetching]=useState(false)
+  const debounceRef=useRef<ReturnType<typeof setTimeout>|null>(null)
   const ref=useRef<HTMLDivElement>(null)
 
-  const results = query.length>1
-    ? CITIES.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())||c.country.toLowerCase().includes(query.toLowerCase())).slice(0,8)
+  // Hardcoded matches — shown first, have extra metadata (notes, flags)
+  const staticMatches = query.length>1
+    ? CITIES.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())||c.country.toLowerCase().includes(query.toLowerCase()))
     : []
+
+  // Merge: hardcoded first, then live results not already in static list
+  const staticKeys = new Set(staticMatches.map(c=>c.name.toLowerCase()+'|'+c.country))
+  const results = [...staticMatches, ...liveResults.filter(c=>!staticKeys.has(c.name.toLowerCase()+'|'+c.country))].slice(0,8)
+
+  // Live Nominatim search with debounce
+  useEffect(()=>{
+    if(debounceRef.current) clearTimeout(debounceRef.current)
+    if(query.length<2){ setLiveResults([]); return }
+    debounceRef.current=setTimeout(async()=>{
+      setFetching(true)
+      try{
+        const res=await fetch(`/api/geocode/search?q=${encodeURIComponent(query)}`)
+        if(res.ok) setLiveResults(await res.json())
+      }catch{ /* silent */ }
+      finally{ setFetching(false) }
+    },300)
+    return ()=>{ if(debounceRef.current) clearTimeout(debounceRef.current) }
+  },[query])
 
   useEffect(()=>{
     const handler=(e:MouseEvent)=>{ if(ref.current&&!ref.current.contains(e.target as Node)) setOpen(false) }
@@ -507,7 +530,7 @@ function CitySearch({label,value,onSelect,placeholder}:{label:string;value:City|
     return ()=>document.removeEventListener('mousedown',handler)
   },[])
 
-  const select=(c:City)=>{ onSelect(c); setQuery(''); setOpen(false) }
+  const select=(c:City)=>{ onSelect(c); setQuery(''); setOpen(false); setLiveResults([]) }
 
   return (
     <div ref={ref} style={{position:'relative'}}>
@@ -534,8 +557,9 @@ function CitySearch({label,value,onSelect,placeholder}:{label:string;value:City|
               onChange={e=>{setQuery(e.target.value);setOpen(true)}}
               onFocus={()=>setOpen(true)}
             />
+            {fetching&&<div style={{position:'absolute',right:'1rem',top:'50%',transform:'translateY(-50%)',fontSize:'0.65rem',color:'#9ca3af',fontFamily:'Lato'}}>searching…</div>}
           </div>
-          {open&&results.length>0&&(
+          {open&&(results.length>0)&&(
             <div style={{position:'absolute',top:'100%',left:0,right:0,background:'#ffffff',border:'1px solid #e5e7eb',zIndex:50,boxShadow:'0 8px 24px rgba(0,0,0,0.08)'}}>
               {results.map(c=>(
                 <button key={c.id} onClick={()=>select(c)} style={{width:'100%',padding:'0.85rem 1.2rem',background:'none',border:'none',borderBottom:'1px solid #f3f4f6',textAlign:'left',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}
