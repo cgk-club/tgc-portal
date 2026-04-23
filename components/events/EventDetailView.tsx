@@ -84,7 +84,8 @@ interface BookingState {
   tier: PricingTier | null;
   price: PricingTierPrice | null;
   paymentMethod: "bank_transfer" | "credit_card" | null;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   notes: string;
@@ -108,7 +109,7 @@ interface BookingState {
 
 const EMPTY_BOOKING: BookingState = {
   tier: null, price: null, paymentMethod: null,
-  name: "", email: "", phone: "", notes: "",
+  firstName: "", lastName: "", email: "", phone: "", notes: "",
   submitting: false, result: null, error: null,
 };
 
@@ -129,7 +130,7 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
   const displayAmount = booking.paymentMethod === "credit_card" && ccPrice ? ccPrice : booking.price?.eur ?? null;
 
   async function submitBooking() {
-    if (!booking.tier || !booking.price || !booking.paymentMethod || !booking.name || !booking.email) return;
+    if (!booking.tier || !booking.price || !booking.paymentMethod || !booking.firstName || !booking.lastName || !booking.email) return;
     setBooking((b) => ({ ...b, submitting: true, error: null }));
 
     const res = await fetch("/api/events/book", {
@@ -141,7 +142,7 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
         tier_id: booking.tier.id,
         tier_name: booking.tier.name,
         tier_option: booking.price.label,
-        guest_name: booking.name,
+        guest_name: `${booking.firstName} ${booking.lastName}`,
         guest_email: booking.email,
         guest_phone: booking.phone || null,
         payment_method: booking.paymentMethod,
@@ -560,14 +561,25 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
 
                 {/* Details */}
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs text-gray-500 font-body mb-1">Full name *</label>
-                    <input
-                      value={booking.name}
-                      onChange={(e) => setBooking((b) => ({ ...b, name: e.target.value }))}
-                      className="w-full px-3 py-2.5 border border-green/20 rounded-xl text-sm font-body focus:outline-none focus:border-green/50"
-                      placeholder="Your name"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 font-body mb-1">First name *</label>
+                      <input
+                        value={booking.firstName}
+                        onChange={(e) => setBooking((b) => ({ ...b, firstName: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-green/20 rounded-xl text-sm font-body focus:outline-none focus:border-green/50"
+                        placeholder="First name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 font-body mb-1">Last name *</label>
+                      <input
+                        value={booking.lastName}
+                        onChange={(e) => setBooking((b) => ({ ...b, lastName: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-green/20 rounded-xl text-sm font-body focus:outline-none focus:border-green/50"
+                        placeholder="Last name"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 font-body mb-1">Email *</label>
@@ -607,7 +619,7 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
 
                 <button
                   onClick={submitBooking}
-                  disabled={booking.submitting || !booking.paymentMethod || !booking.name || !booking.email}
+                  disabled={booking.submitting || !booking.paymentMethod || !booking.firstName || !booking.lastName || !booking.email}
                   className="w-full px-5 py-3 bg-green text-white text-sm font-medium rounded-xl hover:bg-green-light transition-colors font-body disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {booking.submitting ? "Submitting..." : "Confirm Reservation"}

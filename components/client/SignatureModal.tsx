@@ -13,26 +13,27 @@ interface SignatureModalProps {
 }
 
 export default function SignatureModal({ documentTitle, documentUrl, clientName, clientEmail, onSign, onClose }: SignatureModalProps) {
-  const [name, setName] = useState(clientName);
+  const [firstName, setFirstName] = useState(clientName.split(' ').slice(0, -1).join(' ') || clientName);
+  const [lastName, setLastName] = useState(clientName.split(' ').slice(-1).join(''));
   const [email, setEmail] = useState(clientEmail);
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState("");
   const sigRef = useRef<SignatureCanvas | null>(null);
 
   const handleSign = useCallback(async () => {
-    if (!name || !email) { setError("Please enter your name and email."); return; }
+    if (!firstName || !lastName || !email) { setError("Please enter your first name, last name and email."); return; }
     if (!sigRef.current || sigRef.current.isEmpty()) { setError("Please draw your signature."); return; }
 
     setError("");
     setSigning(true);
     try {
       const signatureData = sigRef.current.toDataURL("image/png");
-      await onSign({ signed_by_name: name, signed_by_email: email, signature_data: signatureData });
+      await onSign({ signed_by_name: `${firstName} ${lastName}`, signed_by_email: email, signature_data: signatureData });
     } catch {
       setError("Failed to submit signature. Please try again.");
       setSigning(false);
     }
-  }, [name, email, onSign]);
+  }, [firstName, lastName, email, onSign]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -58,14 +59,22 @@ export default function SignatureModal({ documentTitle, documentUrl, clientName,
           {/* Name and email */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] font-body text-gray-500 block mb-1">Full name</label>
+              <label className="text-[11px] font-body text-gray-500 block mb-1">First name</label>
               <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="w-full text-sm border border-gray-200 rounded px-3 py-2 font-body focus:outline-none focus:ring-1 focus:ring-[#0e4f51]/30"
               />
             </div>
             <div>
+              <label className="text-[11px] font-body text-gray-500 block mb-1">Last name</label>
+              <input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded px-3 py-2 font-body focus:outline-none focus:ring-1 focus:ring-[#0e4f51]/30"
+              />
+            </div>
+            <div className="col-span-2">
               <label className="text-[11px] font-body text-gray-500 block mb-1">Email</label>
               <input
                 value={email}

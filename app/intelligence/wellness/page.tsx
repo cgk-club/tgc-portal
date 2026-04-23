@@ -34,7 +34,7 @@ interface ArchAnswers {
 }
 
 interface ClientDetails {
-  name: string; email: string; phone: string; targetMonth: string; message: string
+  firstName: string; lastName: string; email: string; phone: string; targetMonth: string; message: string
 }
 
 // ── PHILOSOPHIES ──────────────────────────────────────────────────────────────
@@ -619,7 +619,7 @@ export default function WellnessIntelligencePage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitMode, setSubmitMode] = useState<'compass' | 'arch'>('compass')
   const [client, setClient] = useState<ClientDetails>({
-    name: '', email: '', phone: '', targetMonth: '', message: '',
+    firstName: '', lastName: '', email: '', phone: '', targetMonth: '', message: '',
   })
 
   // ── Compass questions ──────────────────────────────────────────────────────
@@ -796,7 +796,7 @@ export default function WellnessIntelligencePage() {
     setPhilosophy(null)
     setMatches([])
     setAnnualPlan(null)
-    setClient({ name: '', email: '', phone: '', targetMonth: '', message: '' })
+    setClient({ firstName: '', lastName: '', email: '', phone: '', targetMonth: '', message: '' })
   }
 
   const phil = philosophy ? PHILOSOPHIES[philosophy] : null
@@ -1254,7 +1254,7 @@ export default function WellnessIntelligencePage() {
           <div className="tgc-fade" style={{ textAlign:'center', paddingTop:'4rem' }}>
             <div className="tgc-mono" style={{ color:'#c8aa4a', marginBottom:'1.2rem' }}>Brief received</div>
             <h2 className="tgc-serif" style={{ fontWeight:400, fontSize:'clamp(2.5rem,5vw,3.5rem)', marginBottom:'1rem' }}>
-              Thank you, {client.name.split(' ')[0] || 'for your brief'}.
+              Thank you, {client.firstName || 'for your brief'}.
             </h2>
             <p className="tgc-sans" style={{ color:'#6b7280', fontSize:'1.1rem', lineHeight:1.6, maxWidth:'500px', margin:'0 auto 2rem' }}>
               Your Gatekeeper will review your brief and be in touch to discuss timing, availability, and how to structure the visit.
@@ -1296,15 +1296,15 @@ function BriefForm({ client, setClient, submitting, onSubmit, mode }: {
           : 'Your Gatekeeper will confirm the suggested structure, check availability, and be in touch to discuss logistics.'}
       </p>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'0.75rem', marginBottom:'1rem' }}>
-        {(['name', 'email', 'phone', 'targetMonth'] as const).map(field => (
+        {(['firstName', 'lastName', 'email', 'phone', 'targetMonth'] as const).map(field => (
           <div key={field}>
             <label className="tgc-mono" style={{ display:'block', marginBottom:'0.4rem', fontSize:'0.6rem', color:'#c8aa4a' }}>
-              {field === 'targetMonth' ? 'Target month' : field}
+              {field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : field === 'targetMonth' ? 'Target month' : field}
             </label>
             <input
               type={field === 'email' ? 'email' : 'text'}
               className="tgc-inp"
-              placeholder={field === 'name' ? 'Your name' : field === 'email' ? 'Email address' : field === 'phone' ? 'Phone number' : 'e.g. October 2026'}
+              placeholder={field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : field === 'email' ? 'Email address' : field === 'phone' ? 'Phone number' : 'e.g. October 2026'}
               value={client[field]}
               onChange={e => setClient({ ...client, [field]: e.target.value })}
             />
@@ -1326,8 +1326,8 @@ function BriefForm({ client, setClient, submitting, onSubmit, mode }: {
       </div>
       <button
         onClick={onSubmit}
-        disabled={submitting || !client.name || !client.email}
-        style={{ background:'#0e4f51', color:'#fff', border:'none', padding:'1rem 2.5rem', cursor:'pointer', fontFamily:"'Lato',sans-serif", fontSize:'0.72rem', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, opacity:(submitting || !client.name || !client.email) ? 0.4 : 1, transition:'opacity 0.2s', borderRadius:'8px' }}
+        disabled={submitting || !client.firstName || !client.lastName || !client.email}
+        style={{ background:'#0e4f51', color:'#fff', border:'none', padding:'1rem 2.5rem', cursor:'pointer', fontFamily:"'Lato',sans-serif", fontSize:'0.72rem', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, opacity:(submitting || !client.firstName || !client.lastName || !client.email) ? 0.4 : 1, transition:'opacity 0.2s', borderRadius:'8px' }}
       >
         {submitting ? 'Sending...' : 'Submit brief →'}
       </button>

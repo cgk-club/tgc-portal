@@ -17,7 +17,8 @@ export default function LeadCaptureModal({
   onClose,
   onSuccess,
 }: LeadCaptureModalProps) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [attendingAs, setAttendingAs] = useState<"individual" | "couple">(
@@ -28,8 +29,8 @@ export default function LeadCaptureModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      setError("Name and email are required.");
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      setError("First name, last name and email are required.");
       return;
     }
 
@@ -43,7 +44,7 @@ export default function LeadCaptureModal({
         body: JSON.stringify({
           action: "enquire",
           ref_code: refCode,
-          name: name.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`,
           email: email.trim(),
           phone: phone.trim() || null,
           package_interest: packageName,
@@ -88,18 +89,33 @@ export default function LeadCaptureModal({
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs text-gray-500 font-body mb-1">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
-              placeholder="Your full name"
-              required
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                First Name *
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
+                placeholder="First name"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                Last Name *
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
+                placeholder="Last name"
+                required
+              />
+            </div>
           </div>
 
           <div>

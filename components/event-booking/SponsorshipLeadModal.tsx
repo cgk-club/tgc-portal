@@ -17,7 +17,8 @@ export default function SponsorshipLeadModal({
   onClose,
   onSuccess,
 }: SponsorshipLeadModalProps) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
@@ -27,8 +28,10 @@ export default function SponsorshipLeadModal({
 
   const t = lang === "fr" ? {
     enquire: "Demande de renseignements",
-    fullName: "Nom complet",
-    fullNamePh: "Votre nom complet",
+    firstName: "Prénom",
+    firstNamePh: "Prénom",
+    lastName: "Nom",
+    lastNamePh: "Nom de famille",
     email: "Email",
     phone: "Telephone (optionnel)",
     company: "Entreprise",
@@ -38,11 +41,13 @@ export default function SponsorshipLeadModal({
     submit: "Envoyer",
     submitting: "Envoi en cours...",
     footnote: "Nous reviendrons vers vous dans les plus brefs delais avec tous les details.",
-    required: "Le nom et l'email sont obligatoires.",
+    required: "Le prénom, le nom et l'email sont obligatoires.",
   } : {
     enquire: "Enquire",
-    fullName: "Full Name",
-    fullNamePh: "Your full name",
+    firstName: "First Name",
+    firstNamePh: "First name",
+    lastName: "Last Name",
+    lastNamePh: "Last name",
     email: "Email",
     phone: "Phone (optional)",
     company: "Company",
@@ -52,12 +57,12 @@ export default function SponsorshipLeadModal({
     submit: "Submit Enquiry",
     submitting: "Submitting...",
     footnote: "We will be in touch shortly with the full sponsorship deck and next steps.",
-    required: "Name and email are required.",
+    required: "First name, last name and email are required.",
   };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       setError(t.required);
       return;
     }
@@ -72,7 +77,7 @@ export default function SponsorshipLeadModal({
         body: JSON.stringify({
           action: "enquire",
           ref_code: null,
-          name: name.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`,
           email: email.trim(),
           phone: phone.trim() || null,
           company: company.trim() || null,
@@ -118,18 +123,33 @@ export default function SponsorshipLeadModal({
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs text-gray-500 font-body mb-1">
-              {t.fullName} *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
-              placeholder={t.fullNamePh}
-              required
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                {t.firstName} *
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
+                placeholder={t.firstNamePh}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 font-body mb-1">
+                {t.lastName} *
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
+                placeholder={t.lastNamePh}
+                required
+              />
+            </div>
           </div>
 
           <div>

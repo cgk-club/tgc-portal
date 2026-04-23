@@ -601,7 +601,7 @@ const TGCTransportIntelligence = () => {
   const [step,setStep] = useState(0)
   const [answers,setAnswers] = useState<Record<string,string|null>>({purpose:null,travellers:null,luggage:null,priority:null,flexibility:null,frequency:null})
   const [selectedMode,setSelectedMode] = useState<ModeResult|null>(null)
-  const [clientDetails,setClientDetails] = useState({name:'',email:'',phone:'',travelDate:'',returnDate:'',message:''})
+  const [clientDetails,setClientDetails] = useState({firstName:'',lastName:'',email:'',phone:'',travelDate:'',returnDate:'',message:''})
   const [submitting,setSubmitting] = useState(false)
   const [submitted,setSubmitted] = useState(false)
   const [calcMode,setCalcMode] = useState('jet-light')
@@ -628,7 +628,7 @@ const TGCTransportIntelligence = () => {
     setOrigin(null); setDestination(null); setStep(0)
     setAnswers({purpose:null,travellers:null,luggage:null,priority:null,flexibility:null,frequency:null})
     setSelectedMode(null); setSubmitted(false)
-    setClientDetails({name:'',email:'',phone:'',travelDate:'',returnDate:'',message:''})
+    setClientDetails({firstName:'',lastName:'',email:'',phone:'',travelDate:'',returnDate:'',message:''})
     setScreen('welcome')
   }
 
@@ -1072,7 +1072,8 @@ const TGCTransportIntelligence = () => {
 
                       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:'1rem',marginBottom:'1rem'}}>
                         {[
-                          {label:'Name',key:'name',type:'text',placeholder:'Your name'},
+                          {label:'First name',key:'firstName',type:'text',placeholder:'First name'},
+                          {label:'Last name',key:'lastName',type:'text',placeholder:'Last name'},
                           {label:'Email',key:'email',type:'email',placeholder:'email@example.com'},
                           {label:'Phone (optional)',key:'phone',type:'tel',placeholder:'+33 or +1...'},
                           {label:'Travel date',key:'travelDate',type:'date',placeholder:''},
@@ -1099,7 +1100,7 @@ const TGCTransportIntelligence = () => {
                           <Save size={15}/><span className="tgc-mono">Save this journey</span>
                         </button>
                         <button onClick={submitBrief}
-                          disabled={!clientDetails.name||!clientDetails.email||!clientDetails.travelDate||submitting}
+                          disabled={!clientDetails.firstName||!clientDetails.lastName||!clientDetails.email||!clientDetails.travelDate||submitting}
                           className="tgc-btn"
                           style={{background:'#0e4f51',color:'#ffffff',border:'none',padding:'1rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'0.6rem',borderRadius:4}}>
                           {submitting?<span className="tgc-mono">Sending…</span>:<><Send size={15}/><span className="tgc-mono">Send brief to TGC</span></>}

@@ -56,7 +56,8 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState({
-    prospect_name: "",
+    prospect_first_name: "",
+    prospect_last_name: "",
     prospect_email: "",
     prospect_phone: "",
     package_interest: "",
@@ -91,7 +92,7 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
 
   async function handleAddProspect(e: React.FormEvent) {
     e.preventDefault();
-    if (!addForm.prospect_name.trim() || !addForm.prospect_email.trim()) return;
+    if (!addForm.prospect_first_name.trim() || !addForm.prospect_last_name.trim() || !addForm.prospect_email.trim()) return;
     setAdding(true);
 
     await fetch("/api/admin/event-referrals", {
@@ -99,12 +100,17 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         project_id: projectId,
-        ...addForm,
+        prospect_name: `${addForm.prospect_first_name.trim()} ${addForm.prospect_last_name.trim()}`,
+        prospect_email: addForm.prospect_email,
+        prospect_phone: addForm.prospect_phone,
+        package_interest: addForm.package_interest,
+        admin_notes: addForm.admin_notes,
       }),
     });
 
     setAddForm({
-      prospect_name: "",
+      prospect_first_name: "",
+      prospect_last_name: "",
       prospect_email: "",
       prospect_phone: "",
       package_interest: "",
@@ -175,10 +181,20 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               type="text"
-              placeholder="Full name *"
-              value={addForm.prospect_name}
+              placeholder="First name *"
+              value={addForm.prospect_first_name}
               onChange={(e) =>
-                setAddForm({ ...addForm, prospect_name: e.target.value })
+                setAddForm({ ...addForm, prospect_first_name: e.target.value })
+              }
+              className="border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Last name *"
+              value={addForm.prospect_last_name}
+              onChange={(e) =>
+                setAddForm({ ...addForm, prospect_last_name: e.target.value })
               }
               className="border border-gray-200 rounded-md px-3 py-2 text-sm font-body focus:outline-none focus:border-green"
               required
