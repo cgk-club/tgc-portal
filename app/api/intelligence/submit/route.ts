@@ -218,6 +218,66 @@ export async function POST(request: NextRequest) {
           <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
         </table>
       `
+    } else if (type === 'household-staffing') {
+      const b = brief || {}
+      subject = `Intelligence brief: Household Staffing — ${b.role?.replace(/-/g, ' ') || 'Enquiry'} · ${client?.name || ''}`
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New Household Staffing Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Placement</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Role</td><td>${b.role?.replace(/-/g, ' ') || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Placement type</td><td>${b.placement || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Location</td><td>${b.location || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Live-in</td><td>${b.liveIn || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Budget</td><td>${b.budget || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Start timeline</td><td>${b.startTimeline || '-'}</td></tr>
+        </table>
+        ${b.requirements ? `<p style="font-family: Arial, sans-serif;"><strong>Requirements:</strong> ${b.requirements}</p>` : ''}
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+        </table>
+        ${client?.message ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${client.message}</p>` : ''}
+      `
+    } else if (type === 'relocation') {
+      const b = brief || {}
+      const serviceList = Array.isArray(b.services) ? (b.services as string[]).join(', ').replace(/-/g, ' ') : '-'
+      const schoolList = Array.isArray(b.schoolTypes) ? (b.schoolTypes as string[]).join(', ').replace(/-/g, ' ') : '-'
+      subject = `Intelligence brief: Relocation — ${b.destination || 'Enquiry'} · ${client?.name || ''}`
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New Relocation Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Profile</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Destination</td><td>${b.destination || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Origin</td><td>${b.origin || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Family profile</td><td>${b.family || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Urgency</td><td>${b.urgency || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Target date</td><td>${b.targetDate || '-'}</td></tr>
+        </table>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Scope</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Services</td><td>${serviceList}</td></tr>
+          ${b.visaRoute ? `<tr><td style="padding: 4px 12px 4px 0; color: #888;">Visa route</td><td>${b.visaRoute}</td></tr>` : ''}
+          ${b.schoolTypes?.length ? `<tr><td style="padding: 4px 12px 4px 0; color: #888;">School types</td><td>${schoolList}</td></tr>` : ''}
+          ${b.childrenAges ? `<tr><td style="padding: 4px 12px 4px 0; color: #888;">Children ages</td><td>${b.childrenAges}</td></tr>` : ''}
+        </table>
+
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+        </table>
+        ${client?.message ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${client.message}</p>` : ''}
+      `
     } else {
       subject = `Intelligence brief: ${type} — ${client?.name || 'Enquiry'}`
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`

@@ -80,6 +80,28 @@ const tools = [
     live: true,
     tgcActive: true,
   },
+  {
+    id: 'household',
+    number: '07',
+    href: '/intelligence/household-staffing',
+    title: 'Household Staffing Intelligence',
+    subtitle: 'The right person in the right role.',
+    description: 'Nine placement categories: chef, housekeeper, house manager, butler, PA, estate manager, nanny, tutor, and full household team. Temporary and permanent. We advise on the brief, go to market quietly, and charge one fee paid by the principal.',
+    cta: 'Start a brief',
+    live: true,
+    tgcActive: true,
+  },
+  {
+    id: 'relocation',
+    number: '08',
+    href: '/intelligence/relocation',
+    title: 'Relocation & Family Office Intelligence',
+    subtitle: 'Domestic infrastructure, built properly.',
+    description: 'French visa pathways, scouting trips, real estate research, schools coordination, banking setup, domestic staff sourcing, healthcare registration, and utilities. The full scope of what relocating actually involves, coordinated as a single project.',
+    cta: 'Start a brief',
+    live: true,
+    tgcActive: true,
+  },
 ]
 
 export default function IntelligenceLandingPage() {
@@ -131,7 +153,7 @@ export default function IntelligenceLandingPage() {
           maxWidth: '620px',
           lineHeight: 1.6,
         }}>
-          Six intelligence tools for transport, property, wellness, events, VIP access, and collecting. Each one built on the same thesis: quiet beats loud, structuring matters, and time is the real cost.
+          Eight intelligence tools for transport, property, wellness, events, VIP access, collecting, household staffing, and relocation. Each one built on the same thesis: quiet beats loud, structuring matters, and time is the real cost.
         </p>
       </section>
 
