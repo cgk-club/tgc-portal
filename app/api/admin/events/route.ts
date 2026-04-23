@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
       brochure_url: body.brochure_url || null,
       gallery_images: body.gallery_images || null,
       stats: body.stats || null,
+      pricing_tiers: body.pricing_tiers || null,
+      payment_config: body.payment_config || null,
     })
     .select()
     .single();

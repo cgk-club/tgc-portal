@@ -6,7 +6,7 @@ export async function GET() {
 
   const { data, error } = await getSupabase()
     .from("events")
-    .select("id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, members_only, ticket_url, ticket_provider, brochure_url, gallery_images, stats")
+    .select("id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, ticket_url, ticket_provider, brochure_url, gallery_images, stats, pricing_tiers")
     .eq("active", true)
     .or(`date_end.gte.${today},date_end.is.null`)
     .order("date_start", { ascending: true });

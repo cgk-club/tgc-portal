@@ -14,7 +14,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   const { data: event } = await getSupabase()
     .from("events")
     .select(
-      "id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, members_only, ticket_url, ticket_provider, ticket_commission_rate, brochure_url, gallery_images, stats"
+      "id, title, category, date_display, date_start, date_end, location, price, description, highlights, itinerary, includes, image_url, featured, ticket_url, ticket_provider, ticket_commission_rate, brochure_url, gallery_images, stats, pricing_tiers"
     )
     .eq("id", id)
     .eq("active", true)

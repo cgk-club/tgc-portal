@@ -9,6 +9,29 @@ interface EventStats {
   countries?: string;
   start_point?: string;
   end_point?: string;
+  yacht?: string;
+}
+
+interface PricingTierPrice {
+  label: string;
+  eur: number;
+  stripe_link: string | null;
+}
+
+interface PricingTier {
+  id: string;
+  name: string;
+  description: string;
+  prices: PricingTierPrice[];
+  available: boolean;
+}
+
+interface PaymentConfig {
+  account_name: string;
+  bank_name: string;
+  iban: string;
+  bic: string;
+  reference_prefix: string;
 }
 
 interface AffiliateLink {
@@ -37,7 +60,6 @@ interface TGCEvent {
   includes: string | null;
   image_url: string | null;
   featured: boolean;
-  members_only: boolean;
   active: boolean;
   sort_order: number;
   ticket_url: string | null;
@@ -46,20 +68,28 @@ interface TGCEvent {
   brochure_url: string | null;
   gallery_images: string[] | null;
   stats: EventStats | null;
+  pricing_tiers: PricingTier[] | null;
+  payment_config: PaymentConfig | null;
 }
 
 const CATEGORIES = [
   "Art & Culture",
-  "Motorsport",
-  "Sport",
-  "Hospitality",
+  "Art & Design",
+  "Automotive",
   "Fashion",
+  "Film & Media",
   "Food & Wine",
-  "Travel & Trade",
-  "Yachting & Marine",
-  "Music & Festivals",
-  "TGC Private",
+  "Hospitality",
   "MICE & Corporate",
+  "Motorsport",
+  "Music & Festivals",
+  "Opera & Classical",
+  "Polo",
+  "Sport",
+  "TGC Private",
+  "Travel & Trade",
+  "Watches & Luxury",
+  "Yachting & Marine",
 ];
 
 const EMPTY_EVENT: Omit<TGCEvent, "id"> = {
@@ -76,7 +106,6 @@ const EMPTY_EVENT: Omit<TGCEvent, "id"> = {
   includes: "",
   image_url: "",
   featured: false,
-  members_only: false,
   active: true,
   sort_order: 0,
   ticket_url: null,
@@ -85,6 +114,8 @@ const EMPTY_EVENT: Omit<TGCEvent, "id"> = {
   brochure_url: null,
   gallery_images: null,
   stats: null,
+  pricing_tiers: null,
+  payment_config: null,
 };
 
 export default function AdminEventsPage() {
@@ -150,6 +181,51 @@ export default function AdminEventsPage() {
     setForm((prev) => ({ ...prev, stats: Object.keys(cleaned).length > 0 ? cleaned : null }));
   }
 
+  function addTier() {
+    const tiers = [...(form.pricing_tiers || [])];
+    tiers.push({ id: `tier_${Date.now()}`, name: "", description: "", prices: [{ label: "Individual", eur: 0, stripe_link: null }], available: true });
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers }));
+  }
+
+  function removeTier(ti: number) {
+    const tiers = [...(form.pricing_tiers || [])];
+    tiers.splice(ti, 1);
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers.length > 0 ? tiers : null }));
+  }
+
+  function updateTier(ti: number, key: keyof PricingTier, value: unknown) {
+    const tiers = [...(form.pricing_tiers || [])];
+    tiers[ti] = { ...tiers[ti], [key]: value };
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers }));
+  }
+
+  function addTierPrice(ti: number) {
+    const tiers = [...(form.pricing_tiers || [])];
+    tiers[ti] = { ...tiers[ti], prices: [...tiers[ti].prices, { label: "", eur: 0, stripe_link: null }] };
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers }));
+  }
+
+  function removeTierPrice(ti: number, pi: number) {
+    const tiers = [...(form.pricing_tiers || [])];
+    const prices = [...tiers[ti].prices];
+    prices.splice(pi, 1);
+    tiers[ti] = { ...tiers[ti], prices };
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers }));
+  }
+
+  function updateTierPrice(ti: number, pi: number, key: keyof PricingTierPrice, value: unknown) {
+    const tiers = [...(form.pricing_tiers || [])];
+    const prices = [...tiers[ti].prices];
+    prices[pi] = { ...prices[pi], [key]: value };
+    tiers[ti] = { ...tiers[ti], prices };
+    setForm((prev) => ({ ...prev, pricing_tiers: tiers }));
+  }
+
+  function updatePaymentConfig(key: keyof PaymentConfig, value: string) {
+    const current = form.payment_config || { account_name: "", bank_name: "", iban: "", bic: "", reference_prefix: "" };
+    setForm((prev) => ({ ...prev, payment_config: { ...current, [key]: value } }));
+  }
+
   async function loadEvents() {
     const res = await fetch("/api/admin/events");
     if (res.ok) setEvents(await res.json());
@@ -199,7 +275,6 @@ export default function AdminEventsPage() {
       includes: ev.includes || "",
       image_url: ev.image_url || "",
       featured: ev.featured,
-      members_only: ev.members_only,
       active: ev.active,
       sort_order: ev.sort_order,
       ticket_url: ev.ticket_url || null,
@@ -208,6 +283,8 @@ export default function AdminEventsPage() {
       brochure_url: ev.brochure_url || null,
       gallery_images: ev.gallery_images || null,
       stats: ev.stats || null,
+      pricing_tiers: ev.pricing_tiers || null,
+      payment_config: ev.payment_config || null,
     });
   }
 
@@ -521,10 +598,86 @@ export default function AdminEventsPage() {
                 <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
                 Active
               </label>
-              <label className="flex items-center gap-2 text-sm font-body">
-                <input type="checkbox" checked={form.members_only} onChange={(e) => setForm({ ...form, members_only: e.target.checked })} />
-                Members only
-              </label>
+            </div>
+
+            {/* Pricing Tiers */}
+            <div className="sm:col-span-2 border-t border-green/10 pt-4 mt-2">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium text-green uppercase tracking-wider font-body">Pricing Tiers</h3>
+                <button type="button" onClick={addTier} className="text-xs text-green hover:underline font-body">+ Add Tier</button>
+              </div>
+              {(form.pricing_tiers || []).map((tier, ti) => (
+                <div key={ti} className="mb-4 bg-pearl border border-green/10 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-gray-500 font-body">Tier {ti + 1}</span>
+                    <button type="button" onClick={() => removeTier(ti)} className="text-[10px] text-red-400 hover:text-red-600 font-body">Remove</button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 font-body mb-0.5">Name</label>
+                      <input value={tier.name} onChange={(e) => updateTier(ti, "name", e.target.value)} className="w-full px-2 py-1.5 border border-green/20 rounded text-xs font-body" placeholder="e.g. VIP Access" />
+                    </div>
+                    <div className="flex items-center gap-2 pt-4">
+                      <input type="checkbox" checked={tier.available} onChange={(e) => updateTier(ti, "available", e.target.checked)} id={`avail-${ti}`} />
+                      <label htmlFor={`avail-${ti}`} className="text-xs text-gray-500 font-body">Available</label>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-[10px] text-gray-400 font-body mb-0.5">Description</label>
+                      <input value={tier.description} onChange={(e) => updateTier(ti, "description", e.target.value)} className="w-full px-2 py-1.5 border border-green/20 rounded text-xs font-body" placeholder="Short description shown to guests" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 border-t border-green/10 pt-2">
+                    <p className="text-[10px] text-gray-400 font-body">Options (Individual / Couple / etc.)</p>
+                    {tier.prices.map((price, pi) => (
+                      <div key={pi} className="grid grid-cols-3 gap-1.5 items-end">
+                        <div>
+                          <label className="block text-[10px] text-gray-400 font-body mb-0.5">Label</label>
+                          <input value={price.label} onChange={(e) => updateTierPrice(ti, pi, "label", e.target.value)} placeholder="Individual" className="w-full px-2 py-1 border border-green/20 rounded text-xs font-body" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-gray-400 font-body mb-0.5">EUR (base)</label>
+                          <input type="number" value={price.eur || ""} onChange={(e) => updateTierPrice(ti, pi, "eur", parseFloat(e.target.value) || 0)} className="w-full px-2 py-1 border border-green/20 rounded text-xs font-body" />
+                        </div>
+                        <div className="flex items-end gap-1">
+                          <div className="flex-1">
+                            <label className="block text-[10px] text-gray-400 font-body mb-0.5">Stripe Link (CC)</label>
+                            <input value={price.stripe_link || ""} onChange={(e) => updateTierPrice(ti, pi, "stripe_link", e.target.value || null)} placeholder="https://buy.stripe.com/..." className="w-full px-2 py-1 border border-green/20 rounded text-xs font-body" />
+                          </div>
+                          <button type="button" onClick={() => removeTierPrice(ti, pi)} className="text-[10px] text-red-400 pb-1 font-body">✕</button>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => addTierPrice(ti)} className="text-[10px] text-green/70 hover:text-green font-body">+ Add option</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Payment Config (Bank Transfer) */}
+            <div className="sm:col-span-2 border-t border-green/10 pt-4">
+              <h3 className="text-xs font-medium text-gold uppercase tracking-wider font-body mb-3">Bank Transfer Details</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Account Name</label>
+                  <input value={form.payment_config?.account_name || ""} onChange={(e) => updatePaymentConfig("account_name", e.target.value)} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" placeholder="The Gatekeepers Club" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Bank Name</label>
+                  <input value={form.payment_config?.bank_name || ""} onChange={(e) => updatePaymentConfig("bank_name", e.target.value)} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">IBAN</label>
+                  <input value={form.payment_config?.iban || ""} onChange={(e) => updatePaymentConfig("iban", e.target.value)} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">BIC / SWIFT</label>
+                  <input value={form.payment_config?.bic || ""} onChange={(e) => updatePaymentConfig("bic", e.target.value)} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-body mb-0.5">Reference Prefix</label>
+                  <input value={form.payment_config?.reference_prefix || ""} onChange={(e) => updatePaymentConfig("reference_prefix", e.target.value)} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" placeholder="e.g. PAV2026" />
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex gap-3 mt-6">
@@ -571,19 +724,16 @@ export default function AdminEventsPage() {
                       {ev.featured ? "Featured" : "Standard"}
                     </button>
                     {ev.ticket_url && (
-                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-gold/10 text-gold">
-                        Tickets
-                      </span>
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-gold/10 text-gold">Tickets</span>
+                    )}
+                    {(ev as any).pricing_tiers && (ev as any).pricing_tiers.length > 0 && (
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-gold/10 text-gold">{(ev as any).pricing_tiers.length} tiers</span>
                     )}
                     {ev.brochure_url && (
-                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">
-                        PDF
-                      </span>
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">PDF</span>
                     )}
                     {ev.gallery_images && ev.gallery_images.length > 0 && (
-                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">
-                        {ev.gallery_images.length} img
-                      </span>
+                      <span className="text-[9px] px-2 py-0.5 rounded font-body bg-green-muted text-green/70">{ev.gallery_images.length} img</span>
                     )}
                   </div>
                 </td>

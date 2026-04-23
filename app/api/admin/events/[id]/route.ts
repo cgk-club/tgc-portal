@@ -9,7 +9,7 @@ export async function PATCH(
   const body = await request.json();
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  const allowed = ["title", "category", "date_display", "date_start", "date_end", "location", "price", "description", "highlights", "itinerary", "includes", "image_url", "featured", "members_only", "active", "sort_order", "ticket_url", "ticket_provider", "ticket_commission_rate", "brochure_url", "gallery_images", "stats"];
+  const allowed = ["title", "category", "date_display", "date_start", "date_end", "location", "price", "description", "highlights", "itinerary", "includes", "image_url", "featured", "active", "sort_order", "ticket_url", "ticket_provider", "ticket_commission_rate", "brochure_url", "gallery_images", "stats", "pricing_tiers", "payment_config"];
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];
   }
