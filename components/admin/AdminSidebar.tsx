@@ -13,7 +13,7 @@ interface NotificationCounts {
 }
 
 const navItems = [
-  { label: 'Dashboard', href: '/admin', badgeKey: null },
+  { label: 'Dashboard', href: '/admin', badgeKey: null, exact: true },
   { label: 'Fiches', href: '/admin/fiches', badgeKey: null },
   { label: 'Itineraries', href: '/admin/itineraries', badgeKey: null },
   { label: 'Clients', href: '/admin/clients', badgeKey: null },
@@ -24,7 +24,8 @@ const navItems = [
   { label: 'Marketplace', href: '/admin/marketplace', badgeKey: 'marketplace_review' as const },
   { label: 'Feedback', href: '/admin/feedback', badgeKey: 'feedback' as const },
   { label: 'Rates', href: '/admin/rates', badgeKey: null },
-  { label: 'Events', href: '/admin/events', badgeKey: null },
+  { label: 'Events', href: '/admin/events', badgeKey: null, exact: true },
+  { label: 'Bookings', href: '/admin/events/bookings', badgeKey: null },
   { label: 'Requests', href: '/admin/requests', badgeKey: 'requests' as const },
 ]
 
@@ -99,8 +100,8 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 px-3 overflow-y-auto">
         {navItems.map((item) => {
-          const active = item.href === '/admin'
-            ? pathname === '/admin'
+          const active = item.exact
+            ? pathname === item.href
             : pathname.startsWith(item.href)
 
           const badgeCount = item.badgeKey ? counts[item.badgeKey] : 0
