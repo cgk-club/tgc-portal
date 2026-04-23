@@ -34,7 +34,7 @@ export async function GET(
   const { data: rawPackages } = await sb
     .from("event_packages")
     .select(
-      "id, name, name_fr, description, description_fr, price, currency, capacity, sold_count, included_services, included_services_fr, sort_order"
+      "id, name, name_fr, description, description_fr, price, currency, capacity, sold_count, included_services, included_services_fr, sort_order, price_options"
     )
     .eq("event_id", event.id)
     .eq("status", "active")
@@ -51,6 +51,7 @@ export async function GET(
     sold_count: pkg.sold_count,
     included_services: lang === "fr" && pkg.included_services_fr ? pkg.included_services_fr : pkg.included_services,
     sort_order: pkg.sort_order,
+    price_options: pkg.price_options || null,
   }));
 
   // Fetch brochure URLs from project documents if available

@@ -9,6 +9,12 @@ const LeadCaptureModal = dynamic(
   { ssr: false }
 );
 
+interface PriceOption {
+  label: string;
+  eur: number;
+  stripe_link: string | null;
+}
+
 interface EventPackage {
   id: string;
   name: string;
@@ -19,6 +25,7 @@ interface EventPackage {
   sold_count: number;
   included_services: string;
   sort_order: number;
+  price_options: PriceOption[] | null;
 }
 
 interface EventData {
@@ -537,12 +544,50 @@ export default function EventPage() {
                   </ul>
                 )}
 
-                <button
-                  onClick={() => setSelectedPackage(pkg.name)}
-                  className="mt-auto w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
-                >
-                  {t.enquire}
-                </button>
+                {pkg.price_options && pkg.price_options.length > 0 ? (
+                  <div className="mt-auto space-y-2">
+                    {pkg.price_options.map((opt) => (
+                      <div key={opt.label} className="flex items-center justify-between gap-2 py-2 border-t border-green/5 first:border-0 first:pt-0">
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-body">{opt.label}</p>
+                          <p className="text-sm font-heading font-semibold text-gold">
+                            €{opt.eur.toLocaleString("fr-FR")}
+                          </p>
+                        </div>
+                        {opt.stripe_link ? (
+                          <a
+                            href={opt.stripe_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 bg-gold text-white text-[10px] font-body rounded-md hover:bg-[#b89a3f] transition-colors whitespace-nowrap"
+                          >
+                            Book by Card
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => setSelectedPackage(`${pkg.name} — ${opt.label}`)}
+                            className="px-3 py-1.5 bg-green text-white text-[10px] font-body rounded-md hover:bg-green-light transition-colors whitespace-nowrap"
+                          >
+                            {t.enquire}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setSelectedPackage(pkg.name)}
+                      className="w-full border border-green/20 text-green py-2 rounded-md text-[10px] font-body tracking-wide hover:bg-green/5 transition-colors mt-1"
+                    >
+                      {t.enquire} / Bank Transfer
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setSelectedPackage(pkg.name)}
+                    className="mt-auto w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
+                  >
+                    {t.enquire}
+                  </button>
+                )}
               </div>
             );
           })}
