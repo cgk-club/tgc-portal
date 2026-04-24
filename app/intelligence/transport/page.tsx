@@ -75,6 +75,8 @@ const CITIES:City[] = [
   {id:'bordeaux',name:'Bordeaux',country:'FR',region:'eu-west',lat:44.84,lng:-0.58,note:'TGV from Paris 2h04 — train wins decisively'},
   {id:'lyon',name:'Lyon',country:'FR',region:'eu-west',lat:45.75,lng:4.84},
   {id:'marseille',name:'Marseille',country:'FR',region:'eu-med',lat:43.30,lng:5.37},
+  {id:'beziers',name:'Béziers',country:'FR',region:'eu-med',lat:43.34,lng:3.22,note:'BZR airport; south of France'},
+  {id:'montpellier',name:'Montpellier',country:'FR',region:'eu-med',lat:43.61,lng:3.88,note:'MPL airport'},
   {id:'toulouse',name:'Toulouse',country:'FR',region:'eu-west',lat:43.60,lng:1.44},
   {id:'biarritz',name:'Biarritz',country:'FR',region:'eu-west',lat:43.48,lng:-1.56},
   {id:'courchevel',name:'Courchevel',country:'FR',region:'eu-alpine',lat:45.42,lng:6.63,note:'Altiport LFLJ; helicopter from Geneva 30-35 min'},
