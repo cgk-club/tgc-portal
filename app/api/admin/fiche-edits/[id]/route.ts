@@ -24,7 +24,8 @@ export async function PATCH(
   }
 
   if (body.action === 'approve') {
-    // Apply the JSONB changes to the fiche
+    // Apply the JSONB changes to the fiche — errors here are non-blocking
+    let ficheUpdateError: string | null = null
     if (editReq.fiche_id && editReq.changes) {
       const rawChanges = typeof editReq.changes === 'string'
         ? JSON.parse(editReq.changes)
@@ -37,7 +38,9 @@ export async function PATCH(
         'show_price', 'latitude', 'longitude',
       ])
       const changes: Record<string, unknown> = Object.fromEntries(
-        Object.entries(rawChanges).filter(([k]) => SAFE_FICHE_FIELDS.has(k))
+        Object.entries(rawChanges)
+          .filter(([k]) => SAFE_FICHE_FIELDS.has(k))
+          .filter(([, v]) => v !== '') // empty strings are invalid for JSONB columns
       )
 
       // Convert highlights string to JSONB array if needed
@@ -54,18 +57,18 @@ export async function PATCH(
           .update({ ...changes, updated_at: new Date().toISOString() })
           .eq('id', editReq.fiche_id)
 
-        if (updateError) {
-          return NextResponse.json({ error: `Failed to apply changes: ${updateError.message}` }, { status: 500 })
-        }
+        if (updateError) ficheUpdateError = updateError.message
       }
     }
 
-    // Mark the edit request as approved
+    // Always mark the edit request as approved, even if fiche update had issues
     const { error: approveError } = await sb
       .from('fiche_edit_requests')
       .update({
         status: 'approved',
-        admin_note: body.admin_note || null,
+        admin_note: ficheUpdateError
+          ? `Approved. Note: fiche update error — ${ficheUpdateError}`
+          : (body.admin_note || null),
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', id)
@@ -75,7 +78,7 @@ export async function PATCH(
     // Notify partner users about approval
     notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit approved', 'Your fiche changes have been approved and applied.', '/partner/fiche')
 
-    return NextResponse.json({ success: true, id })
+    return NextResponse.json({ success: true, id, ficheUpdateError })
 
   } else if (body.action === 'reject') {
     const { error: rejectError } = await sb
