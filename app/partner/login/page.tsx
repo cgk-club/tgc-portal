@@ -136,7 +136,7 @@ export default function PartnerLoginPage() {
               }}
               className="w-full text-xs text-green/60 hover:text-green font-body py-1"
             >
-              Request a magic link instead
+              Forgot your password? Request a login link
             </button>
           </form>
         ) : (

@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { label: "Availability", href: "/partner/availability", key: "availability", tourId: "tour-partner-availability" },
   { label: "Toolkit", href: "/partner/toolkit", key: "toolkit", tourId: "tour-partner-toolkit" },
   { label: "Network", href: "/partner/network", key: "network", tourId: "tour-partner-network" },
+  { label: "Settings", href: "/partner/settings", key: "settings", tourId: "tour-partner-settings" },
 ];
 
 export default function PartnerNav({ active }: PartnerNavProps) {
