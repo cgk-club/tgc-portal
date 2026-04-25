@@ -35,12 +35,6 @@ export async function POST(
     return NextResponse.json({ error: "Token expired" }, { status: 401 });
   }
 
-  // Mark token as used
-  await sb
-    .from("partner_magic_tokens")
-    .update({ used_at: new Date().toISOString() })
-    .eq("id", magicToken.id);
-
   // Get the partner user (use user_id if set, otherwise fall back to finding owner user for the partner)
   let userId = magicToken.user_id;
   let user: { id: string; email: string; name: string | null; partner_id: string } | null = null;
@@ -77,6 +71,12 @@ export async function POST(
   if (!partner || partner.status !== "active") {
     return NextResponse.json({ error: "Account is not active" }, { status: 403 });
   }
+
+  // Mark token as used only after all checks pass — prevents burning the token on a failed attempt
+  await sb
+    .from("partner_magic_tokens")
+    .update({ used_at: new Date().toISOString() })
+    .eq("id", magicToken.id);
 
   // Update last login on partner_users
   await sb
