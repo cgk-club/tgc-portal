@@ -8,7 +8,6 @@ import FicheSplitSection from '@/components/fiche/FicheSplitSection'
 import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
 import FicheHighlights from '@/components/fiche/FicheHighlights'
 import FicheGallery from '@/components/fiche/FicheGallery'
-import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
 import ScrollReveal from '@/components/fiche/ScrollReveal'
@@ -70,21 +69,6 @@ export default function HospitalityFiche({
   const photoGridCards = highlightImages
     .slice(0, 6)
     .map(url => ({ imageUrl: url, heading: '', description: '' }))
-
-  // ── Amenities (luxury icon grid) ────────────────────────────
-  const amenities: { label: string; value: string }[] = []
-  if (tf.room_count) amenities.push({ label: 'Rooms', value: `${tf.room_count} rooms` })
-  if (tf.restaurants_onsite) amenities.push({ label: 'Restaurant', value: `${tf.restaurants_onsite} on-site` })
-  if (tf.has_spa) amenities.push({ label: 'Spa', value: 'Yes' })
-  if (tf.pool && tf.pool !== 'none') amenities.push({ label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
-  if (tf.pet_policy) amenities.push({ label: 'Pets', value: tf.pet_policy })
-  // Add from manual highlights that aren't already covered
-  for (const h of highlights) {
-    const lbl = h.label.toLowerCase()
-    if (!amenities.some(a => a.label.toLowerCase() === lbl)) {
-      amenities.push({ label: h.label, value: h.value })
-    }
-  }
 
   // ── Stay details ──────────────────────────────────────────────
   const hasStayDetails = tf.checkin_time || tf.checkout_time || tf.minimum_stay || tf.pet_policy || (fiche.show_price && fiche.price_display)
@@ -154,10 +138,10 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 4. Amenities & Services (after tagline, before splits) */}
-      {amenities.length > 0 && (
+      {/* 4. Feature highlights with icons */}
+      {displayHighlights.length > 0 && (
         <ScrollReveal>
-          <FicheAmenityIcons amenities={amenities} title="Amenities & Services" />
+          <FicheHighlights highlights={displayHighlights} />
         </ScrollReveal>
       )}
 
@@ -197,21 +181,14 @@ export default function HospitalityFiche({
         </ScrollReveal>
       )}
 
-      {/* 7. Photo grid — pure gallery, no text overlays */}
+      {/* 7. Photo grid */}
       {photoGridCards.length > 0 && (
         <ScrollReveal>
           <FicheHighlightsEditorial cards={photoGridCards} showLabels={false} />
         </ScrollReveal>
       )}
 
-      {/* 8. Highlights — clean feature band */}
-      {displayHighlights.length > 0 && (
-        <ScrollReveal>
-          <FicheHighlights highlights={displayHighlights} />
-        </ScrollReveal>
-      )}
-
-      {/* 9. Gallery */}
+      {/* 8. Gallery */}
       {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
 
       {/* 9. Tags */}

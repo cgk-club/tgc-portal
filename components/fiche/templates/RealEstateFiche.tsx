@@ -8,7 +8,6 @@ import FicheSplitSection from '@/components/fiche/FicheSplitSection'
 import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
 import FicheHighlights from '@/components/fiche/FicheHighlights'
 import FicheGallery from '@/components/fiche/FicheGallery'
-import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
 import FicheContact from '@/components/fiche/FicheContact'
 import ScrollReveal from '@/components/fiche/ScrollReveal'
@@ -81,20 +80,6 @@ export default function RealEstateFiche({
   const photoGridCards = highlightImages
     .slice(0, 6)
     .map(url => ({ imageUrl: url, heading: '', description: '' }))
-
-  // ── Amenities (luxury icon grid) ────────────────────────────
-  const amenities: { label: string; value: string }[] = []
-  if (tf.bedrooms) amenities.push({ label: 'Rooms', value: `${tf.bedrooms} bedrooms` })
-  if (tf.bathrooms) amenities.push({ label: 'Bathrooms', value: `${tf.bathrooms}` })
-  if (tf.pool && tf.pool !== 'none') amenities.push({ label: 'Pool', value: tf.pool.charAt(0).toUpperCase() + tf.pool.slice(1) })
-  if (tf.catering) amenities.push({ label: 'Catering', value: CATERING_LABELS[tf.catering] || tf.catering })
-  if (tf.exclusive_hire) amenities.push({ label: 'Exclusive Hire', value: 'Yes' })
-  for (const h of highlights) {
-    const lbl = h.label.toLowerCase()
-    if (!amenities.some(a => a.label.toLowerCase() === lbl)) {
-      amenities.push({ label: h.label, value: h.value })
-    }
-  }
 
   // ── Property details ──────────────────────────────────────────
   const hasDetails = tf.sleeps_adults || tf.nearest_airport || tf.transfer_time ||
@@ -173,10 +158,10 @@ export default function RealEstateFiche({
         </ScrollReveal>
       )}
 
-      {/* 4. Amenities & Services */}
-      {amenities.length > 0 && (
+      {/* 4. Feature highlights with icons */}
+      {displayHighlights.length > 0 && (
         <ScrollReveal>
-          <FicheAmenityIcons amenities={amenities} title="Property Features" />
+          <FicheHighlights highlights={displayHighlights} />
         </ScrollReveal>
       )}
 
@@ -216,21 +201,14 @@ export default function RealEstateFiche({
         </ScrollReveal>
       )}
 
-      {/* 7. Photo grid — pure gallery, no text overlays */}
+      {/* 7. Photo grid */}
       {photoGridCards.length > 0 && (
         <ScrollReveal>
           <FicheHighlightsEditorial cards={photoGridCards} showLabels={false} />
         </ScrollReveal>
       )}
 
-      {/* 8. Highlights — clean feature band */}
-      {displayHighlights.length > 0 && (
-        <ScrollReveal>
-          <FicheHighlights highlights={displayHighlights} />
-        </ScrollReveal>
-      )}
-
-      {/* 9. Gallery */}
+      {/* 8. Gallery */}
       {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
 
       {/* 9. Tags */}
