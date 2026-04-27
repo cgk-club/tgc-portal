@@ -11,11 +11,13 @@ interface HighlightCard {
 interface FicheHighlightsEditorialProps {
   cards: HighlightCard[]
   stats?: { label: string; value: string }[]
+  showLabels?: boolean
 }
 
 export default function FicheHighlightsEditorial({
   cards,
   stats,
+  showLabels = true,
 }: FicheHighlightsEditorialProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
@@ -38,17 +40,21 @@ export default function FicheHighlightsEditorial({
                   alt={card.heading}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <h3 className="font-display text-lg text-gold font-semibold mb-1">
-                    {card.heading}
-                  </h3>
-                  {card.description && (
-                    <p className="text-white/70 text-sm font-body leading-snug">
-                      {card.description}
-                    </p>
-                  )}
-                </div>
+                {showLabels && (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <h3 className="font-display text-lg text-gold font-semibold mb-1">
+                        {card.heading}
+                      </h3>
+                      {card.description && (
+                        <p className="text-white/70 text-sm font-body leading-snug">
+                          {card.description}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
                 {/* View indicator */}
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">

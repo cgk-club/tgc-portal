@@ -6,6 +6,7 @@ import FicheStatsRibbon from '@/components/fiche/FicheStatsRibbon'
 import FicheStatement from '@/components/fiche/FicheStatement'
 import FicheSplitSection from '@/components/fiche/FicheSplitSection'
 import FicheHighlightsEditorial from '@/components/fiche/FicheHighlightsEditorial'
+import FicheHighlights from '@/components/fiche/FicheHighlights'
 import FicheGallery from '@/components/fiche/FicheGallery'
 import FicheAmenityIcons from '@/components/fiche/FicheAmenityIcons'
 import FicheTags from '@/components/fiche/FicheTags'
@@ -76,14 +77,10 @@ export default function RealEstateFiche({
 
   const displayHighlights = highlights.length > 0 ? highlights : autoHighlights
 
-  const highlightCards = displayHighlights
+  // Photo grid: first 6 gallery images, no label overlay
+  const photoGridCards = highlightImages
     .slice(0, 6)
-    .map((h, i) => ({
-      imageUrl: highlightImages[i] || galleryUrls[i % Math.max(galleryUrls.length, 1)] || '',
-      heading: h.label,
-      description: h.value,
-    }))
-    .filter(card => card.imageUrl)
+    .map(url => ({ imageUrl: url, heading: '', description: '' }))
 
   // ── Amenities (luxury icon grid) ────────────────────────────
   const amenities: { label: string; value: string }[] = []
@@ -219,14 +216,21 @@ export default function RealEstateFiche({
         </ScrollReveal>
       )}
 
-      {/* 7. Editorial Highlights */}
-      {highlightCards.length > 0 && (
+      {/* 7. Photo grid — pure gallery, no text overlays */}
+      {photoGridCards.length > 0 && (
         <ScrollReveal>
-          <FicheHighlightsEditorial cards={highlightCards} />
+          <FicheHighlightsEditorial cards={photoGridCards} showLabels={false} />
         </ScrollReveal>
       )}
 
-      {/* 8. Gallery */}
+      {/* 8. Highlights — clean feature band */}
+      {displayHighlights.length > 0 && (
+        <ScrollReveal>
+          <FicheHighlights highlights={displayHighlights} />
+        </ScrollReveal>
+      )}
+
+      {/* 9. Gallery */}
       {galleryImages.length > 0 && <FicheGallery images={galleryImages} name={name} />}
 
       {/* 9. Tags */}
