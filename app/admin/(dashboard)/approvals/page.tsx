@@ -120,7 +120,8 @@ export default function ApprovalsPage() {
       })
 
       if (res.ok) {
-        // Optimistically update local state for instant feedback
+        // Optimistically update local state — do NOT refetch immediately, Railway's
+        // GET cache can lag behind the PATCH write and would revert the update.
         const newStatus = action === 'approve' ? 'approved' : 'rejected'
         if (endpoint === 'fiche-edits') {
           setFicheEdits(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e))
@@ -133,8 +134,6 @@ export default function ApprovalsPage() {
         }
         setActionNote('')
         setShowNoteFor(null)
-        // Refetch to ensure server state is synced
-        await fetchAll()
         // Tell sidebar to refresh badge counts immediately
         window.dispatchEvent(new Event('badge-refresh'))
       } else {
