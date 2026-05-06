@@ -4,9 +4,10 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import { ChevronLeft, RotateCcw } from 'lucide-react'
 
-// ── TGC WELLNESS INTELLIGENCE · v2 ───────────────────────────────────────────
-// Five philosophies · fourteen clinics · Wellness Compass + Annual Architecture
+// ── TGC WELLNESS INTELLIGENCE · v3 ───────────────────────────────────────────
+// Six philosophies · eighteen clinics · Wellness Compass + Annual Architecture
 // TGC Active: Lanserhof Sylt, Lanserhof Tegernsee, Clinique Nescens, Santé Wellness
+// v3: Added Landscapist philosophy (environmental / architectural restoration)
 
 // ── TYPES ─────────────────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ type Priority  = 'medical' | 'longevity' | 'environment' | 'results' | 'rest'
 type TravelCtx = 'solo' | 'partner' | 'embedded' | 'flexible'
 type Duration  = 'weekend' | 'week' | 'extended' | 'flexible'
 type Region    = 'alpine-swiss' | 'europe-north' | 'europe-med' | 'africa' | 'asia' | 'open'
-type Philosophy = 'clinician' | 'scientist' | 'purifier' | 'immersionist' | 'restorer'
+type Philosophy = 'clinician' | 'scientist' | 'purifier' | 'immersionist' | 'restorer' | 'landscapist'
 type Screen    = 'welcome' | 'compass' | 'philosophy' | 'clinics' | 'arch' | 'arch-result' | 'submitted'
 
 interface CompassAnswers {
@@ -76,6 +77,13 @@ const PHILOSOPHIES: Record<Philosophy, {
     description: 'Not a dedicated retreat — a property that takes care of you properly. Outstanding spa, restorative food, considered pace. Wellness integrated into a hotel experience rather than isolated from it.',
     notThis: 'Not a medical programme. No protocols, no restrictions. This is restorative hospitality — a hotel that genuinely understands recovery.',
     accent: '#4a3a1a',
+  },
+  landscapist: {
+    name: 'The Landscapist',
+    tagline: 'The place does what no programme can.',
+    description: 'You need to stop — but you do not need a protocol to do it. The right architecture, at the right altitude, with the right materials and the right pace, is the medicine. Eriro\'s hand-carved bathtubs from the founders\' own timber. Forestis at 1,800 metres in a converted 1912 sanatorium. Reschio\'s 1,500 acres of Umbrian estate. These places are designed — every stone, every window — to restore without instruction.',
+    notThis: 'Not a hotel with a spa. Not wellness as an amenity. These are purpose-built environments where the architecture and landscape are the entire therapeutic proposition. There are no doctors here, and no need for any.',
+    accent: '#1a3a2a',
   },
 }
 
@@ -397,6 +405,103 @@ const CLINICS: Clinic[] = [
     seasons: 'Spring · Summer · Autumn',
     bestFor: 'Yoga and movement, Bali jungle immersion',
   },
+  // ── LANDSCAPIST ─────────────────────────────────────────────────────────────
+  {
+    id: 'eriro',
+    name: 'Eriro Alpine Hide',
+    location: 'Ehrwalder Alm, Tyrol, Austria · 1,550m',
+    region: 'europe-north',
+    philosophies: ['landscapist'],
+    conditions: ['depleted', 'functional', 'curious'],
+    minNights: 3,
+    priceFrom: 'all-inclusive',
+    summary: 'The benchmark. Nine suites at 1,550 metres on the Ehrwalder Alm, accessible only by gondola. Opened 2025 by the Posch and Spielmann families. Every element is made, not assembled: 4,000 hand-cut cotter pins, bathtubs carved from the founders\' own timber, sheep\'s-wool carpets, locally-sourced stone. All-inclusive. Adults only (14+). No programme.',
+    brochureRealities: [
+      'Gondola access only — there are no cars at the property. Factor 1.5 hours from Innsbruck airport.',
+      'Nine suites only — book months ahead for August and December',
+      'Adults only (14+) — not suitable for families with young children',
+      'No wellness programme or schedule. Clients who need structure may find this difficult.',
+      'All-inclusive pricing is higher per night than most comparable properties — budget accordingly',
+    ],
+    loudQuiet: {
+      loud: 'Forestis (1,800m, South Tyrol) is larger and equally serious — the right choice if altitude and architecture are priorities alongside more amenity range',
+      quiet: 'Eriro is nine suites. The quietest property on this list by a significant margin.',
+    },
+    seasons: 'Winter · Spring · Summer · Autumn',
+    bestFor: 'Complete disconnection, architectural immersion, depletion recovery',
+  },
+  {
+    id: 'forestis',
+    name: 'Forestis',
+    location: 'Mount Plose, Brixen, South Tyrol, Italy · 1,800m',
+    region: 'europe-north',
+    philosophies: ['landscapist'],
+    conditions: ['depleted', 'functional'],
+    minNights: 3,
+    priceFrom: 'from €600/night',
+    summary: 'Sixty-two rooms at 1,800 metres, in three glass-and-steel towers built into the bones of a 1912 sanatorium above Brixen. Opened 2020 after an eight-year restoration by the Hinteregger family. The spa is 2,000m² with glacial plunge pools, a hay sound room, and four Finnish saunas. Roland Lamprecht\'s forest cuisine changes daily with altitude and season. 100% renewable energy. Adults only.',
+    brochureRealities: [
+      'Gondola access from Brixen — add 30 minutes each way, check the last departure time',
+      'Adults only — not suitable for families',
+      'Minimum 3 nights; 5+ recommended to properly decompress at altitude',
+      'The cuisine is the strongest element — clients who do not appreciate food-forward design will undervalue the stay',
+      'Altitude (1,800m) affects sleep quality in the first night for some guests',
+    ],
+    loudQuiet: {
+      loud: 'Eriro is nine suites and fully all-inclusive — more contained, more intimate',
+      quiet: 'Forestis is the right choice for clients who want more amenity range while keeping the same architectural seriousness',
+    },
+    seasons: 'All year',
+    bestFor: 'Architecture-first restoration, altitude, family-of-two reset',
+  },
+  {
+    id: 'reschio',
+    name: 'Reschio',
+    location: 'Lisciano Niccone, Umbria, Italy',
+    region: 'europe-med',
+    philosophies: ['landscapist', 'restorer'],
+    conditions: ['depleted', 'curious', 'functional'],
+    minNights: 3,
+    priceFrom: 'from €700/night',
+    summary: 'Count Benedikt Bolza\'s medieval estate in Umbria. Thirty-six rooms in a restored castle across 1,500 acres of Umbrian countryside. Bolza designed every element — the stonework, the furniture, the kitchen garden. No wellness programme. Horses, tennis, the estate pool, and the slow-food kitchen from the land. The therapeutic proposition is the place itself.',
+    brochureRealities: [
+      'Not a hotel in the conventional sense — do not expect standard hotel-level service infrastructure',
+      'Rural Umbria: the pace is genuinely slow. Some clients who expect London-standard responsiveness will find it difficult.',
+      'No programme, no schedule. The estate is the experience.',
+      'Nearest airport: Perugia (40 min) or Florence (90 min)',
+      'High season July–August is warm but peak Umbrian season — book early',
+    ],
+    loudQuiet: {
+      loud: 'Borgo Pignano (Tuscany) is a smaller biodynamic estate with a similar philosophy — more intimate',
+      quiet: 'Reschio is the more architecturally serious of the Italian estate properties',
+    },
+    seasons: 'Spring · Summer · Autumn',
+    bestFor: 'Italian estate restoration, design-literate clients, couples',
+  },
+  {
+    id: 'schloss-elmau',
+    name: 'Schloss Elmau',
+    location: 'Klais, Bavarian Alps, Germany',
+    region: 'europe-north',
+    philosophies: ['landscapist', 'restorer'],
+    conditions: ['depleted', 'curious', 'functional'],
+    minNights: 3,
+    priceFrom: 'from €500/night',
+    summary: 'Founded 1916 by Johannes Müller. Rebuilt after a 2005 fire; the modern Retreat building is the quieter option alongside the original Schloss. Six restaurants, six spas, three Alpine pools. Hosted G7 summits in 2015 and 2022. Family-run by the Müller-Elmau dynasty — the literary and music programming (Schloss Elmau Concerts) is genuine, not decorative.',
+    brochureRealities: [
+      'High season July–August is genuinely busy — not the choice for those seeking solitude',
+      'The Retreat building is significantly quieter than the original Schloss — specify on booking',
+      'G7 protocol means excellent UHNW logistics capability but can feel institutional during large events',
+      'Munich airport is 90 minutes by car — manageable',
+      'The cultural programming (concerts, literary events) is a serious reason to choose Elmau, not a bonus',
+    ],
+    loudQuiet: {
+      loud: 'Elmau in July and August is the Alps\' most socially visible wellness property',
+      quiet: 'Book the Retreat building, arrive in May or September, and it is an entirely different experience',
+    },
+    seasons: 'Spring · Autumn · Winter',
+    bestFor: 'Cultural + landscape combination, couples with different wellness agendas, return guests to the Alps',
+  },
   {
     id: 'ananda-himalayas',
     name: 'Ananda in the Himalayas',
@@ -420,27 +525,28 @@ const CLINICS: Clinic[] = [
 // ── SCORING ───────────────────────────────────────────────────────────────────
 
 const COND_SCORES: Record<Condition, Record<Philosophy, number>> = {
-  performing: { clinician: 3, scientist: 3, purifier: 1, immersionist: 1, restorer: 0 },
-  functional: { clinician: 3, scientist: 2, purifier: 2, immersionist: 2, restorer: 1 },
-  depleted:   { clinician: 2, scientist: 1, purifier: 3, immersionist: 3, restorer: 0 },
-  recovering: { clinician: 4, scientist: 2, purifier: 1, immersionist: 2, restorer: 0 },
-  curious:    { clinician: 1, scientist: 2, purifier: 1, immersionist: 2, restorer: 3 },
+  performing: { clinician: 3, scientist: 3, purifier: 1, immersionist: 1, restorer: 0, landscapist: 0 },
+  functional: { clinician: 3, scientist: 2, purifier: 2, immersionist: 2, restorer: 1, landscapist: 1 },
+  depleted:   { clinician: 2, scientist: 1, purifier: 3, immersionist: 3, restorer: 0, landscapist: 4 },
+  recovering: { clinician: 4, scientist: 2, purifier: 1, immersionist: 2, restorer: 0, landscapist: 2 },
+  curious:    { clinician: 1, scientist: 2, purifier: 1, immersionist: 2, restorer: 3, landscapist: 2 },
 }
 
 const PRIO_SCORES: Record<Priority, Record<Philosophy, number>> = {
-  medical:     { clinician: 4, scientist: 2, purifier: 1, immersionist: 0, restorer: 0 },
-  longevity:   { clinician: 1, scientist: 4, purifier: 1, immersionist: 1, restorer: 0 },
-  environment: { clinician: 0, scientist: 0, purifier: 1, immersionist: 4, restorer: 2 },
-  results:     { clinician: 3, scientist: 3, purifier: 2, immersionist: 0, restorer: 0 },
-  rest:        { clinician: 0, scientist: 0, purifier: 1, immersionist: 2, restorer: 4 },
+  medical:     { clinician: 4, scientist: 2, purifier: 1, immersionist: 0, restorer: 0, landscapist: 0 },
+  longevity:   { clinician: 1, scientist: 4, purifier: 1, immersionist: 1, restorer: 0, landscapist: 0 },
+  environment: { clinician: 0, scientist: 0, purifier: 1, immersionist: 4, restorer: 2, landscapist: 4 },
+  results:     { clinician: 3, scientist: 3, purifier: 2, immersionist: 0, restorer: 0, landscapist: 0 },
+  rest:        { clinician: 0, scientist: 0, purifier: 1, immersionist: 2, restorer: 4, landscapist: 3 },
 }
 
 const ADJACENT: Record<Philosophy, Philosophy[]> = {
   clinician:    ['scientist', 'purifier'],
   scientist:    ['clinician'],
   purifier:     ['clinician', 'immersionist'],
-  immersionist: ['restorer', 'purifier'],
-  restorer:     ['immersionist'],
+  immersionist: ['restorer', 'purifier', 'landscapist'],
+  restorer:     ['immersionist', 'landscapist'],
+  landscapist:  ['immersionist', 'restorer'],
 }
 
 const REGION_GROUPS: Record<string, string[]> = {
@@ -453,7 +559,7 @@ const REGION_GROUPS: Record<string, string[]> = {
 }
 
 function derivePhilosophy(condition: Condition, priority: Priority): Philosophy {
-  const ps: Philosophy[] = ['clinician', 'scientist', 'purifier', 'immersionist', 'restorer']
+  const ps: Philosophy[] = ['clinician', 'scientist', 'purifier', 'immersionist', 'restorer', 'landscapist']
   return ps.reduce((best, p) => {
     const bScore = COND_SCORES[condition][best] + PRIO_SCORES[priority][best]
     const pScore = COND_SCORES[condition][p]   + PRIO_SCORES[priority][p]
@@ -860,7 +966,7 @@ export default function WellnessIntelligencePage() {
           <a href="/intelligence" style={{ textDecoration:'none' }}>
             <span className="tgc-serif" style={{ fontSize:'1.1rem', color:'#0e4f51' }}>The Gatekeepers Club</span>
           </a>
-          <span className="tgc-mono" style={{ color:'#6b7280' }}>Wellness Intelligence · v.2</span>
+          <span className="tgc-mono" style={{ color:'#6b7280' }}>Wellness Intelligence · v.3</span>
         </div>
 
         {/* ── WELCOME ──────────────────────────────────────────────────────── */}
@@ -883,7 +989,7 @@ export default function WellnessIntelligencePage() {
                 <div className="tgc-mono" style={{ color:'#c8aa4a', marginBottom:'1rem' }}>Tool 01 · Wellness Compass</div>
                 <div className="tgc-serif" style={{ fontSize:'1.9rem', marginBottom:'0.6rem', lineHeight:1.1 }}>Find my approach</div>
                 <div style={{ fontSize:'0.88rem', opacity:0.85, lineHeight:1.5, fontFamily:"'Lato',sans-serif", fontWeight:300 }}>
-                  Five questions. A philosophy match. An honest recommendation from fourteen clinics — with what the brochure won&apos;t tell you.
+                  Five questions. A philosophy match. An honest recommendation from eighteen clinics — with what the brochure won&apos;t tell you.
                 </div>
                 <div className="tgc-mono" style={{ marginTop:'1.5rem', color:'#c8aa4a' }}>Begin →</div>
               </button>
@@ -905,7 +1011,7 @@ export default function WellnessIntelligencePage() {
 
             {/* Philosophy teasers */}
             <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:'2rem' }}>
-              <div className="tgc-mono" style={{ color:'#c8aa4a', marginBottom:'1.2rem' }}>Five approaches</div>
+              <div className="tgc-mono" style={{ color:'#c8aa4a', marginBottom:'1.2rem' }}>Six approaches</div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:'1rem' }}>
                 {(Object.entries(PHILOSOPHIES) as [Philosophy, typeof PHILOSOPHIES[Philosophy]][]).map(([id, p]) => (
                   <div key={id} className="phil-card" style={{ padding:'1.2rem', background:'white', border:'1px solid #f0ede8', borderRadius:'8px', cursor:'default' }}>
@@ -1269,7 +1375,7 @@ export default function WellnessIntelligencePage() {
         <div style={{ marginTop:'4rem', paddingTop:'2rem', borderTop:'1px solid #e5e7eb', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'1rem' }}>
           <a href="/intelligence" className="tgc-mono" style={{ color:'#c8aa4a', textDecoration:'none' }}>← All tools</a>
           <span style={{ fontFamily:"'Lato',sans-serif", fontWeight:300, fontSize:'0.75rem', color:'#6b7280' }}>
-            The Gatekeepers Club · Wellness Intelligence v.2 · 14 clinics · 5 philosophies
+            The Gatekeepers Club · Wellness Intelligence v.3 · 18 clinics · 6 philosophies
           </span>
         </div>
 
