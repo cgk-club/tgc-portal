@@ -18,7 +18,7 @@ const nextConfig = {
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' https://*.supabase.co https://*.tile.openstreetmap.org https://*.riv-art.fr https://res.cloudinary.com https://images.unsplash.com https://tgc-intake-proxy-production.up.railway.app data: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://tgc-intake-proxy-production.up.railway.app; frame-ancestors 'none';" },
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' https://*.supabase.co https://*.tile.openstreetmap.org https://*.riv-art.fr https://res.cloudinary.com https://images.unsplash.com https://tgc-intake-proxy-production.up.railway.app https://axwwgrkdco.cloudimg.io https://image-tc.galaxy.tf https://media.timeout.com https://www.countryandtownhouse.com https://www.morganataormina.it data: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://tgc-intake-proxy-production.up.railway.app; frame-ancestors 'none';" },
         ],
       },
       {
@@ -57,14 +57,15 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'tgc-intake-proxy-production.up.railway.app',
-      },
+      { protocol: 'https', hostname: '*.supabase.co' },
+      { protocol: 'https', hostname: 'tgc-intake-proxy-production.up.railway.app' },
+      { protocol: 'https', hostname: 'axwwgrkdco.cloudimg.io' },
+      { protocol: 'https', hostname: 'image-tc.galaxy.tf' },
+      { protocol: 'https', hostname: 'media.timeout.com' },
+      { protocol: 'https', hostname: 'www.countryandtownhouse.com' },
+      { protocol: 'https', hostname: 'www.morganataormina.it' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
 }
