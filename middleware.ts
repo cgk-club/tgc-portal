@@ -36,7 +36,9 @@ export async function middleware(request: NextRequest) {
 
   // Notification API routes: handled by route-level auth (check client or partner session)
   if (pathname.startsWith('/api/notifications')) {
-    return NextResponse.next()
+    const res = NextResponse.next()
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+    return res
   }
 
   // Client portal auth (protect /client and subpaths, but not /client/login or /client/auth)
@@ -79,7 +81,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next()
+  const response = NextResponse.next()
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+  return response
 }
 
 export const config = {
