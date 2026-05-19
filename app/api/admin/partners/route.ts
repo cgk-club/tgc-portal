@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { requireAdminAuth } from '@/lib/auth'
+import { sanitizeSearch } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request)
@@ -16,7 +17,8 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false })
 
   if (search) {
-    query = query.or(`org_name.ilike.%${search}%,email.ilike.%${search}%`)
+    const safe = sanitizeSearch(search)
+    query = query.or(`org_name.ilike.%${safe}%,email.ilike.%${safe}%`)
   }
 
   const { data, error } = await query

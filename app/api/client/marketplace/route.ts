@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
+import { sanitizeSearch } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,8 +32,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
+      const safe = sanitizeSearch(search)
       query = query.or(
-        `title.ilike.%${search}%,maker_brand.ilike.%${search}%`
+        `title.ilike.%${safe}%,maker_brand.ilike.%${safe}%`
       );
     }
 

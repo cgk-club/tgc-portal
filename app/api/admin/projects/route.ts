@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { sanitizeSearch } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +28,8 @@ export async function GET(request: NextRequest) {
     query = query.eq('client_id', clientId)
   }
   if (search) {
-    query = query.or(`title.ilike.%${search}%,property_address.ilike.%${search}%`)
+    const safe = sanitizeSearch(search)
+    query = query.or(`title.ilike.%${safe}%,property_address.ilike.%${safe}%`)
   }
 
   const { data, error } = await query

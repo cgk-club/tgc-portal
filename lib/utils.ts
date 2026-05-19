@@ -19,6 +19,13 @@ export function cn(...classes: (string | boolean | undefined | null)[]): string 
   return classes.filter(Boolean).join(' ')
 }
 
+// Strip PostgREST filter metacharacters from user search input before interpolation
+// into .or() strings. Commas split conditions; parens/backslash enable injection.
+// Dots and @ are preserved so email searches work.
+export function sanitizeSearch(input: string): string {
+  return input.replace(/[,()\\]/g, '').trim().slice(0, 100)
+}
+
 export function relativeTime(date: string | Date): string {
   const diff = Date.now() - new Date(date).getTime()
   const mins = Math.floor(diff / 60000)
