@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 
 const COOKIE_NAME = 'tgc_admin_session'
 const ONE_WEEK = 7 * 24 * 60 * 60
@@ -22,8 +23,8 @@ export async function createSession(): Promise<string> {
 
 export async function verifySession(token: string): Promise<boolean> {
   try {
-    await jwtVerify(token, getSecret())
-    return true
+    const { payload } = await jwtVerify(token, getSecret())
+    return payload.role === 'admin'
   } catch {
     return false
   }
@@ -34,6 +35,16 @@ export async function isAuthenticated(): Promise<boolean> {
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return false
   return verifySession(token)
+}
+
+// Route-level auth guard for admin API handlers — defense-in-depth behind middleware.
+// Returns a 401 response if not authenticated, null if OK.
+export async function requireAdminAuth(request: NextRequest): Promise<NextResponse | null> {
+  const token = request.cookies.get(COOKIE_NAME)?.value
+  if (!token || !(await verifySession(token))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return null
 }
 
 export { COOKIE_NAME }

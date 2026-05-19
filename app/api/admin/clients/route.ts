@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { requireAdminAuth } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
+  const authError = await requireAdminAuth(request)
+  if (authError) return authError
+
   const sb = getSupabaseAdmin()
   const searchParams = request.nextUrl.searchParams
   const search = searchParams.get('search')

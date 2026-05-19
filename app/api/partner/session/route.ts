@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
     .eq("id", user.partner_id)
     .single();
 
-  if (!partner) return NextResponse.json({ authenticated: false }, { status: 401 });
+  if (!partner || partner.status !== "active") {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  }
 
   return NextResponse.json({
     authenticated: true,

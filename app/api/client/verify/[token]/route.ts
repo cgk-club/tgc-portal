@@ -39,7 +39,7 @@ export async function GET(
   response.cookies.set(CLIENT_COOKIE_NAME, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge: 30 * 24 * 60 * 60,
     path: '/',
   })

@@ -3,10 +3,16 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { sendPartnerMagicLink } from "@/lib/email";
 import { PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import crypto from "crypto";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   const { email } = await request.json();
   if (!email) {
     return NextResponse.json({ error: "Email required" }, { status: 400 });
