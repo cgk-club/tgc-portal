@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -35,7 +36,13 @@ export async function POST(
 
     const { data, error } = await supabase
       .from("payment_items")
-      .insert({ ...body, itinerary_id: id })
+      .insert({
+        ...body,
+        service_name: sanitizeText(body.service_name),
+        client_notes: sanitizeText(body.client_notes),
+        notes: sanitizeText(body.notes),
+        itinerary_id: id,
+      })
       .select()
       .single();
 

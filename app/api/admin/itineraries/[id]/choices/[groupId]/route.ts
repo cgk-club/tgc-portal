@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/utils";
 
 export async function PUT(
   request: NextRequest,
@@ -17,7 +18,13 @@ export async function PUT(
       const { _action, ...optionData } = body;
       const { data, error } = await supabase
         .from("choice_options")
-        .insert({ ...optionData, group_id: groupId })
+        .insert({
+          ...optionData,
+          title: sanitizeText(optionData.title),
+          subtitle: sanitizeText(optionData.subtitle),
+          description: sanitizeText(optionData.description),
+          group_id: groupId,
+        })
         .select()
         .single();
       if (error) throw error;
@@ -28,7 +35,13 @@ export async function PUT(
       const { _action, optionId, ...fields } = body;
       const { data, error } = await supabase
         .from("choice_options")
-        .update({ ...fields, updated_at: new Date().toISOString() })
+        .update({
+          ...fields,
+          title: sanitizeText(fields.title),
+          subtitle: sanitizeText(fields.subtitle),
+          description: sanitizeText(fields.description),
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", optionId)
         .eq("group_id", groupId)
         .select()

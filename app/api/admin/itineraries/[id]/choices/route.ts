@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -52,7 +53,12 @@ export async function POST(
 
     const { data: group, error } = await supabase
       .from("choice_groups")
-      .insert({ ...body, itinerary_id: id })
+      .insert({
+        ...body,
+        title: sanitizeText(body.title),
+        description: sanitizeText(body.description),
+        itinerary_id: id,
+      })
       .select()
       .single();
 

@@ -26,6 +26,15 @@ export function sanitizeSearch(input: string): string {
   return input.replace(/[,()\\]/g, '').trim().slice(0, 100)
 }
 
+// Strip em dashes from all client-facing text. TGC brand rule: never use em dashes.
+// " — " (space em dash space) → ", " for inline prose and titles
+// "—" (bare) → "-" as a safe fallback
+// Apply to every text field before writing to the DB.
+export function sanitizeText<T extends string | null | undefined>(input: T): T {
+  if (!input) return input
+  return input.replace(/ — /g, ', ').replace(/—/g, '-') as T
+}
+
 export function relativeTime(date: string | Date): string {
   const diff = Date.now() - new Date(date).getTime()
   const mins = Math.floor(diff / 60000)

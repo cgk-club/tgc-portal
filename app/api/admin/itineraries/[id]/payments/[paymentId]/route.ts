@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/utils";
 
 export async function PUT(
   request: NextRequest,
@@ -13,6 +14,11 @@ export async function PUT(
     const supabase = getSupabaseAdmin();
 
     const updates: Record<string, unknown> = { ...body, updated_at: new Date().toISOString() };
+
+    // Sanitize text fields
+    if (typeof updates.service_name === 'string') updates.service_name = sanitizeText(updates.service_name);
+    if (typeof updates.client_notes === 'string') updates.client_notes = sanitizeText(updates.client_notes as string);
+    if (typeof updates.notes === 'string') updates.notes = sanitizeText(updates.notes as string);
 
     // SAFEGUARD: Strip commission/margin keywords from client_notes
     if (typeof updates.client_notes === 'string') {

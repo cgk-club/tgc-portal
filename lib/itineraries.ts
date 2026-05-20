@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 import { randomBytes } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { sanitizeText } from '@/lib/utils'
 import { Itinerary, ItineraryDay, ItineraryItem } from '@/types'
 
 function sb() {
@@ -31,10 +32,10 @@ export async function createItinerary(data: {
   const { data: itinerary, error } = await sb()
     .from('itineraries')
     .insert({
-      client_name: data.client_name,
+      client_name: sanitizeText(data.client_name),
       client_email: data.client_email || null,
       client_account_id: accountId,
-      title: data.title,
+      title: sanitizeText(data.title),
       slug: data.slug,
       start_date: data.start_date || null,
       status: 'draft',
@@ -58,7 +59,7 @@ export async function createDay(
       itinerary_id: itineraryId,
       day_number: dayNumber,
       date: date || null,
-      title: title || null,
+      title: sanitizeText(title) || null,
       sort_order: dayNumber,
     })
     .select()
@@ -85,8 +86,8 @@ export async function createItem(
     .insert({
       day_id: dayId,
       fiche_id: data.fiche_id || null,
-      custom_title: data.custom_title || null,
-      custom_note: data.custom_note || null,
+      custom_title: sanitizeText(data.custom_title) || null,
+      custom_note: sanitizeText(data.custom_note) || null,
       time_of_day: data.time_of_day || null,
       exact_time: data.exact_time || null,
       item_type: data.item_type,
@@ -196,10 +197,12 @@ export async function updateItinerary(
     'status', 'share_token', 'start_date',
     'is_member', 'currency', 'quote_status', 'quote_notes', 'quote_token',
   ]
+  const textFields = new Set(['client_name', 'title', 'summary', 'quote_notes'])
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const field of allowedFields) {
     if (field in data) {
-      updates[field] = (data as Record<string, unknown>)[field]
+      const val = (data as Record<string, unknown>)[field]
+      updates[field] = textFields.has(field) ? sanitizeText(val as string | null | undefined) : val
     }
   }
 
@@ -229,10 +232,12 @@ export async function updateDay(
   data: Partial<ItineraryDay>
 ): Promise<ItineraryDay> {
   const allowedFields = ['day_number', 'date', 'title', 'notes', 'sort_order']
+  const textFields = new Set(['title', 'notes'])
   const updates: Record<string, unknown> = {}
   for (const field of allowedFields) {
     if (field in data) {
-      updates[field] = (data as Record<string, unknown>)[field]
+      const val = (data as Record<string, unknown>)[field]
+      updates[field] = textFields.has(field) ? sanitizeText(val as string | null | undefined) : val
     }
   }
 
@@ -256,10 +261,12 @@ export async function updateItem(
     'time_of_day', 'exact_time', 'sort_order', 'item_type',
     'unit_price', 'quantity', 'price_note', 'is_zero_margin', 'is_included',
   ]
+  const textFields = new Set(['custom_title', 'custom_note', 'price_note'])
   const updates: Record<string, unknown> = {}
   for (const field of allowedFields) {
     if (field in data) {
-      updates[field] = (data as Record<string, unknown>)[field]
+      const val = (data as Record<string, unknown>)[field]
+      updates[field] = textFields.has(field) ? sanitizeText(val as string | null | undefined) : val
     }
   }
 
