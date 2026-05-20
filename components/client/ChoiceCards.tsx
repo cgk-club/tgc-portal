@@ -127,6 +127,8 @@ export default function ChoiceCards({ group, itineraryId, shareToken, onSelect }
   const [selecting, setSelecting] = useState(false);
   const options = group.options || [];
   const hasSelection = options.some((o) => o.is_selected);
+  // Once a choice is made, only show the selected option on the client view
+  const visibleOptions = group.status === "decided" ? options.filter((o) => o.is_selected) : options;
 
   async function handleSelect(optionId: string) {
     setSelecting(true);
@@ -161,13 +163,13 @@ export default function ChoiceCards({ group, itineraryId, shareToken, onSelect }
         )}
       </div>
 
-      {/* Option cards grid */}
+      {/* Option cards grid — shows all options when open, only selected when decided */}
       <div className={`grid gap-4 ${
-        options.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
-        options.length >= 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" :
+        visibleOptions.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
+        visibleOptions.length >= 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" :
         "grid-cols-1"
       }`}>
-        {options.map((option) => (
+        {visibleOptions.map((option) => (
           <OptionCard
             key={option.id}
             option={option}
