@@ -184,6 +184,13 @@ function PaymentCard({ item, itinerary, onSignComplete }: { item: PaymentItem & 
                   </button>
                 )}
 
+                {item.payment_method === "cc_link" && !item.cc_payment_url && (
+                  <p className="text-xs font-body text-amber-700">
+                    A form or payment link is on its way to your email. Please complete and return it to{" "}
+                    <a href="mailto:christian@thegatekeepers.club" className="underline hover:text-amber-900">christian@thegatekeepers.club</a>.
+                  </p>
+                )}
+
                 {item.payment_method === "included" && (
                   <p className="text-xs font-body text-gray-500 italic">Included in your package</p>
                 )}
