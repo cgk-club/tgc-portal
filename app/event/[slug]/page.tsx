@@ -63,7 +63,6 @@ const T = {
     subtitle: "Monaco Grand Prix 2026",
     dateLine: "5 - 7 June 2026 . Monaco",
     days: "Days",
-    guests: "Guests",
     location: "Location",
     venues: "Venues",
     venuesValue: "Yacht + VIP Terraces",
@@ -97,7 +96,6 @@ const T = {
     subtitle: "Grand Prix de Monaco 2026",
     dateLine: "5 - 7 juin 2026 . Monaco",
     days: "Jours",
-    guests: "Invites",
     location: "Lieu",
     venues: "Espaces",
     venuesValue: "Yacht + Terrasses VIP",
@@ -133,7 +131,7 @@ const PROGRAMME_EN = [
     day: "Friday 5 June",
     title: "Practice Day",
     items: [
-      "Board M/Y ARADOS in Monaco",
+      "Board the yacht in Monaco",
       "13:30 Free Practice 1",
       "17:00 Free Practice 2",
       "Daytime on the yacht and VIP Terraces",
@@ -167,7 +165,7 @@ const PROGRAMME_FR = [
     day: "Vendredi 5 juin",
     title: "Essais libres",
     items: [
-      "Embarquement sur le M/Y ARADOS a Monaco",
+      "Embarquement sur le yacht a Monaco",
       "13h30 Essais libres 1",
       "17h00 Essais libres 2",
       "Journee sur le yacht et les Terrasses VIP",
@@ -197,15 +195,15 @@ const PROGRAMME_FR = [
 ];
 
 const DESCRIPTION_FR =
-  "Trois jours a bord du M/Y ARADOS a Monaco. La journee sur le yacht et les Terrasses VIP surplombant le circuit. Les soirees : cocktail dinatoire, canapes et boissons raffinées, echanges avec des legendes du sport et des entrepreneurs internationaux. Espace media pour podcasts et interviews. The Pavilion est une experience privee, sur invitation uniquement, concue pour reunir des personnalites du sport, des affaires et de la culture dans un cadre decontracte et privilegie.";
+  "Trois jours a bord du yacht a Monaco. La journee sur le yacht et les Terrasses VIP surplombant le circuit. Les soirees : cocktail dinatoire, canapes et boissons raffinées, echanges avec des legendes du sport et des entrepreneurs internationaux. Espace media pour podcasts et interviews. The Pavilion est une experience privee, sur invitation uniquement, concue pour reunir des personnalites du sport, des affaires et de la culture dans un cadre decontracte et privilegie.";
 
 const HIGHLIGHTS_FR = [
-  "M/Y ARADOS, superyacht de 47m a Monaco",
+  "Superyacht prive a Monaco",
   "Terrasses VIP sur le circuit du Grand Prix de Monaco",
   "Cocktail dinatoire sur le pont chaque soir",
   "Athletes et personnalites sportives de premier plan",
-  "80 invites sur le yacht, 20 sur les terrasses VIP",
   "Soiree caritative le dimanche soir",
+  "Transferts helicoptere disponibles",
 ];
 
 function formatPrice(price: number, currency: string): string {
@@ -373,7 +371,6 @@ export default function EventPage() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-6 sm:gap-12">
           {[
             { label: t.days, value: "3" },
-            { label: t.guests, value: "100" },
             { label: t.location, value: "Monaco" },
             { label: t.venues, value: t.venuesValue },
           ].map((stat) => (
