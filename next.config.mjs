@@ -7,6 +7,15 @@ const nextConfig = {
       dynamic: 0,
     },
   },
+  async redirects() {
+    return [
+      {
+        source: '/event/the-pavilion',
+        destination: '/event/pavilion-terrace',
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {

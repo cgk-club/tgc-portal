@@ -62,12 +62,12 @@ export async function GET(
       .select("title, file_url")
       .eq("project_id", event.project_id)
       .in("title", [
-        "The Pavilion Residences — Client Brochure v4",
-        "The Pavilion Experience — Client Brochure v4",
+        "The Pavilion Residences — Client Brochure v5",
+        "The Pavilion Experience — Client Brochure v5",
       ]);
 
     brochures = (docs || []).map((d) => ({
-      title: d.title.replace(" — Client Brochure v4", ""),
+      title: d.title.replace(" — Client Brochure v5", ""),
       url: d.file_url,
     }));
   }
