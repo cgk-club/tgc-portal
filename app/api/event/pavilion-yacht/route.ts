@@ -16,10 +16,6 @@ const BROCHURES = [
     title: "The Pavilion Residences",
     url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/1779542566550-The_Pavilion_Residences_v5.pdf",
   },
-  {
-    title: "M/Y ARADOS",
-    url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/1775741684282-MY_ARADOS_Brochure.pdf",
-  },
 ];
 
 export async function GET() {
