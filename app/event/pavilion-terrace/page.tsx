@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
@@ -131,6 +131,14 @@ function formatPrice(price: number, currency: string) {
 }
 
 export default function PavilionTerracePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-pearl flex items-center justify-center"><p className="text-gray-400 font-body text-sm">Loading...</p></div>}>
+      <PavilionTerraceContent />
+    </Suspense>
+  );
+}
+
+function PavilionTerraceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const lang: Lang = searchParams.get("lang") === "fr" ? "fr" : "en";
