@@ -102,36 +102,32 @@ const T = {
       "3 guest passes (full weekend)",
       "Social media coverage and tagged content",
     ],
-    eveningTitle: "Evening Programme",
+    eveningTitle: "Private Dinner",
     eveningIntro:
-      "Each sponsor selects an evening to host, in order of tier priority. The Saturday gala is the centrepiece of the weekend.",
+      "Higher-tier sponsors have the option of a private dinner on the Friday or Saturday evening, hosted at a curated restaurant near the circuit. Table for 12 maximum. Relaxed, no speeches, no formality.",
     eveningFri: "Friday 5 June",
     eveningSat: "Saturday 6 June",
-    eveningSun: "Sunday 7 June",
-    eveningTime: "18:00 - 23:30",
-    eveningVenue: "Silver VIP Terraces",
-    eveningFriDesc: "Welcome cocktail dinatoire on deck",
-    eveningSatDesc: "Gala cocktail dinatoire (centrepiece)",
-    eveningSunDesc: "Charity cocktail dinatoire with athletes",
+    eveningFriDesc: "Post-practice dinner. A quieter, more intimate evening — ideal for first conversations.",
+    eveningSatDesc: "Post-qualifying dinner. The most sought-after evening of the weekend.",
     mediaTitle: "Media & Content",
     mediaIntro:
-      "Every sponsorship includes an editorial content programme across our channels. Pre-event, during the Grand Prix, and post-event. All content is editorial in tone, not advertorial.",
-    mediaPreEvent: "Pre-Event (8 weeks)",
+      "The primary media value is post-event. We capture content professionally across the weekend and deliver an editorial package your team can use. All content is editorial in tone, not advertorial.",
+    mediaPreEvent: "Pre-Event",
     mediaDuring: "During the Event",
-    mediaPostEvent: "Post-Event (4 weeks)",
+    mediaPostEvent: "Post-Event (main deliverable)",
     mediaPlatLabel: "Platinum",
     mediaGoldLabel: "Gold",
-    mediaBronzeLabel: "Bronze",
-    mediaPlatPre: "5 social posts + 3 newsletter mentions including a dedicated editorial spotlight on your brand",
-    mediaGoldPre: "3 social posts + 2 newsletter mentions woven into Pavilion editorial",
-    mediaBronzePre: "2 social posts + 1 newsletter mention",
-    mediaPlatDuring: "Daily Instagram Stories and feed posts with your branding, dedicated media booth interview, comprehensive professional photo library",
-    mediaGoldDuring: "Stories and feed coverage across the weekend, media booth interview clip, curated photo selection",
-    mediaBronzeDuring: "Story coverage featuring branded tenders, event atmosphere content, curated photo selection",
-    mediaPlatPost: "3 recap posts, dedicated newsletter feature, full-edit media booth interview, complete content package, ROI report with candid assessment",
-    mediaGoldPost: "2 recap posts, newsletter mention, interview clip published, curated content selection delivered",
-    mediaBronzePost: "Included in recap content, newsletter mention, curated content selection delivered",
-    mediaNote: "All content is approved by your team before publication. One approval round, 48-hour window.",
+    mediaBronzeLabel: "Bronze / Terrace",
+    mediaPlatPre: "Sponsor announcement post + 2 newsletter mentions woven into Pavilion editorial",
+    mediaGoldPre: "1 newsletter mention at announcement",
+    mediaBronzePre: "Newsletter mention at announcement",
+    mediaPlatDuring: "Professional photography and video captured throughout all three days. Selective live coverage at team discretion.",
+    mediaGoldDuring: "Professional photography captured across the weekend. Curated selection shared where appropriate.",
+    mediaBronzeDuring: "Included in the event photography coverage. Curated selection provided post-event.",
+    mediaPlatPost: "3 editorial recap posts across TGC channels, dedicated feature in The Concierge Chronicles, full content package (50+ photos, edited video), brand moment filmed and delivered within 10 days, honest ROI summary.",
+    mediaGoldPost: "2 editorial recap posts, Chronicles mention, curated photo selection (25+ images) delivered within 10 days.",
+    mediaBronzePost: "Included in recap content, Chronicles mention, curated photo selection delivered within 14 days.",
+    mediaNote: "All content is approved by your team before publication. One approval round, 48-hour turnaround.",
     ctaTitle: "Interested?",
     ctaText:
       "For the full sponsorship deck or to discuss how your brand fits within The Pavilion, get in touch directly.",
@@ -151,13 +147,13 @@ const T = {
     sponsorship: "Sponsoring",
     headline: "Devenez partenaire de The Pavilion",
     intro:
-      "The Pavilion reunit entrepreneurs, athletes et personnalites culturelles pendant trois jours sur les Terrasses VIP Silver surplombant le circuit du Grand Prix de Monaco. Un sponsoring place votre marque au coeur de cette experience.",
+      "The Pavilion reunit entrepreneurs, athletes et personnalites culturelles pendant trois jours sur les Terrasses VIP surplombant le circuit du Grand Prix de Monaco. Un sponsoring place votre marque au coeur de cette experience.",
     whyTitle: "Pourquoi The Pavilion",
     why: [
-      "Terrasses VIP Silver directement sur le circuit du GP de Monaco",
+      "Terrasses VIP directement sur le circuit du GP de Monaco",
       "Trois jours en direct : Essais, Qualifications et Dimanche de course",
       "Invites tries sur le volet : athletes, entrepreneurs, medias et figures culturelles",
-      "Petit-dejeuner, dejeuner et bar a champagne inclus chaque jour",
+      "Buffet gastronomique de canapes et bar a champagne inclus chaque jour",
       "Creation de contenu professionnel sur les trois jours",
       "Audience internationale des Etats-Unis, du Commonwealth et d'Europe",
       "Edition inaugurale avec priorite sur les futures editions",
@@ -239,35 +235,31 @@ const T = {
       "3 pass invites (week-end complet)",
       "Couverture reseaux sociaux et contenu tagge",
     ],
-    eveningTitle: "Programme de soirees",
+    eveningTitle: "Diner Prive",
     eveningIntro:
-      "Chaque sponsor choisit une soiree a animer, par ordre de priorite. Le gala du samedi est le moment fort du week-end.",
+      "Les sponsors de niveau superieur ont la possibilite d'organiser un diner prive le vendredi ou le samedi soir, dans un restaurant selectionne pres du circuit. Table de 12 personnes maximum. Decontracte, sans discours, sans formalite.",
     eveningFri: "Vendredi 5 juin",
     eveningSat: "Samedi 6 juin",
-    eveningSun: "Dimanche 7 juin",
-    eveningTime: "18h00 - 23h30",
-    eveningVenue: "Silver VIP Terraces",
-    eveningFriDesc: "Cocktail dinatoire de bienvenue sur le pont",
-    eveningSatDesc: "Cocktail dinatoire de gala (evenement phare)",
-    eveningSunDesc: "Cocktail dinatoire caritatif avec athletes",
+    eveningFriDesc: "Diner post-essais. Une soiree plus intime et tranquille, ideale pour les premieres conversations.",
+    eveningSatDesc: "Diner post-qualifications. La soiree la plus recherchee du week-end.",
     mediaTitle: "Media & Contenu",
     mediaIntro:
-      "Chaque sponsoring inclut un programme de contenu editorial sur nos canaux. Avant, pendant et apres le Grand Prix. Le ton est editorial, jamais publicitaire.",
-    mediaPreEvent: "Avant l'evenement (8 semaines)",
+      "La valeur media principale est post-evenement. Nous capturons le contenu professionnellement tout au long du week-end et livrons un package editorial que votre equipe peut utiliser. Le ton est editorial, jamais publicitaire.",
+    mediaPreEvent: "Avant l'evenement",
     mediaDuring: "Pendant l'evenement",
-    mediaPostEvent: "Apres l'evenement (4 semaines)",
+    mediaPostEvent: "Apres l'evenement (livrable principal)",
     mediaPlatLabel: "Platine",
     mediaGoldLabel: "Or",
-    mediaBronzeLabel: "Bronze",
-    mediaPlatPre: "5 publications sociales + 3 mentions newsletter dont un portrait editorial dedie a votre marque",
-    mediaGoldPre: "3 publications sociales + 2 mentions newsletter integrees au contenu editorial Pavilion",
-    mediaBronzePre: "2 publications sociales + 1 mention newsletter",
-    mediaPlatDuring: "Stories et posts Instagram quotidiens avec votre branding, interview dediee au media booth, bibliotheque photo professionnelle complete",
-    mediaGoldDuring: "Stories et couverture sur le week-end, clip d'interview au media booth, selection photo curee",
-    mediaBronzeDuring: "Stories mettant en avant les tenders brandes, contenu ambiance, selection photo curee",
-    mediaPlatPost: "3 posts recap, feature newsletter dediee, interview media booth montee, package contenu complet, rapport ROI avec bilan candide",
-    mediaGoldPost: "2 posts recap, mention newsletter, clip interview publie, selection contenu curee livree",
-    mediaBronzePost: "Inclus dans le contenu recap, mention newsletter, selection contenu curee livree",
+    mediaBronzeLabel: "Bronze / Terrasse",
+    mediaPlatPre: "Post d'annonce sponsor + 2 mentions newsletter integrees au contenu editorial Pavilion",
+    mediaGoldPre: "1 mention newsletter a l'annonce",
+    mediaBronzePre: "Mention newsletter a l'annonce",
+    mediaPlatDuring: "Photo et video professionnelles sur les trois jours. Couverture live selective selon discretion de l'equipe.",
+    mediaGoldDuring: "Photo professionnelle tout le week-end. Selection curee partagee selon pertinence.",
+    mediaBronzeDuring: "Inclus dans la couverture photo de l'evenement. Selection curee livree post-evenement.",
+    mediaPlatPost: "3 posts recap editoriaux sur les canaux TGC, feature dediee dans The Concierge Chronicles, package contenu complet (50+ photos, video montee), moment de marque filme et livre sous 10 jours, bilan ROI candide.",
+    mediaGoldPost: "2 posts recap editoriaux, mention Chronicles, selection photo (25+ images) livree sous 10 jours.",
+    mediaBronzePost: "Inclus dans le contenu recap, mention Chronicles, selection photo curee livree sous 14 jours.",
     mediaNote: "Tout le contenu est approuve par votre equipe avant publication. Un tour d'approbation, delai de 48 heures.",
     ctaTitle: "Interesse ?",
     ctaText:
@@ -625,7 +617,7 @@ export default function SponsorshipPage() {
         </div>
       </section>
 
-      {/* Evening Programme */}
+      {/* Private Dinner */}
       <section className="bg-green">
         <div className="max-w-5xl mx-auto px-6 py-14">
           <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
@@ -634,11 +626,10 @@ export default function SponsorshipPage() {
           <p className="text-sm text-white/70 font-body mb-8 max-w-2xl">
             {t.eveningIntro}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
             {[
               { day: t.eveningFri, desc: t.eveningFriDesc },
               { day: t.eveningSat, desc: t.eveningSatDesc },
-              { day: t.eveningSun, desc: t.eveningSunDesc },
             ].map((ev) => (
               <div
                 key={ev.day}
@@ -651,7 +642,7 @@ export default function SponsorshipPage() {
                   {ev.desc}
                 </p>
                 <p className="text-xs text-white/50 font-body">
-                  {t.eveningTime} &middot; {t.eveningVenue}
+                  {lang === "fr" ? "Table de 12 personnes max · Restaurant pres du circuit" : "Table for 12 max · Restaurant near the circuit"}
                 </p>
               </div>
             ))}
