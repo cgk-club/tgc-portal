@@ -57,6 +57,7 @@ const T = {
     tailored: "Tailored pricing",
     from: "from",
     perDay: "per day",
+    perPerson: "per person",
     onApplication: "On application",
     enquire: "Enquire",
     more: "more",
@@ -99,6 +100,7 @@ const T = {
     tailored: "Tarif sur mesure",
     from: "a partir de",
     perDay: "par jour",
+    perPerson: "par personne",
     onApplication: "Sur demande",
     enquire: "Nous contacter",
     more: "de plus",
@@ -295,7 +297,7 @@ function PavilionTerraceContent() {
                       {isCombination
                         ? t.tailored
                         : pkg.price > 0
-                          ? `${t.from} ${formatPrice(pkg.price, pkg.currency)} ${t.perDay}`
+                          ? `${t.from} ${formatPrice(pkg.price, pkg.currency)} ${t.perPerson}`
                           : t.onApplication}
                     </p>
                     <p className="text-xs text-gray-500 font-body mb-4">{pkg.description}</p>
