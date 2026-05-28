@@ -10,7 +10,7 @@ const TERRACE_IDS = [
 const BROCHURES = [
   {
     title: "The Pavilion Experience",
-    url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/The_Pavilion_Experience_v7.pdf",
+    url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/The_Pavilion_Experience_v8.pdf",
   },
 ];
 

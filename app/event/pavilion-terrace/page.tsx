@@ -204,25 +204,25 @@ const T = {
 };
 
 const PROG_EN = [
-  { day: "Friday 5 June", title: "Practice Day", items: ["Terrace access from 10:00", "12:00 Aramco F1 Pit Lane Walk", "13:30 Free Practice 1", "16:00 Aramco F1 Pit Lane Walk", "17:00 Free Practice 2", "Gourmet canape buffet and open champagne bar all day"] },
-  { day: "Saturday 6 June", title: "Qualifying Day", items: ["Terrace access from 10:00", "12:30 Free Practice 3", "13:30 Pit lane walk and terrace social", "16:00 Qualifying (Q1, Q2, Q3)", "Canape buffet, open bar and the biggest social session of the weekend"] },
-  { day: "Sunday 7 June", title: "Race Day", items: ["Terrace access from 09:30", "12:50 Aramco F1 Pit Lane Walk", "13:00 F1 Drivers Parade", "14:44 National Anthem and pre-race build-up", "15:00 Monaco Grand Prix, 78 laps", "Champagne bar open through the race", "Terrace closes after the podium"] },
+  { day: "Friday 5 June", title: "Practice Day", items: ["Terrace access from 10:00", "13:30 Free Practice 1", "17:00 Free Practice 2", "Gourmet canape buffet and open champagne bar all day"] },
+  { day: "Saturday 6 June", title: "Qualifying Day", items: ["Terrace access from 10:00", "12:30 Free Practice 3", "16:00 Qualifying (Q1, Q2, Q3)", "Canape buffet, open bar and the biggest social session of the weekend"] },
+  { day: "Sunday 7 June", title: "Race Day", items: ["Terrace access from 09:30", "13:00 F1 Drivers Parade", "14:44 National Anthem and pre-race build-up", "15:00 Monaco Grand Prix, 78 laps", "Champagne bar open through the race", "Terrace closes after the podium"] },
 ];
 const PROG_FR = [
-  { day: "Vendredi 5 juin", title: "Essais libres", items: ["Acces terrasse a partir de 10h00", "12h00 Tour des stands Aramco F1", "13h30 Essais libres 1", "16h00 Tour des stands Aramco F1", "17h00 Essais libres 2", "Buffet gastronomique de canapes et bar a champagne toute la journee"] },
-  { day: "Samedi 6 juin", title: "Qualifications", items: ["Acces terrasse a partir de 10h00", "12h30 Essais libres 3", "13h30 Tour des stands et moment social", "16h00 Qualifications (Q1, Q2, Q3)", "Buffet canapes, bar ouvert et la plus grande session sociale du week-end"] },
-  { day: "Dimanche 7 juin", title: "Jour de course", items: ["Acces terrasse a partir de 09h30", "12h50 Tour des stands Aramco F1", "13h00 Parade des pilotes F1", "14h44 Hymne national et montee en puissance", "15h00 Grand Prix de Monaco, 78 tours", "Bar a champagne ouvert pendant la course", "Fermeture apres le podium"] },
+  { day: "Vendredi 5 juin", title: "Essais libres", items: ["Acces terrasse a partir de 10h00", "13h30 Essais libres 1", "17h00 Essais libres 2", "Buffet gastronomique de canapes et bar a champagne toute la journee"] },
+  { day: "Samedi 6 juin", title: "Qualifications", items: ["Acces terrasse a partir de 10h00", "12h30 Essais libres 3", "16h00 Qualifications (Q1, Q2, Q3)", "Buffet canapes, bar ouvert et la plus grande session sociale du week-end"] },
+  { day: "Dimanche 7 juin", title: "Jour de course", items: ["Acces terrasse a partir de 09h30", "13h00 Parade des pilotes F1", "14h44 Hymne national et montee en puissance", "15h00 Grand Prix de Monaco, 78 tours", "Bar a champagne ouvert pendant la course", "Fermeture apres le podium"] },
 ];
 
 const PROG_SV = [
-  { day: "Fredag 5 juni", title: "Trainingsdag", items: ["Terrass oppnar 10:00", "12:00 Aramco F1-depagata", "13:30 Fri ovning 1", "16:00 Aramco F1-depagata", "17:00 Fri ovning 2", "Gourmet-canapebuffe och oppet champagnebar hela dagen"] },
-  { day: "Lordag 6 juni", title: "Kval", items: ["Terrass oppnar 10:00", "12:30 Fri ovning 3", "13:30 Depagata och socialt", "16:00 Kval (Q1, Q2, Q3)", "Canapebuffe, oppet champagnebar och helgens storsta sociala session"] },
-  { day: "Sondag 7 juni", title: "Tavlingsdag", items: ["Terrass oppnar 09:30", "12:50 Aramco F1-depagata", "13:00 F1-forarparad", "14:44 Nationalsang och uppbyggnad", "15:00 Monaco Grand Prix, 78 varv", "Champagnebar under loppet", "Terrassen stangs efter prispallen"] },
+  { day: "Fredag 5 juni", title: "Trainingsdag", items: ["Terrass oppnar 10:00", "13:30 Fri ovning 1", "17:00 Fri ovning 2", "Gourmet-canapebuffe och oppet champagnebar hela dagen"] },
+  { day: "Lordag 6 juni", title: "Kval", items: ["Terrass oppnar 10:00", "12:30 Fri ovning 3", "16:00 Kval (Q1, Q2, Q3)", "Canapebuffe, oppet champagnebar och helgens storsta sociala session"] },
+  { day: "Sondag 7 juni", title: "Tavlingsdag", items: ["Terrass oppnar 09:30", "13:00 F1-forarparad", "14:44 Nationalsang och uppbyggnad", "15:00 Monaco Grand Prix, 78 varv", "Champagnebar under loppet", "Terrassen stangs efter prispallen"] },
 ];
 const PROG_NL = [
-  { day: "Vrijdag 5 juni", title: "Trainingsdag", items: ["Terrassen openen 10:00", "12:00 Aramco F1 pitstraat-wandeling", "13:30 Vrije training 1", "16:00 Aramco F1 pitstraat-wandeling", "17:00 Vrije training 2", "Gourmet canapebuffet en open champagnebar de hele dag"] },
-  { day: "Zaterdag 6 juni", title: "Kwalificatie", items: ["Terrassen openen 10:00", "12:30 Vrije training 3", "13:30 Pitstraat-wandeling en sociaal", "16:00 Kwalificatie (Q1, Q2, Q3)", "Canapebuffet, open champagnebar en de drukste sociale sessie van het weekend"] },
-  { day: "Zondag 7 juni", title: "Racedag", items: ["Terrassen openen 09:30", "12:50 Aramco F1 pitstraat-wandeling", "13:00 F1 rijdersparade", "14:44 Volkslied en opbouw", "15:00 Monaco Grand Prix, 78 ronden", "Champagnebar open tijdens de race", "Terrassen sluiten na het podium"] },
+  { day: "Vrijdag 5 juni", title: "Trainingsdag", items: ["Terrassen openen 10:00", "13:30 Vrije training 1", "17:00 Vrije training 2", "Gourmet canapebuffet en open champagnebar de hele dag"] },
+  { day: "Zaterdag 6 juni", title: "Kwalificatie", items: ["Terrassen openen 10:00", "12:30 Vrije training 3", "16:00 Kwalificatie (Q1, Q2, Q3)", "Canapebuffet, open champagnebar en de drukste sociale sessie van het weekend"] },
+  { day: "Zondag 7 juni", title: "Racedag", items: ["Terrassen openen 09:30", "13:00 F1 rijdersparade", "14:44 Volkslied en opbouw", "15:00 Monaco Grand Prix, 78 ronden", "Champagnebar open tijdens de race", "Terrassen sluiten na het podium"] },
 ];
 
 function formatPrice(price: number, currency: string) {
