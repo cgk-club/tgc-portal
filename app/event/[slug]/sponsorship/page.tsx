@@ -14,17 +14,45 @@ const T = {
     sponsorship: "Sponsorship",
     headline: "Partner with The Pavilion",
     intro:
-      "The Pavilion brings together entrepreneurs, athletes and cultural figures for three days aboard a superyacht and VIP terraces overlooking the Monaco Grand Prix. A sponsorship places your brand at the centre of this experience.",
+      "The Pavilion brings together entrepreneurs, athletes and cultural figures for three days on the Silver VIP Terraces overlooking the Monaco Grand Prix circuit. A sponsorship places your brand at the centre of this experience.",
     whyTitle: "Why The Pavilion",
     why: [
-      "100 guests maximum: 80 on the yacht, 20 on VIP terraces",
-      "Three days of live Grand Prix action from yacht and terraces",
-      "Evening programme with A-list athletes and entrepreneurs",
-      "Cocktail dinatoire each evening: fine drinks, canapes, only stirred cocktails",
-      "Media booth for podcasts and interviews throughout the weekend",
+      "Silver VIP Terraces directly on the Monaco GP circuit",
+      "Three days of live Grand Prix action: Practice, Qualifying and Race Day",
+      "Curated guest list: athletes, entrepreneurs, media and cultural figures",
+      "Breakfast, lunch and open champagne bar throughout each day",
       "Professional content creation across all three days",
       "International audience from the US, Commonwealth and Europe",
       "Inaugural edition with first-refusal on future events",
+    ],
+    terraceTitle: "Terrace Packages",
+    terraceSub: "Brand-led activations and product placements on the Silver VIP Terraces. Three days on the Monaco Grand Prix circuit, in front of a curated audience.",
+    terracePlacement: "Terrace Placement",
+    terraceActivation: "Terrace Activation",
+    terracePresentation: "Terrace Presentation",
+    terraceTag1: "Available",
+    terraceTag2: "Available",
+    terraceTag3: "Available",
+    terracePlacementItems: [
+      "Brand logo on terrace signage throughout the weekend",
+      "Product or literature display at the terrace welcome area",
+      "Brand mention in pre-event and event-day communications",
+      "2 guest passes (Saturday and Sunday)",
+    ],
+    terraceActivationItems: [
+      "Dedicated brand activation table or display zone on the terrace",
+      "Product showcase or sampling for all terrace guests",
+      "Branded element included in photography and video coverage",
+      "Social media feature across TGC and Pavilion channels",
+      "3 guest passes (full weekend)",
+    ],
+    terracePresentationItems: [
+      "Dedicated 15-minute product presentation slot to all terrace guests",
+      "Full terrace branded for your session with signage and materials",
+      "Professionally filmed and edited presentation",
+      "4 guest passes (full weekend)",
+      "Post-event editorial feature in The Concierge Chronicles",
+      "Full media package delivered within 10 days of the event",
     ],
     tiersTitle: "Sponsorship Tiers",
     exclusive: "Exclusive",
@@ -33,12 +61,10 @@ const T = {
     exclusiveItems: [
       "Full brand ownership of The Pavilion Monaco 2026",
       "Naming rights: \"The Pavilion by [Brand]\"",
-      "Total branding across yacht, terraces, tenders, all materials",
-      "Host all three cocktail dinatoire evenings",
-      "15-20 guest passes (full access)",
-      "Full brand activation on yacht deck",
+      "Total branding across terraces and all event materials",
+      "Dedicated brand activation zone on the terraces",
+      "15-20 guest passes (full weekend)",
       "Content ownership: all event photography and video",
-      "Private meeting room aboard the yacht",
       "First refusal on all future Pavilion editions",
     ],
     exclusiveNote:
@@ -47,12 +73,11 @@ const T = {
     platinumTag: "1 available",
     platinumPrice: "175,000",
     platinumItems: [
-      "Primary branding across all materials, signage and digital",
-      "Logo on yacht exterior banner (Monaco harbour visibility)",
-      "Branded welcome area on yacht deck",
-      "10 guest passes (full access: terrace + yacht + hospitality)",
-      "First choice of cocktail dinatoire to host (recommended: Saturday gala)",
-      "Welcome speech or hosted moment at chosen evening",
+      "Primary branding across all terrace materials, signage and digital",
+      "Branded welcome area at terrace entrance",
+      "10 guest passes (full weekend)",
+      "Dedicated product presentation or activation slot (Saturday)",
+      "Welcome speech or hosted moment at chosen session",
       "Primary logo on The Pavilion brochure",
       "Full social media coverage and tagged content",
       "Priority introductions to all attendees",
@@ -61,22 +86,21 @@ const T = {
     goldTag: "1 available",
     goldPrice: "125,000",
     goldItems: [
-      "Secondary branding: yacht deck signage + Silver Terrace area",
+      "Secondary branding across terrace signage and digital",
       "Logo on brochure (second placement)",
       "Social media mentions and tagged content",
-      "5 guest passes (full access)",
-      "Second choice of evening to host",
+      "5 guest passes (full weekend)",
       "Branded element at one daytime session",
     ],
-    bronze: "Bronze",
+    bronze: "Terrace Partner",
     bronzeTag: "2 available",
     bronzePrice: "50,000",
     bronzeItems: [
-      "Exclusive tender branding (one tender per Bronze sponsor)",
-      "Continuous on-water visibility all weekend",
+      "Branded activation zone on the terrace for the full weekend",
+      "Product display or sampling throughout all three days",
       "Logo on brochure and digital communications",
-      "3 guest passes each (full access)",
-      "Co-hosted evening event (shared between Bronze sponsors)",
+      "3 guest passes (full weekend)",
+      "Social media coverage and tagged content",
     ],
     eveningTitle: "Evening Programme",
     eveningIntro:
@@ -85,7 +109,7 @@ const T = {
     eveningSat: "Saturday 6 June",
     eveningSun: "Sunday 7 June",
     eveningTime: "18:00 - 23:30",
-    eveningVenue: "M/Y ARADOS",
+    eveningVenue: "Silver VIP Terraces",
     eveningFriDesc: "Welcome cocktail dinatoire on deck",
     eveningSatDesc: "Gala cocktail dinatoire (centrepiece)",
     eveningSunDesc: "Charity cocktail dinatoire with athletes",
@@ -127,16 +151,45 @@ const T = {
     sponsorship: "Sponsoring",
     headline: "Devenez partenaire de The Pavilion",
     intro:
-      "The Pavilion reunit entrepreneurs, athletes et personnalites culturelles pendant trois jours a bord d'un superyacht et sur des terrasses VIP surplombant le Grand Prix de Monaco. Un sponsoring place votre marque au coeur de cette experience.",
+      "The Pavilion reunit entrepreneurs, athletes et personnalites culturelles pendant trois jours sur les Terrasses VIP Silver surplombant le circuit du Grand Prix de Monaco. Un sponsoring place votre marque au coeur de cette experience.",
     whyTitle: "Pourquoi The Pavilion",
     why: [
-      "100 invites maximum : 80 sur le yacht, 20 sur les terrasses VIP",
-      "Trois jours de Grand Prix en direct depuis le yacht et les terrasses",
-      "Cocktail dinatoire chaque soir : boissons raffinées, canapes, cocktails remues uniquement",
-      "Espace media pour podcasts et interviews tout au long du week-end",
+      "Terrasses VIP Silver directement sur le circuit du GP de Monaco",
+      "Trois jours en direct : Essais, Qualifications et Dimanche de course",
+      "Invites tries sur le volet : athletes, entrepreneurs, medias et figures culturelles",
+      "Petit-dejeuner, dejeuner et bar a champagne inclus chaque jour",
       "Creation de contenu professionnel sur les trois jours",
       "Audience internationale des Etats-Unis, du Commonwealth et d'Europe",
       "Edition inaugurale avec priorite sur les futures editions",
+    ],
+    terraceTitle: "Formules Terrasse",
+    terraceSub: "Activations de marque et placements produit sur les Terrasses VIP Silver. Trois jours sur le circuit du Grand Prix de Monaco, face a un public selectionne.",
+    terracePlacement: "Placement Terrasse",
+    terraceActivation: "Activation Terrasse",
+    terracePresentation: "Presentation Terrasse",
+    terraceTag1: "Disponible",
+    terraceTag2: "Disponible",
+    terraceTag3: "Disponible",
+    terracePlacementItems: [
+      "Logo de marque sur la signaletique des terrasses tout le week-end",
+      "Presentoir produit ou supports a l'espace d'accueil",
+      "Mention de la marque dans les communications pre-evenement et jour J",
+      "2 pass invites (samedi et dimanche)",
+    ],
+    terraceActivationItems: [
+      "Table ou zone d'activation dediee sur les terrasses",
+      "Showcase ou echantillonnage produit pour tous les invites",
+      "Element de marque inclus dans la photo et video",
+      "Feature reseaux sociaux sur les canaux TGC et Pavilion",
+      "3 pass invites (week-end complet)",
+    ],
+    terracePresentationItems: [
+      "Creneau de presentation produit de 15 minutes devant tous les invites",
+      "Terrasses entierement brandees pour votre session",
+      "Presentation filmee et montee professionnellement",
+      "4 pass invites (week-end complet)",
+      "Feature editorial post-evenement dans The Concierge Chronicles",
+      "Package media complet livre sous 10 jours",
     ],
     tiersTitle: "Formules de Sponsoring",
     exclusive: "Exclusif",
@@ -145,12 +198,10 @@ const T = {
     exclusiveItems: [
       "Propriete totale de la marque The Pavilion Monaco 2026",
       "Droits de denomination : \"The Pavilion by [Marque]\"",
-      "Branding integral sur yacht, terrasses, tenders, tous supports",
-      "Animation des trois cocktails dinatoires",
-      "15-20 pass invites (acces complet)",
-      "Activation de marque sur le pont du yacht",
+      "Branding integral sur terrasses et tous supports evenementiels",
+      "Zone d'activation de marque dediee sur les terrasses",
+      "15-20 pass invites (week-end complet)",
       "Propriete du contenu : photos et videos de l'evenement",
-      "Salle de reunion privee a bord du yacht",
       "Priorite sur toutes les futures editions de The Pavilion",
     ],
     exclusiveNote:
@@ -159,12 +210,11 @@ const T = {
     platinumTag: "1 disponible",
     platinumPrice: "175 000",
     platinumItems: [
-      "Branding principal sur tous les supports, signaletique et digital",
-      "Logo sur banniere exterieure du yacht (visibilite port de Monaco)",
-      "Espace d'accueil de marque sur le pont du yacht",
-      "10 pass invites (acces complet : terrasse + yacht + hospitalite)",
-      "Premier choix de cocktail dinatoire a animer (recommande : gala du samedi)",
-      "Discours de bienvenue ou moment anime lors de la soiree choisie",
+      "Branding principal sur la signaletique des terrasses et digital",
+      "Espace d'accueil de marque a l'entree des terrasses",
+      "10 pass invites (week-end complet)",
+      "Creneau de presentation produit ou activation (samedi)",
+      "Prise de parole ou moment anime lors d'une session",
       "Logo principal sur la brochure The Pavilion",
       "Couverture complete sur les reseaux sociaux",
       "Introductions prioritaires aupres de tous les invites",
@@ -173,22 +223,21 @@ const T = {
     goldTag: "1 disponible",
     goldPrice: "125 000",
     goldItems: [
-      "Branding secondaire : pont du yacht + zone Terrasse Silver",
+      "Branding secondaire sur la signaletique des terrasses et digital",
       "Logo sur brochure (deuxieme placement)",
       "Mentions et contenu tagge sur les reseaux sociaux",
-      "5 pass invites (acces complet)",
-      "Deuxieme choix de soiree a animer",
+      "5 pass invites (week-end complet)",
       "Element de marque lors d'une session de journee",
     ],
-    bronze: "Bronze",
+    bronze: "Partenaire Terrasse",
     bronzeTag: "2 disponibles",
     bronzePrice: "50 000",
     bronzeItems: [
-      "Branding exclusif sur tender (un tender par sponsor Bronze)",
-      "Visibilite continue sur l'eau tout le week-end",
+      "Zone d'activation brandee sur les terrasses tout le week-end",
+      "Exposition produit ou echantillonnage sur les trois jours",
       "Logo sur brochure et communications digitales",
-      "3 pass invites chacun (acces complet)",
-      "Soiree co-animee (partagee entre les sponsors Bronze)",
+      "3 pass invites (week-end complet)",
+      "Couverture reseaux sociaux et contenu tagge",
     ],
     eveningTitle: "Programme de soirees",
     eveningIntro:
@@ -197,7 +246,7 @@ const T = {
     eveningSat: "Samedi 6 juin",
     eveningSun: "Dimanche 7 juin",
     eveningTime: "18h00 - 23h30",
-    eveningVenue: "M/Y ARADOS",
+    eveningVenue: "Silver VIP Terraces",
     eveningFriDesc: "Cocktail dinatoire de bienvenue sur le pont",
     eveningSatDesc: "Cocktail dinatoire de gala (evenement phare)",
     eveningSunDesc: "Cocktail dinatoire caritatif avec athletes",
@@ -370,7 +419,95 @@ export default function SponsorshipPage() {
         </div>
       </section>
 
-      {/* Sponsorship Tiers */}
+      {/* Terrace Packages — €10k–€50k */}
+      <section className="bg-white border-y border-green/10">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-3">
+            {t.terraceTitle}
+          </p>
+          <p className="text-sm text-gray-600 font-body mb-10 max-w-2xl">
+            {t.terraceSub}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Placement — €10k */}
+            <div className="border border-green/15 rounded-lg p-6 flex flex-col bg-pearl">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <h3 className="text-base font-heading font-semibold text-green">{t.terracePlacement}</h3>
+                <span className="text-[9px] tracking-[1px] uppercase font-body px-2 py-0.5 rounded-full bg-green/10 text-green">{t.terraceTag1}</span>
+              </div>
+              <p className="text-2xl font-heading font-semibold text-green mb-1">EUR 10,000</p>
+              <p className="text-xs text-gray-400 font-body mb-4">{t.perSponsor}</p>
+              <ul className="space-y-2 flex-1">
+                {t.terracePlacementItems.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-600 font-body">
+                    <span className="text-gold mt-0.5 shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => setSelectedTier(t.terracePlacement)} className="mt-5 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors">
+                {lang === "fr" ? "Nous contacter" : "Enquire"}
+              </button>
+            </div>
+
+            {/* Activation — €25k */}
+            <div className="border-2 border-gold/60 rounded-lg p-6 flex flex-col bg-gradient-to-b from-gold/5 to-transparent">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <h3 className="text-base font-heading font-semibold text-green">{t.terraceActivation}</h3>
+                <span className="text-[9px] tracking-[1px] uppercase font-body px-2 py-0.5 rounded-full bg-gold text-white">{t.terraceTag2}</span>
+              </div>
+              <p className="text-2xl font-heading font-semibold text-green mb-1">EUR 25,000</p>
+              <p className="text-xs text-gray-400 font-body mb-4">{t.perSponsor}</p>
+              <ul className="space-y-2 flex-1">
+                {t.terraceActivationItems.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-600 font-body">
+                    <span className="text-gold mt-0.5 shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => setSelectedTier(t.terraceActivation)} className="mt-5 w-full bg-gold text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-gold/90 transition-colors">
+                {lang === "fr" ? "Nous contacter" : "Enquire"}
+              </button>
+            </div>
+
+            {/* Presentation — €50k */}
+            <div className="border border-green/15 rounded-lg p-6 flex flex-col bg-pearl">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <h3 className="text-base font-heading font-semibold text-green">{t.terracePresentation}</h3>
+                <span className="text-[9px] tracking-[1px] uppercase font-body px-2 py-0.5 rounded-full bg-green/10 text-green">{t.terraceTag3}</span>
+              </div>
+              <p className="text-2xl font-heading font-semibold text-green mb-1">EUR 50,000</p>
+              <p className="text-xs text-gray-400 font-body mb-4">{t.perSponsor}</p>
+              <ul className="space-y-2 flex-1">
+                {t.terracePresentationItems.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-600 font-body">
+                    <span className="text-gold mt-0.5 shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => setSelectedTier(t.terracePresentation)} className="mt-5 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors">
+                {lang === "fr" ? "Nous contacter" : "Enquire"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Full Event Sponsorship Tiers */}
       <section className="max-w-5xl mx-auto px-6 py-16">
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
           {t.tiersTitle}
