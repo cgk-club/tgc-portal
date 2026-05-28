@@ -33,17 +33,17 @@ const T = {
     presents: "The Gatekeepers Club presents",
     subtitle: "Monaco Grand Prix 2026",
     dateLine: "5 – 7 June 2026 · Monaco",
-    days: "Days", location: "Monaco", venue: "Silver VIP Terraces",
+    days: "Days", location: "Monaco", venue: "VIP Terraces",
     venueLabel: "Venue",
     experience: "The Experience",
     experienceTitle: "On the circuit",
-    desc: "The Pavilion Terraces sit directly on the Monaco Grand Prix circuit. Three days of race access from a position very few people in the world occupy. Breakfast and lunch served at your table. An open champagne bar throughout each day. The crowd is drawn from international sport, business and media. The terrace is where the conversations happen between laps.",
+    desc: "The Pavilion Terraces sit directly on the Monaco Grand Prix circuit. Three days of race access from a position very few people in the world occupy. A gourmet canapé buffet throughout the day, open champagne bar, and relaxed table service — quality food without any formality. The crowd is drawn from international sport, business and media. The terrace is where the conversations happen between laps.",
     highlights: [
-      "Silver VIP Terraces on the Monaco GP circuit",
-      "Breakfast, lunch and open champagne bar included",
+      "VIP Terraces on the Monaco GP circuit",
+      "Gourmet canapé buffet and open champagne bar all day",
       "Race viewing: Practice, Qualifying and Race Day",
       "Curated crowd: athletes, entrepreneurs, media",
-      "F&B service throughout the day",
+      "Relaxed F&B service throughout — no formality",
       "Helicopter transfers available",
     ],
     programme: "Programme",
@@ -76,17 +76,17 @@ const T = {
     presents: "The Gatekeepers Club presente",
     subtitle: "Grand Prix de Monaco 2026",
     dateLine: "5 – 7 juin 2026 · Monaco",
-    days: "Jours", location: "Monaco", venue: "Terrasses VIP Silver",
+    days: "Jours", location: "Monaco", venue: "Terrasses VIP",
     venueLabel: "Espace",
     experience: "L'Experience",
     experienceTitle: "Sur le circuit",
-    desc: "Les Terrasses du Pavilion sont situées directement sur le circuit du Grand Prix de Monaco. Trois jours d'accès au circuit depuis l'une des positions les plus privilegiees du monde. Petit-dejeuner et dejeuner servis a table. Bar a champagne ouvert toute la journee. Un public issu du sport international, du monde des affaires et des medias. La terrasse, c'est la ou les conversations ont lieu entre les tours de piste.",
+    desc: "Les Terrasses du Pavilion sont situées directement sur le circuit du Grand Prix de Monaco. Trois jours d'acces depuis l'une des positions les plus privilegiees du monde. Un buffet gastronomique de canapes tout au long de la journee, bar a champagne ouvert, service decontracte — qualite sans formalite. Un public issu du sport international, du monde des affaires et des medias.",
     highlights: [
-      "Terrasses VIP Silver sur le circuit du GP de Monaco",
-      "Petit-dejeuner, dejeuner et bar a champagne inclus",
+      "Terrasses VIP sur le circuit du GP de Monaco",
+      "Buffet gastronomique de canapes et bar a champagne",
       "Vue sur la course : Essais, Qualifications et Jour de course",
       "Invites tries sur le volet : athletes, entrepreneurs, medias",
-      "Service F&B tout au long de la journee",
+      "Service F&B decontracte et continu — sans formalite",
       "Transferts helicoptere disponibles",
     ],
     programme: "Programme",
@@ -118,14 +118,14 @@ const T = {
 };
 
 const PROG_EN = [
-  { day: "Friday 5 June", title: "Practice Day", items: ["Terrace access from 10:00", "13:30 Free Practice 1", "17:00 Free Practice 2", "Open champagne bar all day", "Lunch served at table"] },
-  { day: "Saturday 6 June", title: "Qualifying", items: ["Terrace access from 10:00", "12:30 Free Practice 3", "16:00 Qualifying session", "The biggest social session of the weekend", "Lunch and open bar"] },
-  { day: "Sunday 7 June", title: "Race Day", items: ["Terrace access from 10:00", "15:00 Race start — 78 laps", "Race viewing from circuit-side position", "Champagne bar open through the race", "Terrace closes after the podium"] },
+  { day: "Friday 5 June", title: "Practice Day", items: ["Terrace access from 10:00", "12:00 Aramco F1 Pit Lane Walk", "13:30 Free Practice 1", "16:00 Aramco F1 Pit Lane Walk", "17:00 Free Practice 2", "Gourmet canape buffet and open champagne bar all day"] },
+  { day: "Saturday 6 June", title: "Qualifying Day", items: ["Terrace access from 10:00", "12:30 Free Practice 3", "13:30 Pit lane walk and terrace social", "16:00 Qualifying (Q1, Q2, Q3)", "Canape buffet, open bar and the biggest social session of the weekend"] },
+  { day: "Sunday 7 June", title: "Race Day", items: ["Terrace access from 09:30", "12:50 Aramco F1 Pit Lane Walk", "13:00 F1 Drivers Parade", "14:44 National Anthem and pre-race build-up", "15:00 Monaco Grand Prix, 78 laps", "Champagne bar open through the race", "Terrace closes after the podium"] },
 ];
 const PROG_FR = [
-  { day: "Vendredi 5 juin", title: "Essais libres", items: ["Acces terrasse a partir de 10h00", "13h30 Essais libres 1", "17h00 Essais libres 2", "Bar a champagne ouvert toute la journee", "Dejeuner servi a table"] },
-  { day: "Samedi 6 juin", title: "Qualifications", items: ["Acces terrasse a partir de 10h00", "12h30 Essais libres 3", "16h00 Qualifications", "La plus grande session sociale du week-end", "Dejeuner et bar ouvert"] },
-  { day: "Dimanche 7 juin", title: "Jour de course", items: ["Acces terrasse a partir de 10h00", "15h00 Depart — 78 tours", "Vue sur la course depuis le bord du circuit", "Bar a champagne ouvert pendant la course", "Fermeture apres le podium"] },
+  { day: "Vendredi 5 juin", title: "Essais libres", items: ["Acces terrasse a partir de 10h00", "12h00 Tour des stands Aramco F1", "13h30 Essais libres 1", "16h00 Tour des stands Aramco F1", "17h00 Essais libres 2", "Buffet gastronomique de canapes et bar a champagne toute la journee"] },
+  { day: "Samedi 6 juin", title: "Qualifications", items: ["Acces terrasse a partir de 10h00", "12h30 Essais libres 3", "13h30 Tour des stands et moment social", "16h00 Qualifications (Q1, Q2, Q3)", "Buffet canapes, bar ouvert et la plus grande session sociale du week-end"] },
+  { day: "Dimanche 7 juin", title: "Jour de course", items: ["Acces terrasse a partir de 09h30", "12h50 Tour des stands Aramco F1", "13h00 Parade des pilotes F1", "14h44 Hymne national et montee en puissance", "15h00 Grand Prix de Monaco, 78 tours", "Bar a champagne ouvert pendant la course", "Fermeture apres le podium"] },
 ];
 
 function formatPrice(price: number, currency: string) {
