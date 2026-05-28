@@ -4,14 +4,13 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 
 const TERRACE_IDS = [
-  "c3cc1b10-7b7a-44b8-bce7-9d1379c4f89f", // Daytime Pass (Terrace)
-  "815d946f-cf19-4a80-b46b-7c69c2fbdec9", // Combination of Passes
+  "c3cc1b10-7b7a-44b8-bce7-9d1379c4f89f", // Weekend Package — VIP Terrace
 ];
 
 const BROCHURES = [
   {
     title: "The Pavilion Experience",
-    url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/1779542566551-The_Pavilion_Experience_v5.pdf",
+    url: "https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/The_Pavilion_Experience_v6.pdf",
   },
 ];
 

@@ -49,8 +49,8 @@ const T = {
     programme: "Programme",
     threedays: "Three Days in Monaco",
     packages: "Packages",
-    chooseTitle: "Choose your days",
-    chooseSub: "Friday, Saturday or Sunday. Or all three.",
+    chooseTitle: "Choose your package",
+    chooseSub: "Saturday & Sunday, or the full three-day weekend. Single days on request.",
     gallery: "In the Terraces",
     galleryTitle: "What to expect",
     alaCarte: "A la carte",
@@ -91,8 +91,8 @@ const T = {
     programme: "Programme",
     threedays: "Trois jours a Monaco",
     packages: "Formules",
-    chooseTitle: "Choisissez vos jours",
-    chooseSub: "Vendredi, samedi ou dimanche. Ou les trois.",
+    chooseTitle: "Choisissez votre formule",
+    chooseSub: "Samedi et dimanche, ou le week-end complet. Journees a la carte sur demande.",
     gallery: "Sur les Terrasses",
     galleryTitle: "A quoi s'attendre",
     alaCarte: "A la carte",
@@ -356,17 +356,10 @@ function PavilionTerraceContent() {
             </div>
           )}
 
-          {/* Cross-sell to yacht */}
-          <div className="mt-10 border border-green/10 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-pearl">
-            <div>
-              <p className="text-[10px] tracking-[2px] text-gold uppercase font-body mb-1">{t.alsoOnYacht}</p>
-              <p className="text-sm text-gray-600 font-body">Private cabin accommodation · Daytime on the water · Evening cocktail dinatoire</p>
-            </div>
-            <a href="/event/pavilion-yacht"
-              className="shrink-0 px-5 py-2.5 border border-green/20 rounded-md text-xs font-body text-green hover:bg-green/5 transition-colors whitespace-nowrap">
-              {t.yachtLink} →
-            </a>
-          </div>
+          {/* Single day note */}
+          <p className="mt-8 text-center text-xs text-gray-400 font-body">
+            Single day passes available on request — contact us to discuss.
+          </p>
         </div>
       </section>
 
