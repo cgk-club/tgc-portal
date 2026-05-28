@@ -26,7 +26,7 @@ interface EventPackage {
   included_services: string; sort_order: number; price_options: PriceOption[] | null;
 }
 interface Brochure { title: string; url: string }
-type Lang = "en" | "fr";
+type Lang = "en" | "fr" | "sv" | "nl";
 
 const T = {
   en: {
@@ -115,6 +115,92 @@ const T = {
     alsoOnYacht: "Egalement sur le yacht",
     yachtLink: "Voir les formules yacht",
   },
+  sv: {
+    presents: "The Gatekeepers Club presenterar",
+    subtitle: "Monaco Grand Prix 2026",
+    dateLine: "5 – 7 juni 2026 · Monaco",
+    days: "Dagar", location: "Monaco", venue: "VIP-terrasser",
+    venueLabel: "Plats",
+    experience: "Upplevelsen",
+    experienceTitle: "Pa banan",
+    desc: "Paviljongens terrasser ar placerade direkt pa Monaco Grand Prix-banan. Tre dagars tillgang fran en av de mest exklusiva positionerna i varlden. Gourmet-canapebuffe under dagen, oppet champagnebar och avslappnad service utan formalia. Sallskapet ar internationellt och bestar av atleter, entreprenaorer och mediafolk.",
+    highlights: [
+      "VIP-terrasser direkt pa Monaco GP-banan",
+      "Gourmet-canapebuffe och oppet champagnebar hela dagen",
+      "Race-visning: Ovning, Kval och Tavlingsdag",
+      "Kuraterat sallskap: atleter, entreprenaorer, media",
+      "Avslappnad F&B-service utan formalia",
+      "Helikoptertransfer tillganglig",
+    ],
+    programme: "Program",
+    threedays: "Tre dagar i Monaco",
+    packages: "Paket",
+    chooseTitle: "Valj ditt paket",
+    chooseSub: "Lordag och sondag, eller hela helgen. Enstaka dagar pa forfragan.",
+    gallery: "Pa terrassen",
+    galleryTitle: "Vad du kan forvanta dig",
+    alaCarte: "A la carte",
+    tailored: "Anpassat pris",
+    from: "fran",
+    perDay: "per dag",
+    perPerson: "per person",
+    onApplication: "Pa forfragan",
+    enquire: "Forfragan",
+    more: "till",
+    downloads: "Nedladdningar",
+    brochures: "Broschyrer",
+    jointVenture: "Ett samarbete",
+    download: "Ladda ned",
+    close: "Stang",
+    switchLang: "NL",
+    thankYou: "Tack",
+    thankYouMsg: "Vi har mottagit din forfragan och aterkomme snart.",
+    alsoOnYacht: "",
+    yachtLink: "",
+  },
+  nl: {
+    presents: "The Gatekeepers Club presenteert",
+    subtitle: "Monaco Grand Prix 2026",
+    dateLine: "5 – 7 juni 2026 · Monaco",
+    days: "Dagen", location: "Monaco", venue: "VIP-terrassen",
+    venueLabel: "Locatie",
+    experience: "De Ervaring",
+    experienceTitle: "Op het circuit",
+    desc: "De Pavilion Terrassen liggen direct op het Monaco Grand Prix circuit. Drie dagen toegang vanuit een van de meest exclusieve posities ter wereld. Gourmet canapebuffet de hele dag, open champagnebar en ontspannen service zonder formaliteit. Het gezelschap bestaat uit internationale atleten, ondernemers en mediavertegenwoordigers.",
+    highlights: [
+      "VIP-terrassen direct op het Monaco GP circuit",
+      "Gourmet canapebuffet en open champagnebar de hele dag",
+      "Race-kijken: Training, Kwalificatie en Racedag",
+      "Geselecteerd gezelschap: atleten, ondernemers, media",
+      "Ontspannen F&B-service zonder formaliteit",
+      "Helikoptertransfer beschikbaar",
+    ],
+    programme: "Programma",
+    threedays: "Drie dagen in Monaco",
+    packages: "Pakketten",
+    chooseTitle: "Kies uw pakket",
+    chooseSub: "Zaterdag en zondag, of het volledige weekend. Losse dagen op aanvraag.",
+    gallery: "Op de terrassen",
+    galleryTitle: "Wat u kunt verwachten",
+    alaCarte: "A la carte",
+    tailored: "Prijs op maat",
+    from: "vanaf",
+    perDay: "per dag",
+    perPerson: "per persoon",
+    onApplication: "Op aanvraag",
+    enquire: "Informeren",
+    more: "meer",
+    downloads: "Downloads",
+    brochures: "Brochures",
+    jointVenture: "Een samenwerking",
+    download: "Download",
+    close: "Sluiten",
+    switchLang: "EN",
+    thankYou: "Dank u",
+    thankYouMsg: "Wij hebben uw interesse ontvangen en nemen spoedig contact op.",
+    alsoOnYacht: "",
+    yachtLink: "",
+  },
 };
 
 const PROG_EN = [
@@ -126,6 +212,17 @@ const PROG_FR = [
   { day: "Vendredi 5 juin", title: "Essais libres", items: ["Acces terrasse a partir de 10h00", "12h00 Tour des stands Aramco F1", "13h30 Essais libres 1", "16h00 Tour des stands Aramco F1", "17h00 Essais libres 2", "Buffet gastronomique de canapes et bar a champagne toute la journee"] },
   { day: "Samedi 6 juin", title: "Qualifications", items: ["Acces terrasse a partir de 10h00", "12h30 Essais libres 3", "13h30 Tour des stands et moment social", "16h00 Qualifications (Q1, Q2, Q3)", "Buffet canapes, bar ouvert et la plus grande session sociale du week-end"] },
   { day: "Dimanche 7 juin", title: "Jour de course", items: ["Acces terrasse a partir de 09h30", "12h50 Tour des stands Aramco F1", "13h00 Parade des pilotes F1", "14h44 Hymne national et montee en puissance", "15h00 Grand Prix de Monaco, 78 tours", "Bar a champagne ouvert pendant la course", "Fermeture apres le podium"] },
+];
+
+const PROG_SV = [
+  { day: "Fredag 5 juni", title: "Trainingsdag", items: ["Terrass oppnar 10:00", "12:00 Aramco F1-depagata", "13:30 Fri ovning 1", "16:00 Aramco F1-depagata", "17:00 Fri ovning 2", "Gourmet-canapebuffe och oppet champagnebar hela dagen"] },
+  { day: "Lordag 6 juni", title: "Kval", items: ["Terrass oppnar 10:00", "12:30 Fri ovning 3", "13:30 Depagata och socialt", "16:00 Kval (Q1, Q2, Q3)", "Canapebuffe, oppet champagnebar och helgens storsta sociala session"] },
+  { day: "Sondag 7 juni", title: "Tavlingsdag", items: ["Terrass oppnar 09:30", "12:50 Aramco F1-depagata", "13:00 F1-forarparad", "14:44 Nationalsang och uppbyggnad", "15:00 Monaco Grand Prix, 78 varv", "Champagnebar under loppet", "Terrassen stangs efter prispallen"] },
+];
+const PROG_NL = [
+  { day: "Vrijdag 5 juni", title: "Trainingsdag", items: ["Terrassen openen 10:00", "12:00 Aramco F1 pitstraat-wandeling", "13:30 Vrije training 1", "16:00 Aramco F1 pitstraat-wandeling", "17:00 Vrije training 2", "Gourmet canapebuffet en open champagnebar de hele dag"] },
+  { day: "Zaterdag 6 juni", title: "Kwalificatie", items: ["Terrassen openen 10:00", "12:30 Vrije training 3", "13:30 Pitstraat-wandeling en sociaal", "16:00 Kwalificatie (Q1, Q2, Q3)", "Canapebuffet, open champagnebar en de drukste sociale sessie van het weekend"] },
+  { day: "Zondag 7 juni", title: "Racedag", items: ["Terrassen openen 09:30", "12:50 Aramco F1 pitstraat-wandeling", "13:00 F1 rijdersparade", "14:44 Volkslied en opbouw", "15:00 Monaco Grand Prix, 78 ronden", "Champagnebar open tijdens de race", "Terrassen sluiten na het podium"] },
 ];
 
 function formatPrice(price: number, currency: string) {
@@ -143,9 +240,10 @@ export default function PavilionTerracePage() {
 function PavilionTerraceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const lang: Lang = searchParams.get("lang") === "fr" ? "fr" : "en";
+  const langParam = searchParams.get("lang") as Lang | null;
+  const lang: Lang = (["en", "fr", "sv", "nl"] as const).includes(langParam as Lang) ? langParam as Lang : "en";
   const t = T[lang];
-  const PROG = lang === "fr" ? PROG_FR : PROG_EN;
+  const PROG = lang === "fr" ? PROG_FR : lang === "sv" ? PROG_SV : lang === "nl" ? PROG_NL : PROG_EN;
 
   const [packages, setPackages] = useState<EventPackage[]>([]);
   const [brochures, setBrochures] = useState<Brochure[]>([]);
@@ -161,21 +259,26 @@ function PavilionTerraceContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  function switchLang() {
+  function setLang(l: Lang) {
     const p = new URLSearchParams(searchParams.toString());
-    if (lang === "en") p.set("lang", "fr"); else p.delete("lang");
+    if (l === "en") p.delete("lang"); else p.set("lang", l);
     router.push(`/event/pavilion-terrace?${p.toString()}`);
   }
 
   return (
     <div className="min-h-screen bg-pearl">
       {/* Lang switcher */}
-      <button
-        onClick={switchLang}
-        className="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-sm border border-green/20 rounded-full px-3 py-1.5 text-xs font-body font-medium text-green hover:bg-white transition-colors shadow-sm"
-      >
-        {t.switchLang}
-      </button>
+      <div className="fixed top-4 right-4 z-50 flex bg-white/90 backdrop-blur-sm border border-green/20 rounded-full shadow-sm overflow-hidden">
+        {(["en", "fr", "sv", "nl"] as const).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className={`px-3 py-1.5 text-xs font-body font-medium transition-colors ${lang === l ? "bg-green text-white" : "text-green hover:bg-green/5"}`}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
 
       {/* Hero */}
       <section className="relative h-[75vh] min-h-[520px] flex items-end">

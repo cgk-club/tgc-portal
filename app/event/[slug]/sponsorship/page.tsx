@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import SponsorshipLeadModal from "@/components/event-booking/SponsorshipLeadModal";
 
-type Lang = "en" | "fr";
+type Lang = "en" | "fr" | "sv" | "nl";
 
 const T = {
   en: {
@@ -269,9 +269,207 @@ const T = {
     ctaPhone: "+33 7 73 77 90 71",
     perSponsor: "par sponsor",
     eur: "EUR",
-    switchLang: "EN",
+    switchLang: "SV",
     backToEvent: "Retour a l'evenement",
     jointVenture: "Une co-production",
+  },
+  sv: {
+    presents: "The Gatekeepers Club presenterar",
+    subtitle: "Monaco Grand Prix 2026",
+    dateLine: "5 - 7 juni 2026 . Monaco",
+    sponsorship: "Sponsring",
+    headline: "Bli partner med The Pavilion",
+    intro: "The Pavilion samlar entreprenaorer, atleter och kulturpersonligheter under tre dagar pa VIP-terrasser med utsikt over Monaco Grand Prix-banan. En sponsring placerar ditt varumarke i centrum av upplevelsen.",
+    whyTitle: "Varfor The Pavilion",
+    why: [
+      "VIP-terrasser direkt pa Monaco GP-banan",
+      "Tre dagar: ovning, kval och tavlingsdag",
+      "Kuraterat sallskap: atleter, entreprenaorer, media och kulturprofiler",
+      "Gourmet-canapebuffe och champagnebar hela dagen",
+      "Professionell innehallsproduktion under tre dagar",
+      "Internationell publik fran USA, Commonwealth och Europa",
+      "Inledande upplaga med forsta alternativ pa framtida evenemang",
+    ],
+    terraceTitle: "Terrass-paket",
+    terraceSub: "Varumarkesaktivering och produktplacering pa VIP-terrassen. Tre dagar pa Monaco Grand Prix-banan, infor en kuraterad publik.",
+    terracePlacement: "Brons",
+    terraceActivation: "Silver",
+    terracePresentation: "Guld",
+    terraceTag1: "Tillganglig",
+    terraceTag2: "Tillganglig",
+    terraceTag3: "Tillganglig",
+    terracePlacementItems: [
+      "Varumarkeslogga pa terrass-skyltning under hela helgen",
+      "Produktexponering vid valkoms-omradet",
+      "Varumarkesnamnande i kommunikation fore och under eventet",
+      "1 gastpass (lordag och sondag)",
+    ],
+    terraceActivationItems: [
+      "Dedikerat aktiverings-bord eller visningszon pa terrassen",
+      "Produktvisning eller provning for alla gaster",
+      "Varumarkesinnehall i foto- och videomaterial",
+      "Sociala medie-exponering pa TGC- och Pavilion-kanaler",
+      "3 gastpass (hela helgen)",
+    ],
+    terracePresentationItems: [
+      "Dedikerat 15-minuters produktpresentationsslot for alla terrass-gaster",
+      "Hela terrassen brandad for din session",
+      "Professionellt filmad och redigerad presentation",
+      "4 gastpass (hela helgen)",
+      "Redaktionell feature post-event i The Concierge Chronicles",
+      "Fullt mediapaket levererat inom 10 dagar",
+    ],
+    tiersTitle: "Sponsringsnivaar",
+    exclusive: "Exklusiv",
+    exclusiveTag: "1 tillganglig",
+    exclusivePrice: "",
+    exclusiveItems: [],
+    exclusiveNote: "Om Exklusiv-nivan tecknas, annulleras alla andra navaer.",
+    platinum: "Platina",
+    platinumTag: "1 tillganglig",
+    platinumPrice: "175,000",
+    platinumItems: [],
+    gold: "Guld",
+    goldTag: "1 tillganglig",
+    goldPrice: "125,000",
+    goldItems: [],
+    bronze: "Terrass Partner",
+    bronzeTag: "2 tillgangliga",
+    bronzePrice: "50,000",
+    bronzeItems: [],
+    eveningTitle: "Privat middag",
+    eveningIntro: "Silver- och Guld-sponsorer har mojlighet till en privat middag pa fredags- eller lordagskvallen, pa en kuraterad restaurang nara banan. Max 12 personer. Avslappnat, inga tal, ingen formalia.",
+    eveningFri: "Fredag 5 juni",
+    eveningSat: "Lordag 6 juni",
+    eveningFriDesc: "Middag efter ovningen. En lugnare, mer intim kvaell for forsta samtal.",
+    eveningSatDesc: "Middag efter kvalet. Helgens mest eftertraktade kvaell.",
+    mediaTitle: "Media & Innehall",
+    mediaIntro: "Det primara mediavaardet ar post-event. Vi producerar innehall professionellt under helgen och levererar ett redaktionellt paket som ditt team kan anvanda.",
+    mediaPreEvent: "Fore eventet",
+    mediaDuring: "Under eventet",
+    mediaPostEvent: "Post-event (huvudleverans)",
+    mediaPlatLabel: "Platina",
+    mediaGoldLabel: "Guld",
+    mediaBronzeLabel: "Brons / Terrass",
+    mediaPlatPre: "Sponsringsmeddelande + 2 nyhetsbrevsnamnanden",
+    mediaGoldPre: "1 nyhetsbrevsnamnande",
+    mediaBronzePre: "Nyhetsbrevsnamnande",
+    mediaPlatDuring: "Professionell foto och video. Mediabas for poddar, live-sessioner och intervjuer.",
+    mediaGoldDuring: "Professionell foto. Mediabas for intervjuer och live-stunder.",
+    mediaBronzeDuring: "Inkluderad i eventfoto. Mediabas-access for en session.",
+    mediaPlatPost: "3 redaktionella recap-inlagg, Chronicles-feature, 50+ foton + redigerad video, mediabas-session publicerad inom 10 dagar, ROI-sammanfattning.",
+    mediaGoldPost: "2 recap-inlagg, Chronicles-namnande, 25+ foton inom 10 dagar.",
+    mediaBronzePost: "Inkluderad i recap-innehall, Chronicles-namnande, kurerat fotourval inom 14 dagar.",
+    mediaNote: "Allt innehall godkands av ditt team fore publicering. En godkannanderunda, 48-timmars svarstid.",
+    ctaTitle: "Intresserad?",
+    ctaText: "For hela sponsringsdossien eller for att diskutera hur ditt varumarke passar inom The Pavilion, kontakta oss direkt.",
+    ctaButton: "Kontakta oss",
+    ctaEmail: "christian@thegatekeepers.club",
+    ctaPhone: "+33 7 73 77 90 71",
+    perSponsor: "per sponsor",
+    eur: "EUR",
+    switchLang: "NL",
+    backToEvent: "Tillbaka till eventet",
+    jointVenture: "Ett samarbete",
+  },
+  nl: {
+    presents: "The Gatekeepers Club presenteert",
+    subtitle: "Monaco Grand Prix 2026",
+    dateLine: "5 - 7 juni 2026 . Monaco",
+    sponsorship: "Sponsoring",
+    headline: "Word partner van The Pavilion",
+    intro: "The Pavilion brengt ondernemers, atleten en culturele figuren samen voor drie dagen op de VIP-terrassen uitkijkend over het Monaco Grand Prix circuit. Een sponsoring plaatst uw merk in het middelpunt van deze ervaring.",
+    whyTitle: "Waarom The Pavilion",
+    why: [
+      "VIP-terrassen direct op het Monaco GP circuit",
+      "Drie dagen: training, kwalificatie en racedag",
+      "Geselecteerd gezelschap: atleten, ondernemers, media en culturele figuren",
+      "Gourmet canapebuffet en champagnebar de hele dag",
+      "Professionele contentcreatie gedurende drie dagen",
+      "Internationaal publiek uit de VS, Commonwealth en Europa",
+      "Eerste editie met voorrangsrecht op toekomstige evenementen",
+    ],
+    terraceTitle: "Terraspakketten",
+    terraceSub: "Merkactivaties en productplaatsingen op de VIP-terrassen. Drie dagen op het Monaco Grand Prix circuit, voor een geselecteerd publiek.",
+    terracePlacement: "Brons",
+    terraceActivation: "Zilver",
+    terracePresentation: "Goud",
+    terraceTag1: "Beschikbaar",
+    terraceTag2: "Beschikbaar",
+    terraceTag3: "Beschikbaar",
+    terracePlacementItems: [
+      "Merklogo op terrasnaambordjes tijdens het volledige weekend",
+      "Product- of literatuurvertoon bij het welkomstgebied",
+      "Merkvermeldingen in communicatie voor en tijdens het evenement",
+      "1 gastenpass (zaterdag en zondag)",
+    ],
+    terraceActivationItems: [
+      "Dedicated activatietafel of displayzone op het terras",
+      "Productpresentatie of proeverij voor alle gasten",
+      "Merkelement in foto- en videocoverage",
+      "Social media feature op TGC- en Pavilion-kanalen",
+      "3 gastenpassen (volledig weekend)",
+    ],
+    terracePresentationItems: [
+      "Dedicated 15-minuten productpresentatieslot voor alle terrasgangers",
+      "Volledig gemerkt terras voor uw sessie",
+      "Professioneel gefilmde en gemonteerde presentatie",
+      "4 gastenpassen (volledig weekend)",
+      "Redactionele feature na het evenement in The Concierge Chronicles",
+      "Volledig mediapakket geleverd binnen 10 dagen",
+    ],
+    tiersTitle: "Sponsorpakketten",
+    exclusive: "Exclusief",
+    exclusiveTag: "1 beschikbaar",
+    exclusivePrice: "",
+    exclusiveItems: [],
+    exclusiveNote: "Als het Exclusieve niveau wordt getekend, vervallen alle andere niveaus.",
+    platinum: "Platina",
+    platinumTag: "1 beschikbaar",
+    platinumPrice: "175,000",
+    platinumItems: [],
+    gold: "Goud",
+    goldTag: "1 beschikbaar",
+    goldPrice: "125,000",
+    goldItems: [],
+    bronze: "Terraspartner",
+    bronzeTag: "2 beschikbaar",
+    bronzePrice: "50,000",
+    bronzeItems: [],
+    eveningTitle: "Privatediner",
+    eveningIntro: "Zilver- en Goud-sponsors hebben de optie van een privatediner op de vrijdag- of zaterdagavond, georganiseerd in een geselecteerd restaurant nabij het circuit. Tafel voor maximaal 12 personen. Ontspannen, geen speeches, geen formaliteit.",
+    eveningFri: "Vrijdag 5 juni",
+    eveningSat: "Zaterdag 6 juni",
+    eveningFriDesc: "Diner na de training. Een rustigere, intiemere avond voor eerste gesprekken.",
+    eveningSatDesc: "Diner na de kwalificatie. De meest gevraagde avond van het weekend.",
+    mediaTitle: "Media & Content",
+    mediaIntro: "De primaire mediawaarde is post-evenement. Wij leggen content professioneel vast tijdens het weekend en leveren een redactioneel pakket dat uw team kan gebruiken.",
+    mediaPreEvent: "Voor het evenement",
+    mediaDuring: "Tijdens het evenement",
+    mediaPostEvent: "Na het evenement (hoofdlevering)",
+    mediaPlatLabel: "Platina",
+    mediaGoldLabel: "Goud",
+    mediaBronzeLabel: "Brons / Terras",
+    mediaPlatPre: "Sponsoraankondiging + 2 nieuwsbriefvermeldingen",
+    mediaGoldPre: "1 nieuwsbriefvermelding bij aankondiging",
+    mediaBronzePre: "Nieuwsbriefvermelding bij aankondiging",
+    mediaPlatDuring: "Professionele foto en video gedurende drie dagen. Mediabooth voor podcasts, live-sessies en interviews.",
+    mediaGoldDuring: "Professionele foto het hele weekend. Mediabooth voor interviews en live-momenten.",
+    mediaBronzeDuring: "Opgenomen in eventfotografie. Mediabooth-toegang voor een sessie.",
+    mediaPlatPost: "3 redactionele recap-posts, Chronicles-feature, 50+ fotos + gemonteerde video, mediabooth-sessie gepubliceerd binnen 10 dagen, ROI-samenvatting.",
+    mediaGoldPost: "2 recap-posts, Chronicles-vermelding, 25+ fotos binnen 10 dagen.",
+    mediaBronzePost: "Opgenomen in recap-content, Chronicles-vermelding, gecureerde fotoselectie binnen 14 dagen.",
+    mediaNote: "Alle content wordt goedgekeurd door uw team voor publicatie. Een goedkeuringsronde, 48-uur responstijd.",
+    ctaTitle: "Geinteresseerd?",
+    ctaText: "Voor het volledige sponsordossier of om te bespreken hoe uw merk past binnen The Pavilion, neem direct contact met ons op.",
+    ctaButton: "Neem contact op",
+    ctaEmail: "christian@thegatekeepers.club",
+    ctaPhone: "+33 7 73 77 90 71",
+    perSponsor: "per sponsor",
+    eur: "EUR",
+    switchLang: "EN",
+    backToEvent: "Terug naar het evenement",
+    jointVenture: "Een samenwerking",
   },
 };
 
@@ -289,7 +487,8 @@ export default function SponsorshipPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const lang: Lang = searchParams.get("lang") === "fr" ? "fr" : "en";
+  const langParam = searchParams.get("lang") as Lang | null;
+  const lang: Lang = (["en", "fr", "sv", "nl"] as const).includes(langParam as Lang) ? langParam as Lang : "en";
   const t = T[lang];
 
   const [heroImage, setHeroImage] = useState<string | null>(null);
@@ -325,11 +524,9 @@ export default function SponsorshipPage() {
     }).catch(() => {});
   }, [slug, lang]);
 
-  function switchLang() {
-    const newLang = lang === "en" ? "fr" : "en";
+  function setLang(l: Lang) {
     const p = new URLSearchParams(searchParams.toString());
-    if (newLang === "en") p.delete("lang");
-    else p.set("lang", newLang);
+    if (l === "en") p.delete("lang"); else p.set("lang", l);
     const qs = p.toString();
     router.push(`/event/${slug}/sponsorship${qs ? `?${qs}` : ""}`);
   }
@@ -337,12 +534,17 @@ export default function SponsorshipPage() {
   return (
     <div className="min-h-screen bg-pearl">
       {/* Language Switcher */}
-      <button
-        onClick={switchLang}
-        className="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-sm border border-green/20 rounded-full px-3 py-1.5 text-xs font-body font-medium text-green hover:bg-white transition-colors shadow-sm"
-      >
-        {t.switchLang}
-      </button>
+      <div className="fixed top-4 right-4 z-50 flex bg-white/90 backdrop-blur-sm border border-green/20 rounded-full shadow-sm overflow-hidden">
+        {(["en", "fr", "sv", "nl"] as const).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className={`px-3 py-1.5 text-xs font-body font-medium transition-colors ${lang === l ? "bg-green text-white" : "text-green hover:bg-green/5"}`}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[380px] flex items-end">
@@ -499,124 +701,6 @@ export default function SponsorshipPage() {
         </div>
       </section>
 
-      {/* Full Event Sponsorship Tiers */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
-        <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
-          {t.tiersTitle}
-        </p>
-
-        {/* Exclusive - Full Width */}
-        <div
-          className={`border-2 ${TIER_COLORS.exclusive.border} rounded-lg p-6 sm:p-8 mb-6 ${TIER_COLORS.exclusive.bg}`}
-        >
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <h3 className="text-xl font-heading font-semibold text-green">
-              {t.exclusive}
-            </h3>
-            <span
-              className={`text-[10px] tracking-[1px] uppercase font-body px-2 py-0.5 rounded-full ${TIER_COLORS.exclusive.badge}`}
-            >
-              {t.exclusiveTag}
-            </span>
-          </div>
-          <ul className="mt-4 space-y-2">
-            {t.exclusiveItems.map((item, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 text-sm text-gray-600 font-body"
-              >
-                <span className="text-gold mt-0.5">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-xs text-gray-500 font-body italic">
-            {t.exclusiveNote}
-          </p>
-          <button
-            onClick={() => setSelectedTier(t.exclusive)}
-            className="mt-4 w-full sm:w-auto bg-gold text-white py-2.5 px-6 rounded-md text-xs font-body tracking-wide hover:bg-gold/90 transition-colors"
-          >
-            {lang === "fr" ? "Nous contacter" : "Enquire"}
-          </button>
-        </div>
-
-        {/* Platinum / Gold / Bronze - Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {(["platinum", "gold", "bronze"] as const).map((tier) => {
-            const tierT = t as Record<string, unknown>;
-            const colors = TIER_COLORS[tier];
-            const items = tierT[`${tier}Items`] as string[];
-            return (
-              <div
-                key={tier}
-                className={`border ${colors.border} rounded-lg p-5 ${colors.bg} flex flex-col`}
-              >
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <h3 className="text-lg font-heading font-semibold text-green">
-                    {tierT[tier] as string}
-                  </h3>
-                  <span
-                    className={`text-[9px] tracking-[1px] uppercase font-body px-2 py-0.5 rounded-full ${colors.badge}`}
-                  >
-                    {tierT[`${tier}Tag`] as string}
-                  </span>
-                </div>
-                <p className="text-xl font-heading font-semibold text-green mb-1">
-                  {t.eur} {tierT[`${tier}Price`] as string}
-                </p>
-                {tier === "bronze" && (
-                  <p className="text-xs text-gray-500 font-body mb-2">
-                    {t.perSponsor}
-                  </p>
-                )}
-                <ul className="mt-3 space-y-2">
-                  {items.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2 text-xs text-gray-600 font-body"
-                    >
-                      <span className="text-gold mt-0.5 shrink-0">
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => setSelectedTier(tierT[tier] as string)}
-                  className="mt-4 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors"
-                >
-                  {lang === "fr" ? "Nous contacter" : "Enquire"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Private Dinner */}
       <section className="bg-green">
         <div className="max-w-5xl mx-auto px-6 py-14">
@@ -697,6 +781,21 @@ export default function SponsorshipPage() {
         </p>
       </section>
 
+      {/* Download */}
+      <section className="max-w-3xl mx-auto px-6 pt-12 pb-4 text-center">
+        <a
+          href="https://vxmrvnmtauqqqjikhjbh.supabase.co/storage/v1/object/public/project-documents/7593a2ec-c2c2-4813-ba12-9f0372d37780/The_Pavilion_Sponsorship_2026.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 border border-green/20 rounded-md text-sm font-body text-green hover:bg-green/5 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          {lang === "fr" ? "Telecharger le dossier de sponsoring (PDF)" : "Download Sponsorship Pack (PDF)"}
+        </a>
+      </section>
+
       {/* CTA */}
       <section className="max-w-3xl mx-auto px-6 py-16 text-center">
         <p className="text-[10px] tracking-[3px] text-gold uppercase font-body mb-4">
@@ -718,7 +817,7 @@ export default function SponsorshipPage() {
         <SponsorshipLeadModal
           tierName={selectedTier}
           eventSlug={slug}
-          lang={lang}
+          lang={lang === "fr" ? "fr" : "en"}
           onClose={() => setSelectedTier(null)}
           onSuccess={() => {
             setSelectedTier(null);
