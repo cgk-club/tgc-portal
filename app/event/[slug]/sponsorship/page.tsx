@@ -139,6 +139,13 @@ const T = {
     switchLang: "FR",
     backToEvent: "Back to event",
     jointVenture: "A joint venture",
+    enquire: "Enquire",
+    tableNote: "Table for 12 max · Restaurant near the circuit",
+    downloadPDF: "Download Sponsorship Pack (PDF)",
+    thankYou: "Thank you",
+    thankYouMsg: "We have received your enquiry and will be in touch shortly with full details.",
+    close: "Close",
+    sponsorTitle: "Sponsorship — The Pavilion",
   },
   fr: {
     presents: "The Gatekeepers Club presente",
@@ -272,6 +279,13 @@ const T = {
     switchLang: "SV",
     backToEvent: "Retour a l'evenement",
     jointVenture: "Une co-production",
+    enquire: "Nous contacter",
+    tableNote: "Table de 12 personnes max · Restaurant pres du circuit",
+    downloadPDF: "Telecharger le dossier de sponsoring (PDF)",
+    thankYou: "Merci",
+    thankYouMsg: "Nous avons bien recu votre demande et reviendrons vers vous dans les plus brefs delais.",
+    close: "Fermer",
+    sponsorTitle: "Sponsoring — The Pavilion",
   },
   sv: {
     presents: "The Gatekeepers Club presenterar",
@@ -323,20 +337,49 @@ const T = {
     exclusive: "Exklusiv",
     exclusiveTag: "1 tillganglig",
     exclusivePrice: "",
-    exclusiveItems: [],
+    exclusiveItems: [
+      "Fullt varumarkesagande av The Pavilion Monaco 2026",
+      "Namngivningsratt: \"The Pavilion by [Varumarke]\"",
+      "Total branding pa terrasser och alla evenemangsmaterial",
+      "Dedikerad varumarkesaktiverings-zon pa terrassen",
+      "15-20 gastpass (hela helgen)",
+      "Innehallsagande: all eventfoto och video",
+      "Forsta alternativ pa alla framtida Pavilion-upplagor",
+    ],
     exclusiveNote: "Om Exklusiv-nivan tecknas, annulleras alla andra navaer.",
     platinum: "Platina",
     platinumTag: "1 tillganglig",
     platinumPrice: "175,000",
-    platinumItems: [],
+    platinumItems: [
+      "Primaar varumarkesbranding pa all terrass-skyltning och digitalt",
+      "Brandad valkoms-yta vid terrass-entren",
+      "10 gastpass (hela helgen)",
+      "Dedikerat produktpresentationsslot eller aktivering (lordag)",
+      "Valkoms-tal eller animerat ogonblick vid vald session",
+      "Primaarlogga pa The Pavilion-broschyren",
+      "Full sociala medie-bevakning och taggat innehall",
+      "Prioriterade introduktioner till alla deltagare",
+    ],
     gold: "Guld",
     goldTag: "1 tillganglig",
     goldPrice: "125,000",
-    goldItems: [],
+    goldItems: [
+      "Sekundar varumarkesbranding pa terrass-skyltning och digitalt",
+      "Logga pa broschyr (andra placering)",
+      "Sociala medie-namnanden och taggat innehall",
+      "5 gastpass (hela helgen)",
+      "Varumarkesinnehall vid en dagsession",
+    ],
     bronze: "Terrass Partner",
     bronzeTag: "2 tillgangliga",
     bronzePrice: "50,000",
-    bronzeItems: [],
+    bronzeItems: [
+      "Brandad aktiverings-zon pa terrassen under hela helgen",
+      "Produktvisning eller provning under alla tre dagar",
+      "Logga pa broschyr och digital kommunikation",
+      "3 gastpass (hela helgen)",
+      "Sociala medie-bevakning och taggat innehall",
+    ],
     eveningTitle: "Privat middag",
     eveningIntro: "Silver- och Guld-sponsorer har mojlighet till en privat middag pa fredags- eller lordagskvallen, pa en kuraterad restaurang nara banan. Max 12 personer. Avslappnat, inga tal, ingen formalia.",
     eveningFri: "Fredag 5 juni",
@@ -371,6 +414,13 @@ const T = {
     switchLang: "NL",
     backToEvent: "Tillbaka till eventet",
     jointVenture: "Ett samarbete",
+    enquire: "Forfragan",
+    tableNote: "Max 12 personer · Restaurang nara banan",
+    downloadPDF: "Ladda ned sponsringspaket (PDF)",
+    thankYou: "Tack",
+    thankYouMsg: "Vi har mottagit din forfragan och aterkomme snart med fullstandig information.",
+    close: "Stang",
+    sponsorTitle: "Sponsring — The Pavilion",
   },
   nl: {
     presents: "The Gatekeepers Club presenteert",
@@ -422,20 +472,49 @@ const T = {
     exclusive: "Exclusief",
     exclusiveTag: "1 beschikbaar",
     exclusivePrice: "",
-    exclusiveItems: [],
+    exclusiveItems: [
+      "Volledig merkeigendom van The Pavilion Monaco 2026",
+      "Naamgevingsrechten: \"The Pavilion by [Merk]\"",
+      "Totale branding op terrassen en alle evenementmaterialen",
+      "Dedicated merkactivatiezone op de terrassen",
+      "15-20 gastenpassen (volledig weekend)",
+      "Contenteigendom: alle eventfotografie en video",
+      "Voorrangsrecht op alle toekomstige Pavilion-edities",
+    ],
     exclusiveNote: "Als het Exclusieve niveau wordt getekend, vervallen alle andere niveaus.",
     platinum: "Platina",
     platinumTag: "1 beschikbaar",
     platinumPrice: "175,000",
-    platinumItems: [],
+    platinumItems: [
+      "Primaire merkbranding op alle terrasnaambordjes en digitaal",
+      "Gemerkt welkomstgebied bij terrasingang",
+      "10 gastenpassen (volledig weekend)",
+      "Dedicated productpresentatieslot of activatie (zaterdag)",
+      "Welkomsttoespraak of geanimeerd moment bij gekozen sessie",
+      "Primair logo op The Pavilion brochure",
+      "Volledige social media coverage en getagde content",
+      "Prioriteitsintroducties aan alle aanwezigen",
+    ],
     gold: "Goud",
     goldTag: "1 beschikbaar",
     goldPrice: "125,000",
-    goldItems: [],
+    goldItems: [
+      "Secundaire merkbranding op terrasnaambordjes en digitaal",
+      "Logo op brochure (tweede plaatsing)",
+      "Social media vermeldingen en getagde content",
+      "5 gastenpassen (volledig weekend)",
+      "Merkelement bij een dagsessie",
+    ],
     bronze: "Terraspartner",
     bronzeTag: "2 beschikbaar",
     bronzePrice: "50,000",
-    bronzeItems: [],
+    bronzeItems: [
+      "Gemerkte activatiezone op het terras voor het volledige weekend",
+      "Productdisplay of proeverij gedurende alle drie dagen",
+      "Logo op brochure en digitale communicaties",
+      "3 gastenpassen (volledig weekend)",
+      "Social media coverage en getagde content",
+    ],
     eveningTitle: "Privatediner",
     eveningIntro: "Zilver- en Goud-sponsors hebben de optie van een privatediner op de vrijdag- of zaterdagavond, georganiseerd in een geselecteerd restaurant nabij het circuit. Tafel voor maximaal 12 personen. Ontspannen, geen speeches, geen formaliteit.",
     eveningFri: "Vrijdag 5 juni",
@@ -470,6 +549,13 @@ const T = {
     switchLang: "EN",
     backToEvent: "Terug naar het evenement",
     jointVenture: "Een samenwerking",
+    enquire: "Informeren",
+    tableNote: "Tafel voor 12 max · Restaurant nabij het circuit",
+    downloadPDF: "Download sponsorpakket (PDF)",
+    thankYou: "Dank u",
+    thankYouMsg: "Wij hebben uw aanvraag ontvangen en nemen spoedig contact op met volledige informatie.",
+    close: "Sluiten",
+    sponsorTitle: "Sponsoring — The Pavilion",
   },
 };
 
@@ -559,7 +645,7 @@ export default function SponsorshipPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 pb-10 w-full">
           <a
-            href={`/event/${slug}${lang === "fr" ? "?lang=fr" : ""}`}
+            href={`/event/${slug}${lang !== "en" ? `?lang=${lang}` : ""}`}
             className="inline-block text-white/60 hover:text-white text-xs font-body mb-4 transition-colors"
           >
             &larr; {t.backToEvent}
@@ -644,7 +730,7 @@ export default function SponsorshipPage() {
                 ))}
               </ul>
               <button onClick={() => setSelectedTier(t.terracePlacement)} className="mt-5 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors">
-                {lang === "fr" ? "Nous contacter" : "Enquire"}
+                {t.enquire}
               </button>
             </div>
 
@@ -669,7 +755,7 @@ export default function SponsorshipPage() {
                 ))}
               </ul>
               <button onClick={() => setSelectedTier(t.terraceActivation)} className="mt-5 w-full bg-gold text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-gold/90 transition-colors">
-                {lang === "fr" ? "Nous contacter" : "Enquire"}
+                {t.enquire}
               </button>
             </div>
 
@@ -694,7 +780,7 @@ export default function SponsorshipPage() {
                 ))}
               </ul>
               <button onClick={() => setSelectedTier(t.terracePresentation)} className="mt-5 w-full bg-green text-white py-2.5 rounded-md text-xs font-body tracking-wide hover:bg-green-light transition-colors">
-                {lang === "fr" ? "Nous contacter" : "Enquire"}
+                {t.enquire}
               </button>
             </div>
           </div>
@@ -726,7 +812,7 @@ export default function SponsorshipPage() {
                   {ev.desc}
                 </p>
                 <p className="text-xs text-white/50 font-body">
-                  {lang === "fr" ? "Table de 12 personnes max · Restaurant pres du circuit" : "Table for 12 max · Restaurant near the circuit"}
+                  {t.tableNote}
                 </p>
               </div>
             ))}
@@ -792,7 +878,7 @@ export default function SponsorshipPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
           </svg>
-          {lang === "fr" ? "Telecharger le dossier de sponsoring (PDF)" : "Download Sponsorship Pack (PDF)"}
+          {t.downloadPDF}
         </a>
       </section>
 
@@ -805,7 +891,7 @@ export default function SponsorshipPage() {
           {t.ctaText}
         </p>
         <button
-          onClick={() => setSelectedTier(lang === "fr" ? "Sponsoring — The Pavilion" : "Sponsorship — The Pavilion")}
+          onClick={() => setSelectedTier(t.sponsorTitle)}
           className="inline-flex items-center gap-2 px-6 py-3 bg-green text-white rounded font-body text-sm hover:bg-green/90 transition-colors"
         >
           {t.ctaButton}
@@ -817,7 +903,7 @@ export default function SponsorshipPage() {
         <SponsorshipLeadModal
           tierName={selectedTier}
           eventSlug={slug}
-          lang={lang === "fr" ? "fr" : "en"}
+          lang={lang}
           onClose={() => setSelectedTier(null)}
           onSuccess={() => {
             setSelectedTier(null);
@@ -840,18 +926,16 @@ export default function SponsorshipPage() {
               </svg>
             </div>
             <h3 className="text-lg font-heading font-semibold text-green mb-2">
-              {lang === "fr" ? "Merci" : "Thank you"}
+              {t.thankYou}
             </h3>
             <p className="text-sm text-gray-600 font-body mb-6">
-              {lang === "fr"
-                ? "Nous avons bien recu votre demande et reviendrons vers vous dans les plus brefs delais."
-                : "We have received your enquiry and will be in touch shortly with full details."}
+              {t.thankYouMsg}
             </p>
             <button
               onClick={() => setShowSuccess(false)}
               className="text-xs text-gray-400 font-body hover:text-gray-600"
             >
-              {lang === "fr" ? "Fermer" : "Close"}
+              {t.close}
             </button>
           </div>
         </div>

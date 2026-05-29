@@ -5,7 +5,7 @@ import { useState } from "react";
 interface SponsorshipLeadModalProps {
   tierName: string;
   eventSlug: string;
-  lang?: "en" | "fr";
+  lang?: "en" | "fr" | "sv" | "nl";
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -26,39 +26,53 @@ export default function SponsorshipLeadModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const t = lang === "fr" ? {
-    enquire: "Demande de renseignements",
-    firstName: "Prénom",
-    firstNamePh: "Prénom",
-    lastName: "Nom",
-    lastNamePh: "Nom de famille",
-    email: "Email",
-    phone: "Telephone (optionnel)",
-    company: "Entreprise",
-    companyPh: "Nom de votre entreprise",
-    messageLbl: "Message (optionnel)",
-    messagePh: "Dites-nous en plus sur votre interet...",
-    submit: "Envoyer",
-    submitting: "Envoi en cours...",
-    footnote: "Nous reviendrons vers vous dans les plus brefs delais avec tous les details.",
-    required: "Le prénom, le nom et l'email sont obligatoires.",
-  } : {
-    enquire: "Enquire",
-    firstName: "First Name",
-    firstNamePh: "First name",
-    lastName: "Last Name",
-    lastNamePh: "Last name",
-    email: "Email",
-    phone: "Phone (optional)",
-    company: "Company",
-    companyPh: "Your company name",
-    messageLbl: "Message (optional)",
-    messagePh: "Tell us more about your interest...",
-    submit: "Submit Enquiry",
-    submitting: "Submitting...",
-    footnote: "We will be in touch shortly with the full sponsorship deck and next steps.",
-    required: "First name, last name and email are required.",
+  const MODAL_T = {
+    en: {
+      enquire: "Enquire",
+      firstName: "First Name", firstNamePh: "First name",
+      lastName: "Last Name", lastNamePh: "Last name",
+      email: "Email", phone: "Phone (optional)",
+      company: "Company", companyPh: "Your company name",
+      messageLbl: "Message (optional)", messagePh: "Tell us more about your interest...",
+      submit: "Submit Enquiry", submitting: "Submitting...",
+      footnote: "We will be in touch shortly with the full sponsorship deck and next steps.",
+      required: "First name, last name and email are required.",
+    },
+    fr: {
+      enquire: "Demande de renseignements",
+      firstName: "Prenom", firstNamePh: "Prenom",
+      lastName: "Nom", lastNamePh: "Nom de famille",
+      email: "Email", phone: "Telephone (optionnel)",
+      company: "Entreprise", companyPh: "Nom de votre entreprise",
+      messageLbl: "Message (optionnel)", messagePh: "Dites-nous en plus sur votre interet...",
+      submit: "Envoyer", submitting: "Envoi en cours...",
+      footnote: "Nous reviendrons vers vous dans les plus brefs delais avec tous les details.",
+      required: "Le prenom, le nom et l'email sont obligatoires.",
+    },
+    sv: {
+      enquire: "Forfragan",
+      firstName: "Fornamn", firstNamePh: "Fornamn",
+      lastName: "Efternamn", lastNamePh: "Efternamn",
+      email: "E-post", phone: "Telefon (valfritt)",
+      company: "Foretag", companyPh: "Ditt foretagsnamn",
+      messageLbl: "Meddelande (valfritt)", messagePh: "Beraetta mer om ditt intresse...",
+      submit: "Skicka forfragan", submitting: "Skickar...",
+      footnote: "Vi aterkomme snart med hela sponsringspaketet och nasta steg.",
+      required: "Fornamn, efternamn och e-post ar obligatoriska.",
+    },
+    nl: {
+      enquire: "Informeren",
+      firstName: "Voornaam", firstNamePh: "Voornaam",
+      lastName: "Achternaam", lastNamePh: "Achternaam",
+      email: "E-mail", phone: "Telefoon (optioneel)",
+      company: "Bedrijf", companyPh: "Uw bedrijfsnaam",
+      messageLbl: "Bericht (optioneel)", messagePh: "Vertel ons meer over uw interesse...",
+      submit: "Verstuur aanvraag", submitting: "Versturen...",
+      footnote: "Wij nemen spoedig contact op met het volledige sponsorpakket en de volgende stappen.",
+      required: "Voornaam, achternaam en e-mail zijn verplicht.",
+    },
   };
+  const t = MODAL_T[lang ?? "en"];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
