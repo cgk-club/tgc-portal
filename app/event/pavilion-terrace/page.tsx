@@ -71,6 +71,8 @@ const T = {
     thankYouMsg: "We have received your interest and will be in touch shortly.",
     alsoOnYacht: "Also on the yacht",
     yachtLink: "View yacht packages",
+    bookByCard: "Book by Card",
+    bankTransfer: "Bank Transfer",
   },
   fr: {
     presents: "The Gatekeepers Club presente",
@@ -114,6 +116,8 @@ const T = {
     thankYouMsg: "Nous avons bien recu votre demande et reviendrons vers vous dans les plus brefs delais.",
     alsoOnYacht: "Egalement sur le yacht",
     yachtLink: "Voir les formules yacht",
+    bookByCard: "Reserver par carte",
+    bankTransfer: "Virement bancaire",
   },
   sv: {
     presents: "The Gatekeepers Club presenterar",
@@ -157,6 +161,8 @@ const T = {
     thankYouMsg: "Vi har mottagit din forfragan och aterkomme snart.",
     alsoOnYacht: "",
     yachtLink: "",
+    bookByCard: "Betala med kort",
+    bankTransfer: "Bankoverföring",
   },
   nl: {
     presents: "The Gatekeepers Club presenteert",
@@ -200,6 +206,8 @@ const T = {
     thankYouMsg: "Wij hebben uw interesse ontvangen en nemen spoedig contact op.",
     alsoOnYacht: "",
     yachtLink: "",
+    bookByCard: "Betalen per kaart",
+    bankTransfer: "Bankoverschrijving",
   },
 };
 
@@ -224,6 +232,27 @@ const PROG_NL = [
   { day: "Zaterdag 6 juni", title: "Kwalificatie", items: ["Terrassen openen 10:00", "12:30 Vrije training 3", "16:00 Kwalificatie (Q1, Q2, Q3)", "Canapebuffet, open champagnebar en de drukste sociale sessie van het weekend"] },
   { day: "Zondag 7 juni", title: "Racedag", items: ["Terrassen openen 09:30", "13:00 F1 rijdersparade", "14:44 Volkslied en opbouw", "15:00 Monaco Grand Prix, 78 ronden", "Champagnebar open tijdens de race", "Terrassen sluiten na het podium"] },
 ];
+
+const PKG_T: Record<string, Partial<Record<Exclude<Lang, "en">, { name: string; description: string }>>> = {
+  "a35b160a-1b56-4c4f-b823-4936a3086906": {
+    fr: { name: "Journee individuelle — Terrasse VIP", description: "Acces Terrasse VIP pour une journee de votre choix. Buffet gastronomique de canapes et bar a champagne ouvert toute la journee. Choisissez Essais libres, Qualifications ou Jour de course." },
+    sv: { name: "Enstaka dag — VIP-terrass", description: "VIP-terrass-tillgang for en dag efter eget val. Gourmet-canapebuffe och oppet champagnebar under dagen. Valj Trainingsdag, Kval eller Tavlingsdag." },
+    nl: { name: "Enkele dag — VIP-terras", description: "VIP-terrastoegang voor een dag naar keuze. Gourmet canapebuffet en open champagnebar de hele dag. Kies Training, Kwalificatie of Racedag." },
+  },
+  "c3cc1b10-7b7a-44b8-bce7-9d1379c4f89f": {
+    fr: { name: "Formule weekend — Terrasse VIP", description: "Acces Terrasse VIP Silver sur le circuit du Grand Prix de Monaco. Petit-dejeuner, dejeuner et bar a champagne ouvert toute la journee. Deux formules disponibles. Journees individuelles sur demande." },
+    sv: { name: "Helgpaket — VIP-terrass", description: "Silver VIP-terrass-tillgang pa Monaco Grand Prix-banan. Frukost, lunch och oppet champagnebar hela dagen. Tva paket tillgangliga. Enstaka dagar pa forfragan." },
+    nl: { name: "Weekendpakket — VIP-terras", description: "Silver VIP-terrastoegang op het Monaco Grand Prix circuit. Ontbijt, lunch en open champagnebar de hele dag. Twee pakketten beschikbaar. Losse dagen op aanvraag." },
+  },
+};
+
+const PRICE_LABELS: Record<string, Partial<Record<Lang, string>>> = {
+  "Friday — Practice Day": { fr: "Vendredi — Essais libres", sv: "Fredag — Trainingsdag", nl: "Vrijdag — Training" },
+  "Saturday — Qualifying": { fr: "Samedi — Qualifications", sv: "Lordag — Kval", nl: "Zaterdag — Kwalificatie" },
+  "Sunday — Race Day": { fr: "Dimanche — Jour de course", sv: "Sondag — Tavlingsdag", nl: "Zondag — Racedag" },
+  "Sat + Sun": { fr: "Sam + Dim", sv: "Lor + Son", nl: "Zat + Zon" },
+  "Fri + Sat + Sun": { fr: "Ven + Sam + Dim", sv: "Fre + Lor + Son", nl: "Vrij + Zat + Zon" },
+};
 
 function formatPrice(price: number, currency: string) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(price);
@@ -388,14 +417,16 @@ function PavilionTerraceContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {packages.map((pkg) => {
                 const services: string[] = (() => { try { return JSON.parse(pkg.included_services); } catch { return []; } })();
-                const isCombination = pkg.name.includes("Combination") || pkg.name.includes("Combinaison");
+                const isCombination = pkg.id === "c3cc1b10-7b7a-44b8-bce7-9d1379c4f89f";
+                const pkgName = lang === "en" ? pkg.name : (PKG_T[pkg.id]?.[lang as Exclude<Lang, "en">]?.name ?? pkg.name);
+                const pkgDesc = lang === "en" ? pkg.description : (PKG_T[pkg.id]?.[lang as Exclude<Lang, "en">]?.description ?? pkg.description);
 
                 return (
                   <div key={pkg.id} className="border border-green/10 bg-pearl rounded-lg p-6 flex flex-col">
                     <p className="text-[9px] tracking-[2px] text-green/40 uppercase font-body mb-2">
                       {isCombination ? t.tailored : t.alaCarte}
                     </p>
-                    <h3 className="text-sm font-heading font-semibold text-green mb-1">{pkg.name}</h3>
+                    <h3 className="text-sm font-heading font-semibold text-green mb-1">{pkgName}</h3>
                     <p className="text-lg font-heading font-semibold text-green mb-1">
                       {isCombination
                         ? t.tailored
@@ -403,7 +434,7 @@ function PavilionTerraceContent() {
                           ? `${t.from} ${formatPrice(pkg.price, pkg.currency)} ${t.perPerson}`
                           : t.onApplication}
                     </p>
-                    <p className="text-xs text-gray-500 font-body mb-4">{pkg.description}</p>
+                    <p className="text-xs text-gray-500 font-body mb-4">{pkgDesc}</p>
 
                     {services.length > 0 && (
                       <ul className="space-y-1.5 mb-4 flex-1">
@@ -425,28 +456,31 @@ function PavilionTerraceContent() {
 
                     {pkg.price_options && pkg.price_options.length > 0 ? (
                       <div className="mt-auto space-y-2">
-                        {pkg.price_options.map((opt) => (
+                        {pkg.price_options.map((opt) => {
+                          const optLabel = PRICE_LABELS[opt.label]?.[lang] ?? opt.label;
+                          return (
                           <div key={opt.label} className="flex items-center justify-between gap-2 py-2 border-t border-green/5 first:border-0 first:pt-0">
                             <div>
-                              <p className="text-[10px] text-gray-400 font-body">{opt.label}</p>
+                              <p className="text-[10px] text-gray-400 font-body">{optLabel}</p>
                               <p className="text-sm font-heading font-semibold text-gold">€{opt.eur.toLocaleString("fr-FR")}</p>
                             </div>
                             {opt.stripe_link ? (
                               <a href={opt.stripe_link} target="_blank" rel="noopener noreferrer"
                                 className="px-3 py-1.5 bg-gold text-white text-[10px] font-body rounded-md hover:bg-[#b89a3f] transition-colors whitespace-nowrap">
-                                Book by Card
+                                {t.bookByCard}
                               </a>
                             ) : (
-                              <button onClick={() => setSelectedPackage(`${pkg.name} — ${opt.label}`)}
+                              <button onClick={() => setSelectedPackage(`${pkgName} — ${optLabel}`)}
                                 className="px-3 py-1.5 bg-green text-white text-[10px] font-body rounded-md hover:bg-green-light transition-colors whitespace-nowrap">
                                 {t.enquire}
                               </button>
                             )}
                           </div>
-                        ))}
-                        <button onClick={() => setSelectedPackage(pkg.name)}
+                          );
+                        })}
+                        <button onClick={() => setSelectedPackage(pkgName)}
                           className="w-full border border-green/20 text-green py-2 rounded-md text-[10px] font-body tracking-wide hover:bg-green/5 transition-colors mt-1">
-                          {t.enquire} / Bank Transfer
+                          {t.enquire} / {t.bankTransfer}
                         </button>
                       </div>
                     ) : (
