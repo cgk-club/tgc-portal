@@ -50,7 +50,7 @@ const T = {
     threedays: "Three Days in Monaco",
     packages: "Packages",
     chooseTitle: "Choose your package",
-    chooseSub: "Saturday & Sunday, or the full three-day weekend. Single days on request.",
+    chooseSub: "Individual days or package combinations. Friday from €700, Saturday €1,750, Sunday €3,500.",
     gallery: "In the Terraces",
     galleryTitle: "What to expect",
     alaCarte: "A la carte",
@@ -93,7 +93,7 @@ const T = {
     threedays: "Trois jours a Monaco",
     packages: "Formules",
     chooseTitle: "Choisissez votre formule",
-    chooseSub: "Samedi et dimanche, ou le week-end complet. Journees a la carte sur demande.",
+    chooseSub: "Journees individuelles ou formules combinées. Vendredi a partir de €700, Samedi €1 750, Dimanche €3 500.",
     gallery: "Sur les Terrasses",
     galleryTitle: "A quoi s'attendre",
     alaCarte: "A la carte",
@@ -136,7 +136,7 @@ const T = {
     threedays: "Tre dagar i Monaco",
     packages: "Paket",
     chooseTitle: "Valj ditt paket",
-    chooseSub: "Lordag och sondag, eller hela helgen. Enstaka dagar pa forfragan.",
+    chooseSub: "Enstaka dagar eller paketkombinaioner. Fredag fran €700, Lordag €1 750, Sondag €3 500.",
     gallery: "Pa terrassen",
     galleryTitle: "Vad du kan forvanta dig",
     alaCarte: "A la carte",
@@ -179,7 +179,7 @@ const T = {
     threedays: "Drie dagen in Monaco",
     packages: "Pakketten",
     chooseTitle: "Kies uw pakket",
-    chooseSub: "Zaterdag en zondag, of het volledige weekend. Losse dagen op aanvraag.",
+    chooseSub: "Losse dagen of pakketcombinaties. Vrijdag vanaf €700, Zaterdag €1.750, Zondag €3.500.",
     gallery: "Op de terrassen",
     galleryTitle: "Wat u kunt verwachten",
     alaCarte: "A la carte",
@@ -461,10 +461,6 @@ function PavilionTerraceContent() {
             </div>
           )}
 
-          {/* Single day note */}
-          <p className="mt-8 text-center text-xs text-gray-400 font-body">
-            Single day passes available on request — contact us to discuss.
-          </p>
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 
 const TERRACE_IDS = [
+  "a35b160a-1b56-4c4f-b823-4936a3086906", // Single Day — VIP Terrace
   "c3cc1b10-7b7a-44b8-bce7-9d1379c4f89f", // Weekend Package — VIP Terrace
 ];
 
