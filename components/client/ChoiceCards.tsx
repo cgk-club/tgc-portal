@@ -154,11 +154,6 @@ export default function ChoiceCards({ group, itineraryId, shareToken, onSelect }
         <div className="flex items-center gap-2 mb-1">
           <div className="w-1 h-5 bg-gold rounded-full" />
           <h3 className="font-heading text-base font-semibold text-green">{group.title}</h3>
-          {group.status === "decided" && (
-            <span className="text-[10px] font-body font-medium bg-green/10 text-green px-2 py-0.5 rounded-full">
-              Decided
-            </span>
-          )}
         </div>
         {group.description && (
           <p className="text-xs font-body text-gray-600 ml-3">{group.description}</p>
