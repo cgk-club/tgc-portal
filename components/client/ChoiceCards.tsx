@@ -127,8 +127,10 @@ export default function ChoiceCards({ group, itineraryId, shareToken, onSelect }
   const [selecting, setSelecting] = useState(false);
   const options = group.options || [];
   const hasSelection = options.some((o) => o.is_selected);
-  // Once a choice is made, only show the selected option on the client view
-  const visibleOptions = group.status === "decided" ? options.filter((o) => o.is_selected) : options;
+  const visibleOptions = options;
+
+  // Once decided, hide the choice group entirely — outcome is reflected in the itinerary days
+  if (group.status === "decided") return null;
 
   async function handleSelect(optionId: string) {
     setSelecting(true);
