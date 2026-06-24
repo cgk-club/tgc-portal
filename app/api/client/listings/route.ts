@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       seller_raw_input: body.seller_raw_input || null,
       category_fields: body.category_fields || body,
       seller_type: "private",
+      seller_id: session.clientId,
       seller_display_name: clientName,
       status: "draft",
     })

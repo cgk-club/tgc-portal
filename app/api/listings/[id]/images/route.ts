@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { requireAdminAuth } from "@/lib/auth";
+import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
+import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Upload images to a listing. Accepts multipart form data with "files" field.
  * Stores in Supabase storage, updates listing with URLs.
- * No auth required beyond knowing the listing ID (just created by the caller).
+ * Caller must be an admin, the owning partner, or the owning client (seller).
  */
 export async function POST(
   request: NextRequest,
@@ -15,15 +18,41 @@ export async function POST(
   const { id } = await params;
   const sb = getSupabaseAdmin();
 
-  // Verify listing exists
+  // Fetch listing with its ownership columns.
   const { data: listing, error: fetchErr } = await sb
     .from("listings")
-    .select("id, hero_image_url, gallery_image_urls")
+    .select("id, hero_image_url, gallery_image_urls, partner_account_id, seller_id")
     .eq("id", id)
     .single();
 
   if (fetchErr || !listing) {
     return NextResponse.json({ error: "Listing not found" }, { status: 404 });
+  }
+
+  // Authorize. Previously this route had NO auth, so anyone who knew a listing
+  // UUID could overwrite its hero/gallery images. Allow an admin (manages all
+  // listings), the owning partner, or the owning client.
+  let authorized = (await requireAdminAuth(request)) === null;
+  if (!authorized) {
+    const partnerToken = request.cookies.get(PARTNER_COOKIE_NAME)?.value;
+    if (partnerToken) {
+      const ps = await verifyPartnerSession(partnerToken);
+      if (ps && listing.partner_account_id && listing.partner_account_id === ps.partnerId) {
+        authorized = true;
+      }
+    }
+  }
+  if (!authorized) {
+    const clientToken = request.cookies.get(CLIENT_COOKIE_NAME)?.value;
+    if (clientToken) {
+      const cs = await verifyClientSession(clientToken);
+      if (cs && listing.seller_id && listing.seller_id === cs.clientId) {
+        authorized = true;
+      }
+    }
+  }
+  if (!authorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const formData = await request.formData();
