@@ -27,6 +27,16 @@ export async function GET(
 
     if (!itinerary) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    // Verify the payment item belongs to this itinerary before listing its docs.
+    const { data: paymentItem } = await supabase
+      .from("payment_items")
+      .select("id")
+      .eq("id", paymentId)
+      .eq("itinerary_id", id)
+      .single();
+
+    if (!paymentItem) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
     const { data, error } = await supabase
       .from("payment_documents")
       .select("id, payment_item_id, title, file_url, file_type, document_category, requires_signature, signature_status, created_at")
@@ -63,6 +73,16 @@ export async function POST(
       .single();
 
     if (!itinerary) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Verify the payment item belongs to this itinerary before attaching a doc.
+    const { data: paymentItem } = await supabase
+      .from("payment_items")
+      .select("id")
+      .eq("id", paymentId)
+      .eq("itinerary_id", id)
+      .single();
+
+    if (!paymentItem) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const formData = await request.formData();
     const file = formData.get("file") as File;

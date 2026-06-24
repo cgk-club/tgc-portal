@@ -14,7 +14,7 @@ export async function POST(
     const session = await verifyClientSession(token);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, docId } = await params;
+    const { id, paymentId, docId } = await params;
     const supabase = getSupabaseAdmin();
 
     // Verify client owns this itinerary
@@ -27,11 +27,23 @@ export async function POST(
 
     if (!itinerary) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Verify document exists and requires signature
+    // Verify the payment item belongs to this itinerary (so docId/paymentId from
+    // another client's itinerary can't be signed via this owned itinerary id).
+    const { data: paymentItem } = await supabase
+      .from("payment_items")
+      .select("id")
+      .eq("id", paymentId)
+      .eq("itinerary_id", id)
+      .single();
+
+    if (!paymentItem) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Verify document exists, belongs to that payment item, and requires signature
     const { data: doc } = await supabase
       .from("payment_documents")
       .select("id, requires_signature, signature_status")
       .eq("id", docId)
+      .eq("payment_item_id", paymentId)
       .single();
 
     if (!doc) return NextResponse.json({ error: "Document not found" }, { status: 404 });
