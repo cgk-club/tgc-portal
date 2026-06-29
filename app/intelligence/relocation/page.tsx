@@ -272,6 +272,17 @@ export default function RelocationPage() {
   if (screen === 'welcome') return shell(
     <>
       <p className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '1.5rem' }}>Relocation & Family Office Intelligence</p>
+      <a href="/intelligence/relocation/scouting" style={{ textDecoration: 'none', display: 'block', marginBottom: '2.5rem' }}>
+        <div style={{ background: '#0e4f51', borderRadius: '10px', padding: '1.4rem 1.6rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+          <div>
+            <p className="tgc-mono" style={{ color: '#c8aa4a', marginBottom: '0.45rem' }}>Planning a scouting trip?</p>
+            <p className="tgc-sans" style={{ color: '#fff', fontSize: '0.98rem', lineHeight: 1.5, margin: 0, fontWeight: 300 }}>
+              Start with our Scouting Intelligence. Tell us how you want to live, and we return a tailored plan with three places worth discovering.
+            </p>
+          </div>
+          <span className="tgc-serif" style={{ color: '#c8aa4a', fontSize: '1.6rem', flexShrink: 0 }}>→</span>
+        </div>
+      </a>
       <h1 className="tgc-serif" style={{ fontWeight: 400, fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', lineHeight: 1.05, letterSpacing: '-0.01em', marginBottom: '2rem', maxWidth: '700px' }}>
         Domestic infrastructure,<br />built properly.
       </h1>

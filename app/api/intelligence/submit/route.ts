@@ -9,7 +9,7 @@ const ADMIN_EMAIL = 'jeeves@thegatekeepers.club'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { type, submittedAt, corridor, market, brief, client } = body
+    const { type, submittedAt, corridor, market, brief, client, summary } = body
 
     if (!type || !client?.email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -25,6 +25,8 @@ export async function POST(request: NextRequest) {
     // Build notification email body
     let subject = ''
     let htmlBody = ''
+    // Optional per-type override for the client confirmation email.
+    let clientConfirmation: { subject: string; html: string } | null = null
 
     if (type === 'transport') {
       subject = `Intelligence brief: Transport — ${corridor?.name || 'Unknown corridor'}`
@@ -278,6 +280,56 @@ export async function POST(request: NextRequest) {
         </table>
         ${client?.message ? `<p style="font-family: Arial, sans-serif;"><strong>Notes:</strong> ${client.message}</p>` : ''}
       `
+    } else if (type === 'relocation-scouting') {
+      subject = `Scouting Intelligence: ${client?.name || 'Enquiry'} · France, beyond Paris`
+      const sections: { chapter: string; rows: { q: string; a: string }[] }[] = Array.isArray(summary) ? summary : []
+      const sectionsHtml = sections.map(s => `
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a; margin: 22px 0 6px;">${s.chapter}</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse; width: 100%;">
+          ${s.rows.map(r => `<tr>
+            <td style="padding: 5px 14px 5px 0; color: #888; vertical-align: top; width: 42%;">${r.q}</td>
+            <td style="padding: 5px 0; color: #1a1815;">${r.a}</td>
+          </tr>`).join('')}
+        </table>
+      `).join('')
+      htmlBody = `
+        <h2 style="font-family: Georgia, serif; color: #1a1815;">New Relocation Scouting Brief</h2>
+        <p style="font-family: Arial, sans-serif; color: #444;"><strong>Submitted:</strong> ${submittedDate}</p>
+        <p style="font-family: Arial, sans-serif; color: #444;">Lifestyle intake for a France second base (Part 1). Action: research and return a tailored response plus a Scouting Dossier within 48 hours.</p>
+        ${sectionsHtml || '<p style="font-family: Arial, sans-serif; color:#888;">No answers captured.</p>'}
+        <h3 style="font-family: Georgia, serif; color: #5a4a2a; margin: 22px 0 6px;">Client</h3>
+        <table style="font-family: Arial, sans-serif; font-size: 14px; border-collapse: collapse;">
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Name</td><td>${client?.name || '-'}</td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Email</td><td><a href="mailto:${client?.email}">${client?.email}</a></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; color: #888;">Phone</td><td>${client?.phone || '-'}</td></tr>
+        </table>
+        ${client?.message ? `<p style="font-family: Arial, sans-serif;"><strong>Anything else:</strong> ${client.message}</p>` : ''}
+      `
+      const firstName = (client?.name || '').split(' ')[0] || 'there'
+      clientConfirmation = {
+        subject: 'We have your scouting brief',
+        html: `
+          <div style="max-width: 560px; margin: 0 auto; padding: 40px 24px; background: #f5f1ea; font-family: Georgia, serif;">
+            <p style="font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #8b6f3e;">The Gatekeepers Club</p>
+            <h2 style="font-weight: 400; font-size: 28px; line-height: 1.25; color: #1a1815; margin: 16px 0;">
+              Thank you, ${firstName}.
+            </h2>
+            <p style="font-size: 16px; color: #6b645a; line-height: 1.65;">
+              We have everything we need to start, and our team is already looking at it.
+            </p>
+            <p style="font-size: 16px; color: #6b645a; line-height: 1.65;">
+              Within 48 hours you will receive a considered response and a tailored Scouting Dossier, with three places worth weighing against Paris, so the decision of where to settle is yours to make.
+            </p>
+            <p style="font-size: 14px; color: #6b645a; margin-top: 28px; line-height: 1.65;">
+              If anything comes to mind in the meantime, simply reply to this note.
+            </p>
+            <hr style="border: none; border-top: 1px solid #d8d0c0; margin: 32px 0;" />
+            <p style="font-size: 14px; color: #6b645a; margin: 0;">Christian de Jabrun</p>
+            <p style="font-size: 13px; color: #8b8378; margin: 2px 0 0;">Founder, The Gatekeepers Club</p>
+            <p style="font-size: 12px; color: #aaa; font-family: Arial, sans-serif; margin-top: 8px;">thegatekeepers.club</p>
+          </div>
+        `,
+      }
     } else {
       subject = `Intelligence brief: ${type} — ${client?.name || 'Enquiry'}`
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`
@@ -304,8 +356,8 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: `The Gatekeepers Club <${FROM_EMAIL}>`,
         to: client.email,
-        subject: 'Your brief has been received',
-        html: `
+        subject: clientConfirmation?.subject || 'Your brief has been received',
+        html: clientConfirmation?.html || `
           <div style="max-width: 560px; margin: 0 auto; padding: 40px 24px; background: #f5f1ea; font-family: Georgia, serif;">
             <p style="font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #8b6f3e;">The Gatekeepers Club</p>
             <h2 style="font-weight: 400; font-size: 28px; line-height: 1.2; color: #1a1815; margin: 16px 0;">
@@ -359,6 +411,35 @@ export async function POST(request: NextRequest) {
         })
       } catch (airtableErr) {
         console.error('Airtable CRM sync failed (non-blocking):', airtableErr)
+      }
+    }
+
+    // Relocation Scouting -> CGK CRM relocation-lead pipe (first-class, non-blocking)
+    if (type === 'relocation-scouting' && process.env.RELOCATION_INTAKE_SECRET) {
+      try {
+        const sections: { chapter: string; rows: { q: string; a: string }[] }[] =
+          Array.isArray(summary) ? summary : []
+        const flat = sections
+          .map(s => `${s.chapter}\n` + s.rows.map(r => `  ${r.q}: ${r.a}`).join('\n'))
+          .join('\n\n')
+        const budgetRow = sections.flatMap(s => s.rows)
+          .find(r => /budget|running cost|monthly/i.test(r.q))
+        await fetch('https://kpzfplkoqqebgpxntrnt.supabase.co/functions/v1/relocation-intake', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-intake-secret': process.env.RELOCATION_INTAKE_SECRET,
+          },
+          body: JSON.stringify({
+            client,
+            summary: flat || null,
+            destination: 'France (second base vs Paris)',
+            budget: budgetRow?.a || null,
+            brief_ref: `scouting-${submittedAt || ''}`,
+          }),
+        })
+      } catch (relocErr) {
+        console.error('Relocation CRM pipe failed (non-blocking):', relocErr)
       }
     }
 
