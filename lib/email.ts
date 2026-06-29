@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import type { CreateEmailOptions } from 'resend'
 
 let _resend: Resend
 
@@ -11,11 +12,30 @@ function getResend(): Resend {
 
 const FROM_EMAIL = process.env.FROM_EMAIL || 'jeeves@thegatekeepers.club'
 
+/**
+ * Wrapper around Resend's send. The Resend SDK does NOT throw on API-level
+ * errors (unverified domain, blocked recipient, rate limit, etc.) — it resolves
+ * with { data: null, error }. Callers that only used try/catch would treat a
+ * rejected send as success. This surfaces those failures so routes can report
+ * them, and logs the message id on success for delivery tracing.
+ */
+async function sendEmail(opts: CreateEmailOptions): Promise<string> {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is not set — email cannot be sent')
+  }
+  const { data, error } = await getResend().emails.send(opts)
+  if (error) {
+    throw new Error(`Resend rejected email to ${String(opts.to)}: ${error.name} — ${error.message}`)
+  }
+  console.log(`Resend accepted email to ${String(opts.to)} (id: ${data?.id})`)
+  return data?.id ?? ''
+}
+
 export async function sendMagicLink(to: string, name: string, token: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'
   const link = `${appUrl}/client/auth/${token}`
 
-  await getResend().emails.send({
+  await sendEmail({
     from: `The Gatekeepers Club <${FROM_EMAIL}>`,
     to,
     subject: 'Your TGC portal access',
@@ -37,7 +57,7 @@ export async function sendPartnerMagicLink(to: string, name: string, token: stri
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'
   const link = `${appUrl}/partner/auth/${token}`
 
-  await getResend().emails.send({
+  await sendEmail({
     from: `The Gatekeepers Club <${FROM_EMAIL}>`,
     to,
     subject: 'Your TGC partner portal access',
@@ -92,7 +112,7 @@ export async function sendEventEnquiryNotification(data: Record<string, unknown>
   const textBody = lines.join('\n')
   const htmlBody = lines.map(l => l ? `<p style="color: #333; font-size: 14px; line-height: 1.6; margin: 4px 0;">${l}</p>` : '<br />').join('')
 
-  await getResend().emails.send({
+  await sendEmail({
     from: `TGC Events <${FROM_EMAIL}>`,
     to: 'christian@thegatekeepers.club',
     subject: `Event Enquiry: ${data.event_name || 'New enquiry'} - ${data.name}`,
@@ -125,7 +145,7 @@ export async function sendClientRequestNotification(data: Record<string, unknown
   const textBody = lines.join('\n')
   const htmlBody = lines.map(l => l ? `<p style="color: #333; font-size: 14px; line-height: 1.6; margin: 4px 0;">${l}</p>` : '<br />').join('')
 
-  await getResend().emails.send({
+  await sendEmail({
     from: `TGC Portal <${FROM_EMAIL}>`,
     to: 'christian@thegatekeepers.club',
     subject: `Client Request: ${data.request_type || 'General'} - ${data.name}`,
@@ -157,7 +177,7 @@ export async function sendFicheEditSubmittedNotification(data: {
   const textBody = lines.join('\n')
   const htmlBody = lines.map(l => l ? `<p style="color: #333; font-size: 14px; line-height: 1.6; margin: 4px 0;">${l}</p>` : '<br />').join('')
 
-  await getResend().emails.send({
+  await sendEmail({
     from: `TGC Portal <${FROM_EMAIL}>`,
     to: 'christian@thegatekeepers.club',
     subject: `Fiche edit submitted: ${data.ficheHeadline || data.ficheSlug} (${data.partnerName})`,
@@ -172,7 +192,7 @@ export async function sendFicheEditSubmittedNotification(data: {
 }
 
 export async function sendOutreachEmail(to: string, subject: string, body: string) {
-  await getResend().emails.send({
+  await sendEmail({
     from: `Christian de Jabrun <${FROM_EMAIL}>`,
     to,
     subject,
