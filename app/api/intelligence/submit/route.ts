@@ -4,7 +4,23 @@ import { Resend } from 'resend'
 export const dynamic = 'force-dynamic'
 
 const FROM_EMAIL = process.env.FROM_EMAIL || 'jeeves@thegatekeepers.club'
-const ADMIN_EMAIL = 'jeeves@thegatekeepers.club'
+// Notifications go to christian@ (a monitored inbox). NOT jeeves@: a Resend
+// send from jeeves@ to jeeves@ is treated as self-mail by Gmail and never
+// surfaces in the inbox, so those notifications were effectively invisible.
+const ADMIN_EMAIL = 'christian@thegatekeepers.club'
+
+// Maps an Intelligence tool `type` to a Pipeline "Interest Areas" option.
+const INTEREST_AREA: Record<string, string> = {
+  transport: 'Travel',
+  realestate: 'Property',
+  wellness: 'Lifestyle',
+  'events-production': 'Dining & Events',
+  'vip-hospitality': 'Dining & Events',
+  'art-collectables': 'Lifestyle',
+  'household-staffing': 'Staffing',
+  relocation: 'Relocation',
+  'relocation-scouting': 'Relocation',
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -335,24 +351,75 @@ export async function POST(request: NextRequest) {
       htmlBody = `<pre style="font-family: monospace;">${JSON.stringify(body, null, 2)}</pre>`
     }
 
-    // Send notification to admin
-    await resend.emails.send({
-      from: `The Gatekeepers Club <${FROM_EMAIL}>`,
-      to: ADMIN_EMAIL,
-      subject,
-      html: `
-        <div style="max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #f5f1ea;">
-          ${htmlBody}
-          <hr style="border: none; border-top: 1px solid #d8d0c0; margin: 32px 0;" />
-          <p style="font-family: Arial, sans-serif; font-size: 12px; color: #999;">
-            Submitted via TGC Intelligence Suite — ${type} tool
-          </p>
-        </div>
-      `,
-    })
+    // ── Capture: a submission MUST land in at least one durable place. ──
+    let captured = false
+    const today = new Date().toISOString().split('T')[0]
 
-    // Send confirmation to the client (if email provided and not a test)
+    // 1. Pipeline — the actionable lead board in Airtable. typecast:true so an
+    //    unexpected option value can never silently 422 the whole write.
+    if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
+      try {
+        const notes = [
+          `Source: TGC Intelligence Suite (${type})`,
+          client?.email ? `Email: ${client.email}` : '',
+          client?.phone ? `Phone: ${client.phone}` : '',
+          '',
+          summary && typeof summary === 'object' ? JSON.stringify(summary, null, 2) : '',
+          JSON.stringify({ corridor, market, brief }, null, 2),
+        ].filter(Boolean).join('\n').slice(0, 95000)
+        const res = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Pipeline`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            typecast: true,
+            records: [{
+              fields: {
+                'Lead Name': client?.name || client?.email || 'Intelligence enquiry',
+                'Interest Areas': [INTEREST_AREA[type] || 'Other'],
+                'Form Type': 'Inquiry',
+                'Status': 'New Lead',
+                'Priority': 'Medium',
+                'Source': 'Intelligence Suite',
+                'Preferred Contact': client?.communication_pref === 'whatsapp' ? 'WhatsApp'
+                  : client?.communication_pref === 'phone' ? 'Phone' : 'Email',
+                'Created Date': today,
+                'Notes': notes,
+              },
+            }],
+          }),
+        })
+        if (res.ok) captured = true
+        else console.error('Pipeline write failed:', res.status, await res.text())
+      } catch (airtableErr) {
+        console.error('Pipeline write threw:', airtableErr)
+      }
+    }
+
+    // 2. Notification email to the admin inbox (checked, never swallowed).
+    try {
+      const { error: adminErr } = await resend.emails.send({
+        from: `The Gatekeepers Club <${FROM_EMAIL}>`,
+        to: ADMIN_EMAIL,
+        subject,
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #f5f1ea;">
+            ${htmlBody}
+            <hr style="border: none; border-top: 1px solid #d8d0c0; margin: 32px 0;" />
+            <p style="font-family: Arial, sans-serif; font-size: 12px; color: #999;">
+              Submitted via TGC Intelligence Suite, ${type} tool
+            </p>
+          </div>
+        `,
+      })
+      if (adminErr) console.error('Admin notification email error:', adminErr)
+      else captured = true
+    } catch (adminThrew) {
+      console.error('Admin notification email threw:', adminThrew)
+    }
+
+    // 3. Confirmation to the client (best effort, never blocks capture)
     if (client?.email && !client.email.includes('test')) {
+      try {
       await resend.emails.send({
         from: `The Gatekeepers Club <${FROM_EMAIL}>`,
         to: client.email,
@@ -377,41 +444,7 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       })
-    }
-
-    // Airtable CRM sync — log as Interaction (non-blocking)
-    if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
-      const today = new Date().toISOString().split('T')[0]
-      const summary = `Intelligence brief: ${type} — ${client?.name || 'Unknown'} (${client?.email || ''})`
-      try {
-        await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Interactions`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            records: [{
-              fields: {
-                Summary: summary,
-                Date: today,
-                Subject: subject,
-                Notes: JSON.stringify(body, null, 2),
-                Type: ['Note'],
-                Direction: 'Inbound',
-                Channel: ['Portal'],
-                Purpose: 'Service Request',
-                Status: 'Pending Response',
-                'Created By': 'System',
-                'Follow-up Required': true,
-                Sentiment: 'Neutral',
-              },
-            }],
-          }),
-        })
-      } catch (airtableErr) {
-        console.error('Airtable CRM sync failed (non-blocking):', airtableErr)
-      }
+      } catch (clientErr) { console.error('Client confirmation email threw:', clientErr) }
     }
 
     // Relocation Scouting -> CGK CRM relocation-lead pipe (first-class, non-blocking)
@@ -443,6 +476,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (!captured) {
+      console.error('Intelligence submission captured NOWHERE:', type, client?.email, JSON.stringify(body).slice(0, 500))
+      return NextResponse.json(
+        { error: 'We could not record your submission. Please email christian@thegatekeepers.club and we will pick it up right away.' },
+        { status: 500 },
+      )
+    }
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('Intelligence submit error:', err)
