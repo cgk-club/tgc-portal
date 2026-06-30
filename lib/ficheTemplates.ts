@@ -10,6 +10,7 @@ export type FicheTemplate =
   | 'events_sport'
   | 'arts_culture'
   | 'personal_services'
+  | 'design_studio'
   | 'default'
 
 export const TEMPLATE_LABELS: Record<FicheTemplate, string> = {
@@ -24,6 +25,7 @@ export const TEMPLATE_LABELS: Record<FicheTemplate, string> = {
   events_sport: 'Events & Sport',
   arts_culture: 'Arts & Culture',
   personal_services: 'Personal Services',
+  design_studio: 'Architecture & Design',
   default: 'Default',
 }
 
@@ -120,6 +122,15 @@ export const CATEGORY_TEMPLATE_MAP: Record<string, FicheTemplate> = {
   'Accompaniment Services': 'personal_services',
   'Private Guide Services': 'personal_services',
   'Translation & Interpretation': 'personal_services',
+
+  // ARCHITECTURE & DESIGN template — design studios and practices
+  // "Design Studios" = multidisciplinary (architecture + interiors + landscape).
+  // The single-discipline values below share the same template; the studio_mode
+  // toggle in template_fields drives the multi vs single-discipline layout.
+  'Design Studios': 'design_studio',
+  'Architecture': 'design_studio',
+  'Interior Design': 'design_studio',
+  'Landscape Design': 'design_studio',
 }
 
 export function getTemplate(categorySub?: string): FicheTemplate {
@@ -299,4 +310,21 @@ export interface PersonalServicesFields {
   experience_years?: string
   group_size?: string
   equipment_provided?: string
+}
+
+export interface DesignStudioFields {
+  // 'multi' = full multidisciplinary studio (expands to showcase every discipline)
+  // 'single' = single-discipline studio (focused layout on one discipline)
+  studio_mode?: 'multi' | 'single'
+  disciplines?: string          // multi mode: one discipline per line, e.g. "Architecture\nInterior Design\nLandscape"
+  primary_discipline?: string   // single mode: the one discipline, e.g. "Interior Design"
+  established?: number
+  principals?: string           // e.g. "Lindsay Mattinson, Rene Mattinson"
+  project_types?: string        // e.g. "Private residences, hospitality, yachts"
+  works_in?: string             // e.g. "France, United Kingdom, Switzerland"
+  signature_projects?: string   // one per line, "Project name — Location"
+  approach?: string             // short statement of the studio's approach / philosophy
+  engagement?: string           // how a member commissions the studio via TGC
+  pull_quote?: string
+  pull_quote_attribution?: string
 }

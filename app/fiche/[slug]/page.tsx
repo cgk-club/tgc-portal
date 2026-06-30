@@ -21,6 +21,7 @@ import WellnessFiche from '@/components/fiche/templates/WellnessFiche'
 import EventsSportFiche from '@/components/fiche/templates/EventsSportFiche'
 import ArtsCultureFiche from '@/components/fiche/templates/ArtsCultureFiche'
 import PersonalServicesFiche from '@/components/fiche/templates/PersonalServicesFiche'
+import DesignStudioFiche from '@/components/fiche/templates/DesignStudioFiche'
 import ClientMakerFiche from './ClientMakerFiche'
 import FicheBackButton from './FicheBackButton'
 
@@ -112,7 +113,8 @@ export default async function FichePage({ params, searchParams }: PageProps) {
       {templateType === 'events_sport' && <EventsSportFiche {...commonProps} />}
       {templateType === 'arts_culture' && <ArtsCultureFiche {...commonProps} />}
       {templateType === 'personal_services' && <PersonalServicesFiche {...commonProps} />}
-      {(templateType === 'default' || !['hospitality', 'real_estate', 'dining', 'maker', 'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture', 'personal_services'].includes(templateType)) && (
+      {templateType === 'design_studio' && <DesignStudioFiche {...commonProps} />}
+      {(templateType === 'default' || !['hospitality', 'real_estate', 'dining', 'maker', 'experience', 'transport', 'wine_estate', 'wellness', 'events_sport', 'arts_culture', 'personal_services', 'design_studio'].includes(templateType)) && (
         <DefaultFiche {...commonProps} />
       )}
 
