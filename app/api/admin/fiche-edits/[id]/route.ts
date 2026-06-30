@@ -61,6 +61,30 @@ export async function PATCH(
       }
     }
 
+    // Publish on approval: approving a partner's submission for a still-draft fiche
+    // is the go-live decision, so promote draft -> live here. Respect the same
+    // minimum 4-gallery-image guard the fiche editor enforces, so we never push a
+    // sparse fiche live. Only draft fiches are touched (live/archived are left as-is).
+    let published = false
+    if (editReq.fiche_id) {
+      const { data: current } = await sb
+        .from('fiches')
+        .select('status, gallery_urls')
+        .eq('id', editReq.fiche_id)
+        .single()
+      if (current && current.status === 'draft') {
+        const galleryCount = Array.isArray(current.gallery_urls) ? current.gallery_urls.length : 0
+        if (galleryCount >= 4) {
+          const { error: publishError } = await sb
+            .from('fiches')
+            .update({ status: 'live', updated_at: new Date().toISOString() })
+            .eq('id', editReq.fiche_id)
+          if (!publishError) published = true
+          else if (!ficheUpdateError) ficheUpdateError = publishError.message
+        }
+      }
+    }
+
     // Always mark the edit request as approved, even if fiche update had issues
     const { error: approveError } = await sb
       .from('fiche_edit_requests')
@@ -76,9 +100,17 @@ export async function PATCH(
     if (approveError) return NextResponse.json({ error: approveError.message }, { status: 500 })
 
     // Notify partner users about approval
-    notifyPartnerUsers(sb, editReq.partner_id, 'Fiche edit approved', 'Your fiche changes have been approved and applied.', '/partner/fiche')
+    notifyPartnerUsers(
+      sb,
+      editReq.partner_id,
+      published ? 'Fiche approved and published' : 'Fiche edit approved',
+      published
+        ? 'Your fiche has been approved and is now live.'
+        : 'Your fiche changes have been approved and applied.',
+      '/partner/fiche'
+    )
 
-    return NextResponse.json({ success: true, id, ficheUpdateError })
+    return NextResponse.json({ success: true, id, ficheUpdateError, published })
 
   } else if (body.action === 'reject') {
     const { error: rejectError } = await sb

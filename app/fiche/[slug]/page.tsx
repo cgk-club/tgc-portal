@@ -1,5 +1,10 @@
 export const dynamic = 'force-dynamic'
+// Force every fetch in this segment (incl. the Supabase status read) to bypass the
+// Next.js Data Cache. Without this, a just-published fiche can keep 404ing because the
+// server returns a stale 'draft' status read until the next redeploy.
+export const fetchCache = 'force-no-store'
 
+import { unstable_noStore as noStore } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getOrgById } from '@/lib/airtable'
@@ -25,6 +30,7 @@ interface PageProps {
 }
 
 export default async function FichePage({ params, searchParams }: PageProps) {
+  noStore()
   const { slug } = await params
   const { preview } = await searchParams
 
