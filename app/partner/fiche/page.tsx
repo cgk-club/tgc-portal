@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ImageUpload from "@/components/partner/ImageUpload";
 import { getGuidance } from "@/lib/ficheGuidance";
+import { DisciplineBlock } from "@/lib/ficheTemplates";
 
 interface HighlightItem {
   icon?: string;
@@ -23,7 +24,7 @@ interface Fiche {
   price_display: string | null;
   show_price: boolean;
   template_type: string;
-  template_fields: Record<string, string> | null;
+  template_fields: Record<string, unknown> | null;
   tgc_note: string | null;
   status: string;
   enrichment_score?: number;
@@ -59,7 +60,7 @@ export default function PartnerFichePage() {
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [priceDisplay, setPriceDisplay] = useState("");
   const [templateFields, setTemplateFields] = useState<
-    Record<string, string>
+    Record<string, unknown>
   >({});
 
   useEffect(() => {
@@ -144,6 +145,46 @@ export default function PartnerFichePage() {
 
   function updateTemplateField(key: string, value: string) {
     setTemplateFields({ ...templateFields, [key]: value });
+  }
+
+  // ── Design-studio disciplines (name + write-up + image carousel) ──
+  const disciplineBlocks: DisciplineBlock[] = Array.isArray(templateFields.discipline_blocks)
+    ? (templateFields.discipline_blocks as DisciplineBlock[])
+    : [];
+
+  function setDisciplineBlocks(next: DisciplineBlock[]) {
+    setTemplateFields({ ...templateFields, discipline_blocks: next });
+  }
+  function updateDiscipline(i: number, patch: Partial<DisciplineBlock>) {
+    setDisciplineBlocks(disciplineBlocks.map((b, idx) => (idx === i ? { ...b, ...patch } : b)));
+  }
+  function addDiscipline() {
+    setDisciplineBlocks([...disciplineBlocks, { name: "", blurb: "", images: [] }]);
+  }
+  function removeDiscipline(i: number) {
+    setDisciplineBlocks(disciplineBlocks.filter((_, idx) => idx !== i));
+  }
+  function removeDisciplineImage(i: number, j: number) {
+    updateDiscipline(i, { images: (disciplineBlocks[i].images || []).filter((_, idx) => idx !== j) });
+  }
+  async function handleDisciplineImageUpload(i: number, files: FileList) {
+    setUploading(true);
+    const newUrls: string[] = [];
+    for (const file of Array.from(files)) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/partner/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) newUrls.push(data.url);
+      }
+    }
+    setDisciplineBlocks(
+      disciplineBlocks.map((b, idx) =>
+        idx === i ? { ...b, images: [...(b.images || []), ...newUrls] } : b
+      )
+    );
+    setUploading(false);
   }
 
   async function handleSubmitForReview() {
@@ -591,8 +632,85 @@ export default function PartnerFichePage() {
                 </p>
               </div>
 
-              {/* Template-Specific Fields */}
-              {selectedFiche.template_fields &&
+              {/* Design Studio — per-discipline write-up + image carousel */}
+              {selectedFiche.template_type === "design_studio" && (
+                <div>
+                  <label className="block text-xs text-gray-500 font-body mb-1">
+                    Disciplines
+                  </label>
+                  <p className="text-[11px] text-gray-400 font-body mb-3 italic">
+                    Give each discipline its own write-up and a carousel of images.
+                  </p>
+                  <div className="space-y-4">
+                    {disciplineBlocks.map((b, i) => (
+                      <div key={i} className="rounded-md border border-green/15 p-3 space-y-3 bg-green/[0.02]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-medium text-gray-500">Discipline {i + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeDiscipline(i)}
+                            className="text-[11px] text-red-500 hover:text-red-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Discipline name, e.g. Interior Design"
+                          value={b.name || ""}
+                          onChange={(e) => updateDiscipline(i, { name: e.target.value })}
+                          className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                        />
+                        <textarea
+                          rows={3}
+                          placeholder="A short write-up about this discipline"
+                          value={b.blurb || ""}
+                          onChange={(e) => updateDiscipline(i, { blurb: e.target.value })}
+                          className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                        />
+                        {(b.images || []).length > 0 && (
+                          <div className="grid grid-cols-4 gap-2">
+                            {(b.images || []).map((url, j) => (
+                              <div key={j} className="relative group">
+                                <img src={url} alt="" className="w-full h-16 object-cover rounded-md" />
+                                <button
+                                  type="button"
+                                  onClick={() => removeDisciplineImage(i, j)}
+                                  className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center"
+                                  aria-label="Remove image"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <label className="inline-block cursor-pointer text-[12px] text-green hover:underline font-body">
+                          {uploading ? "Uploading..." : "+ Add images"}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={(e) => e.target.files && handleDisciplineImageUpload(i, e.target.files)}
+                          />
+                        </label>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addDiscipline}
+                      className="text-sm text-green hover:underline font-body"
+                    >
+                      + Add discipline
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Template-Specific Fields (generic, non-design-studio) */}
+              {selectedFiche.template_type !== "design_studio" &&
+                selectedFiche.template_fields &&
                 Object.keys(selectedFiche.template_fields).length > 0 && (
                   <div>
                     <label className="block text-xs text-gray-500 font-body mb-1">
@@ -602,23 +720,23 @@ export default function PartnerFichePage() {
                       These fields are specific to your category. The more you fill in, the richer your fiche presentation.
                     </p>
                     <div className="space-y-3">
-                      {Object.entries(
-                        selectedFiche.template_fields
-                      ).map(([key]) => (
-                        <div key={key}>
-                          <label className="block text-[11px] text-gray-400 font-body mb-0.5 capitalize">
-                            {key.replace(/_/g, " ")}
-                          </label>
-                          <input
-                            type="text"
-                            value={templateFields[key] || ""}
-                            onChange={(e) =>
-                              updateTemplateField(key, e.target.value)
-                            }
-                            className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
-                          />
-                        </div>
-                      ))}
+                      {Object.entries(selectedFiche.template_fields)
+                        .filter(([, v]) => typeof v !== "object")
+                        .map(([key]) => (
+                          <div key={key}>
+                            <label className="block text-[11px] text-gray-400 font-body mb-0.5 capitalize">
+                              {key.replace(/_/g, " ")}
+                            </label>
+                            <input
+                              type="text"
+                              value={typeof templateFields[key] === "string" ? (templateFields[key] as string) : ""}
+                              onChange={(e) =>
+                                updateTemplateField(key, e.target.value)
+                              }
+                              className="w-full rounded-md border border-green/20 px-3 py-2 text-sm text-gray-800 focus:border-green focus:outline-none focus:ring-1 focus:ring-green/30 font-body"
+                            />
+                          </div>
+                        ))}
                     </div>
                   </div>
                 )}

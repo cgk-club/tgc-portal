@@ -1,5 +1,6 @@
 import { Fiche, Highlight, AirtableOrg } from '@/types'
-import { DesignStudioFields } from '@/lib/ficheTemplates'
+import { DesignStudioFields, DisciplineBlock } from '@/lib/ficheTemplates'
+import DisciplineCarousel from '@/components/fiche/DisciplineCarousel'
 import FicheHero from '@/components/fiche/FicheHero'
 import FicheStatsRibbon from '@/components/fiche/FicheStatsRibbon'
 import FicheStatement from '@/components/fiche/FicheStatement'
@@ -46,16 +47,30 @@ export default function DesignStudioFiche({
   const tf = (fiche.template_fields || {}) as DesignStudioFields
   const mode = tf.studio_mode ?? 'multi'
 
-  const disciplineList = mode === 'multi' ? lines(tf.disciplines) : []
+  // Disciplines: prefer structured blocks (name + write-up + carousel),
+  // fall back to the legacy name-only lists for older fiches.
+  const blocks: DisciplineBlock[] =
+    Array.isArray(tf.discipline_blocks) && tf.discipline_blocks.length > 0
+      ? tf.discipline_blocks.filter((b) => b && b.name && b.name.trim())
+      : mode === 'single'
+        ? tf.primary_discipline
+          ? [{ name: tf.primary_discipline }]
+          : []
+        : lines(tf.disciplines).map((name) => ({ name }))
+
+  const richDisciplines = blocks.some(
+    (b) => (b.blurb && b.blurb.trim()) || (b.images && b.images.length > 0)
+  )
+
   const disciplineLabel =
-    mode === 'single' ? tf.primary_discipline || 'Design' : 'Architecture & Design'
+    mode === 'single' ? blocks[0]?.name || 'Design' : 'Architecture & Design'
 
   // ── Stats ribbon ──────────────────────────────────────────────
   const stats: { label: string; value: string }[] = []
-  if (mode === 'single' && tf.primary_discipline) {
-    stats.push({ label: 'Discipline', value: tf.primary_discipline })
-  } else if (disciplineList.length > 0) {
-    stats.push({ label: 'Disciplines', value: String(disciplineList.length) })
+  if (mode === 'single' && blocks[0]) {
+    stats.push({ label: 'Discipline', value: blocks[0].name })
+  } else if (blocks.length > 0) {
+    stats.push({ label: 'Disciplines', value: String(blocks.length) })
   }
   if (tf.established) stats.push({ label: 'Established', value: String(tf.established) })
   if (tf.project_types) stats.push({ label: 'Projects', value: tf.project_types })
@@ -116,8 +131,45 @@ export default function DesignStudioFiche({
         </ScrollReveal>
       )}
 
-      {/* 4. Disciplines (multi-discipline studios) */}
-      {mode === 'multi' && disciplineList.length > 0 && (
+      {/* 4. Disciplines */}
+      {richDisciplines ? (
+        <>
+          {mode === 'multi' && (
+            <ScrollReveal>
+              <section className="pt-14 md:pt-20 px-8 md:px-12 lg:px-16 bg-pearl">
+                <div className="max-w-5xl mx-auto text-center">
+                  <p className="text-[11px] font-body text-gold uppercase tracking-[0.2em] mb-3">
+                    Disciplines
+                  </p>
+                  {tf.principals && (
+                    <p className="text-sm font-body text-gray-500">Led by {tf.principals}</p>
+                  )}
+                </div>
+              </section>
+            </ScrollReveal>
+          )}
+          {blocks.map((b, i) => (
+            <ScrollReveal key={i}>
+              <section className={`py-12 md:py-16 px-8 md:px-12 lg:px-16 ${i % 2 === 0 ? 'bg-pearl' : 'bg-white'}`}>
+                <div className="max-w-5xl mx-auto">
+                  <p className="text-[11px] font-body text-gold uppercase tracking-[0.2em] mb-3">
+                    {mode === 'multi' ? `Discipline ${String(i + 1).padStart(2, '0')}` : 'Discipline'}
+                  </p>
+                  <h3 className="font-display text-3xl md:text-4xl text-green mb-4">{b.name}</h3>
+                  {b.blurb && b.blurb.trim() && (
+                    <p className="font-body text-gray-700 leading-relaxed max-w-2xl mb-8 whitespace-pre-line">
+                      {b.blurb}
+                    </p>
+                  )}
+                  {b.images && b.images.length > 0 && (
+                    <DisciplineCarousel images={b.images} name={b.name} />
+                  )}
+                </div>
+              </section>
+            </ScrollReveal>
+          ))}
+        </>
+      ) : mode === 'multi' && blocks.length > 0 ? (
         <ScrollReveal>
           <section className="py-14 md:py-16 px-8 md:px-12 lg:px-16 bg-pearl">
             <div className="max-w-4xl mx-auto text-center">
@@ -125,24 +177,19 @@ export default function DesignStudioFiche({
                 Disciplines
               </p>
               <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-5">
-                {disciplineList.map((d, i) => (
-                  <span
-                    key={i}
-                    className="font-display text-2xl md:text-3xl text-green"
-                  >
-                    {d}
+                {blocks.map((b, i) => (
+                  <span key={i} className="font-display text-2xl md:text-3xl text-green">
+                    {b.name}
                   </span>
                 ))}
               </div>
               {tf.principals && (
-                <p className="mt-10 text-sm font-body text-gray-500">
-                  Led by {tf.principals}
-                </p>
+                <p className="mt-10 text-sm font-body text-gray-500">Led by {tf.principals}</p>
               )}
             </div>
           </section>
         </ScrollReveal>
-      )}
+      ) : null}
 
       {/* 5. The Practice — paragraph 1 */}
       {splitParagraph1 && splitImage1 ? (

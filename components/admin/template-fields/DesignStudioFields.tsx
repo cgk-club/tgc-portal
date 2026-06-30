@@ -1,7 +1,8 @@
 'use client'
 
-import { DesignStudioFields } from '@/lib/ficheTemplates'
+import { DesignStudioFields, DisciplineBlock } from '@/lib/ficheTemplates'
 import Input from '@/components/ui/Input'
+import ImageUploader from '@/components/admin/ImageUploader'
 
 interface Props {
   fields: DesignStudioFields
@@ -17,6 +18,30 @@ export default function DesignStudioFieldsEditor({ fields, onChange }: Props) {
   }
 
   const mode = fields.studio_mode ?? 'multi'
+  const blocks: DisciplineBlock[] = Array.isArray(fields.discipline_blocks)
+    ? fields.discipline_blocks
+    : []
+
+  function setBlocks(next: DisciplineBlock[]) {
+    update('discipline_blocks', next)
+  }
+  function updateBlock(i: number, patch: Partial<DisciplineBlock>) {
+    setBlocks(blocks.map((b, idx) => (idx === i ? { ...b, ...patch } : b)))
+  }
+  function addBlock() {
+    setBlocks([...blocks, { name: '', blurb: '', images: [] }])
+  }
+  function removeBlock(i: number) {
+    setBlocks(blocks.filter((_, idx) => idx !== i))
+  }
+  function addBlockImage(i: number, url: string) {
+    updateBlock(i, { images: [...(blocks[i].images || []), url] })
+  }
+  function removeBlockImage(i: number, j: number) {
+    updateBlock(i, { images: (blocks[i].images || []).filter((_, idx) => idx !== j) })
+  }
+
+  const canAdd = mode === 'multi' || blocks.length === 0
 
   return (
     <div className="space-y-3">
@@ -32,26 +57,79 @@ export default function DesignStudioFieldsEditor({ fields, onChange }: Props) {
         </select>
       </div>
 
-      {mode === 'multi' ? (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Disciplines</label>
-          <textarea
-            rows={3}
-            placeholder={'One per line, e.g.\nArchitecture\nInterior Design\nLandscape Design'}
-            value={fields.disciplines ?? ''}
-            onChange={(e) => update('disciplines', e.target.value || undefined)}
-            className={textareaClass}
-          />
-          <p className="text-xs text-gray-400 mt-1">One discipline per line. Each gets its own showcase block.</p>
-        </div>
-      ) : (
-        <Input
-          label="Discipline"
-          placeholder="e.g. Interior Design"
-          value={fields.primary_discipline ?? ''}
-          onChange={(e) => update('primary_discipline', e.target.value || undefined)}
-        />
-      )}
+      {/* Disciplines: name + write-up + image carousel each */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-700">
+          {mode === 'multi' ? 'Disciplines' : 'Discipline'}
+        </label>
+        {blocks.length === 0 && (
+          <p className="text-xs text-gray-400">No disciplines yet. Add one to give it a write-up and image carousel.</p>
+        )}
+        {blocks.map((b, i) => (
+          <div key={i} className="rounded-[8px] border border-gray-200 p-3 space-y-3 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500">
+                {mode === 'multi' ? `Discipline ${i + 1}` : 'Discipline'}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeBlock(i)}
+                className="text-xs text-red-500 hover:text-red-700"
+              >
+                Remove
+              </button>
+            </div>
+            <Input
+              label="Name"
+              placeholder="e.g. Interior Design"
+              value={b.name ?? ''}
+              onChange={(e) => updateBlock(i, { name: e.target.value })}
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Write-up</label>
+              <textarea
+                rows={3}
+                placeholder="A short paragraph on this discipline"
+                value={b.blurb ?? ''}
+                onChange={(e) => updateBlock(i, { blurb: e.target.value })}
+                className={textareaClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Images ({(b.images || []).length})
+              </label>
+              {(b.images || []).length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  {(b.images || []).map((url, j) => (
+                    <div key={j} className="relative group">
+                      <img src={url} alt="" className="w-full h-16 object-cover rounded-[4px]" />
+                      <button
+                        type="button"
+                        onClick={() => removeBlockImage(i, j)}
+                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Remove image"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <ImageUploader label="Add image" currentUrl={null} onUpload={(url) => addBlockImage(i, url)} />
+            </div>
+          </div>
+        ))}
+        {canAdd && (
+          <button
+            type="button"
+            onClick={addBlock}
+            className="text-sm text-green hover:underline"
+          >
+            + Add {mode === 'multi' ? 'discipline' : 'the discipline'}
+          </button>
+        )}
+      </div>
 
       <Input
         label="Principals"

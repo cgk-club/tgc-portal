@@ -312,12 +312,20 @@ export interface PersonalServicesFields {
   equipment_provided?: string
 }
 
+// One discipline a studio offers: a name, a short write-up, and its own image carousel.
+export interface DisciplineBlock {
+  name: string
+  blurb?: string
+  images?: string[]
+}
+
 export interface DesignStudioFields {
   // 'multi' = full multidisciplinary studio (expands to showcase every discipline)
   // 'single' = single-discipline studio (focused layout on one discipline)
   studio_mode?: 'multi' | 'single'
-  disciplines?: string          // multi mode: one discipline per line, e.g. "Architecture\nInterior Design\nLandscape"
-  primary_discipline?: string   // single mode: the one discipline, e.g. "Interior Design"
+  discipline_blocks?: DisciplineBlock[]  // per-discipline write-up + image carousel (preferred)
+  disciplines?: string          // legacy fallback: one discipline name per line
+  primary_discipline?: string   // legacy fallback: single mode discipline name
   established?: number
   principals?: string           // e.g. "Lindsay Mattinson, Rene Mattinson"
   project_types?: string        // e.g. "Private residences, hospitality, yachts"
