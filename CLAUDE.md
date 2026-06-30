@@ -266,7 +266,8 @@ Public lead magnet: `intelligence.thegatekeepers.club` should CNAME to `portal.t
 - Approvals + requests badges refresh instantly (custom event dispatch)
 - Requests page has status workflow (new → contacted → quoted → confirmed → closed)
 - Resend domain verified for thegatekeepers.club
-- **Known Railway quirk:** Next.js server can cache a 404 for a fiche route even with `force-dynamic`. If a fiche 404s after publishing, redeploy to clear. `?preview=true` is the quick diagnostic (200 = DB fine, server cache issue).
+- **Fiche publish flow (fixed 30 Jun 2026):** Approving a partner's fiche edit (`/api/admin/fiche-edits/[id]` action:approve) now promotes a still-`draft` fiche to `live` automatically (respecting the ≥4 gallery-image guard). Previously approval applied content but left status `draft`, so the public `/fiche/[slug]` link 404'd while `?preview=true` worked. To publish a fiche outside that flow, use the editor (`PATCH /api/admin/fiches/[id]` `{status:'live'}`, also enforces ≥4 images).
+- **Stale-cache 404 (fixed 30 Jun 2026):** The fiche page used to read a stale `draft` status from the Next.js Data Cache after publishing, 404ing until the next redeploy. `app/fiche/[slug]/page.tsx` now sets `fetchCache = 'force-no-store'` + `noStore()`, so a publish reflects immediately. `?preview=true` returning 200 while the bare URL 404s is the diagnostic that the status gate (not the data) is the issue.
 - `.claude/` added to .gitignore — worktree files must never be committed
 
 ---
