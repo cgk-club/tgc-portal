@@ -107,9 +107,10 @@ export async function POST(
       .eq("prospect_email", emailLower)
       .single();
 
+    let dbError: { message?: string } | null = null;
     if (existingLead) {
       // Update existing record (don't change referrer, first referrer wins)
-      await sb
+      const { error } = await sb
         .from("event_referrals")
         .update({
           prospect_name: name,
@@ -123,9 +124,10 @@ export async function POST(
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingLead.id);
+      dbError = error;
     } else {
       // Create new referral record
-      await sb.from("event_referrals").insert({
+      const { error } = await sb.from("event_referrals").insert({
         event_id: event.id,
         project_id: event.project_id,
         referrer_id: referrerId,
@@ -140,6 +142,27 @@ export async function POST(
         source: ref_code ? "link_click" : "enquiry_form",
         enquired_at: new Date().toISOString(),
       });
+      dbError = error;
+    }
+
+    // Never lose the lead if the tracked event_referrals write fails: keep the raw
+    // enquiry in the durable capture net (which also fires a review notification).
+    // The christian@ email below is a further backstop.
+    if (dbError) {
+      console.error("event_referrals write failed", slug, dbError);
+      await sb
+        .from("aos_lead_captures")
+        .insert({
+          kind: "event_enquiry",
+          source: `tgc-portal:${slug}`,
+          reason: `event_referrals: ${dbError.message ?? "unknown"}`,
+          payload: body,
+          status: "new",
+        })
+        .then(
+          () => {},
+          () => {}
+        );
     }
 
     // Admin notification
