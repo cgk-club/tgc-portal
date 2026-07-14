@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { requireAdminAuth } from '@/lib/auth'
 import { sanitizeSearch } from '@/lib/utils'
+import { syncToCrm } from '@/lib/crm-sync'
 
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request)
@@ -98,6 +99,16 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ error: userError.message }, { status: 500 })
   }
+
+  // Surface the new partner in the CGK CRM as a TGC supplier org (fire-and-forget).
+  syncToCrm({
+    record_type: 'partner',
+    org_name: org_name || undefined,
+    person_name: name || undefined,
+    email,
+    org_type: 'supplier',
+    subject: 'Partner added in the TGC portal',
+  })
 
   return NextResponse.json({ ...partner, users: [user] }, { status: 201 })
 }

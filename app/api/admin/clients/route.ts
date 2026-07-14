@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { requireAdminAuth } from '@/lib/auth'
 import { sanitizeSearch } from '@/lib/utils'
+import { syncToCrm } from '@/lib/crm-sync'
 
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request)
@@ -66,6 +67,15 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  // Surface the new client in the CGK CRM as a TGC client (fire-and-forget).
+  syncToCrm({
+    record_type: 'client',
+    person_name: name || email,
+    email,
+    stage: 'client',
+    subject: 'Client added in the TGC portal',
+  })
 
   return NextResponse.json(data, { status: 201 })
 }

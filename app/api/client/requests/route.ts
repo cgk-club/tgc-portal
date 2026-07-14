@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { sendClientRequestNotification } from "@/lib/email";
 import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
+import { syncToCrm } from "@/lib/crm-sync";
 
 export async function POST(request: NextRequest) {
   // Never-fail intake: a lead must never be lost to a DB hiccup or shown a
@@ -60,6 +61,20 @@ export async function POST(request: NextRequest) {
       { error: "We could not record your request. Please email christian@thegatekeepers.club and we will pick it up right away." },
       { status: 500 },
     );
+  }
+
+  // Surface the lead in the CGK CRM as a TGC lead (only when identifiable, so
+  // the CRM does not fill with anonymous rows). Fire-and-forget.
+  if (data.email) {
+    syncToCrm({
+      record_type: "client",
+      person_name: data.name || data.email,
+      email: data.email,
+      phone: data.phone || undefined,
+      stage: "lead",
+      subject: `Concierge request: ${data.request_type || "general"}`,
+      summary: data.summary || undefined,
+    });
   }
 
   return NextResponse.json({ ok: true });
