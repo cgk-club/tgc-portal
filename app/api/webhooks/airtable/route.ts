@@ -234,14 +234,19 @@ export async function POST(request: NextRequest) {
 
   const bodyText = await request.text()
 
-  // Verify HMAC signature if secret is configured
+  // Verify HMAC signature. Fail CLOSED: if no secret is configured, reject
+  // rather than processing anonymous POSTs (which trigger Airtable fetches +
+  // Supabase writes). The secret is set in Railway; a missing one is a
+  // misconfiguration, not an invitation to run unauthenticated.
   const secret = process.env.AIRTABLE_WEBHOOK_SECRET
-  if (secret) {
-    const signature = request.headers.get('X-Airtable-Content-MAC')
-    if (!verifySignature(bodyText, signature)) {
-      console.warn('Webhook HMAC verification failed — rejecting request')
-      return NextResponse.json({ error: 'Invalid HMAC signature' }, { status: 401 })
-    }
+  if (!secret) {
+    console.error('AIRTABLE_WEBHOOK_SECRET not configured — rejecting webhook (fail closed)')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
+  }
+  const signature = request.headers.get('X-Airtable-Content-MAC')
+  if (!verifySignature(bodyText, signature)) {
+    console.warn('Webhook HMAC verification failed — rejecting request')
+    return NextResponse.json({ error: 'Invalid HMAC signature' }, { status: 401 })
   }
 
   let notification: WebhookNotification

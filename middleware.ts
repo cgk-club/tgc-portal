@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith('/partner') || pathname.startsWith('/api/partner')) {
-    if (pathname === '/api/partner/login' || pathname.startsWith('/api/partner/verify')) {
+    if (pathname === '/api/partner/login' || pathname === '/api/partner/auth' || pathname.startsWith('/api/partner/verify')) {
       return NextResponse.next()
     }
 

@@ -3,7 +3,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getBespokeEventPrompt } from "@/lib/chat-prompts/bespoke-event";
 import { checkChatRateLimit } from "@/lib/rate-limit";
 
-const anthropic = new Anthropic();
+// Lazy singleton: never construct the SDK (which reads ANTHROPIC_API_KEY) at
+// module/build time — only on first request.
+let _anthropic: Anthropic | null = null;
+function getAnthropic(): Anthropic {
+  return (_anthropic ??= new Anthropic());
+}
 
 export async function POST(request: Request) {
   try {
@@ -30,7 +35,7 @@ export async function POST(request: Request) {
 
     const systemPrompt = getBespokeEventPrompt(clientName);
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
       system: systemPrompt,

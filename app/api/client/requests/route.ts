@@ -1,14 +1,36 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { sendClientRequestNotification } from "@/lib/email";
+import { verifyClientSession, CLIENT_COOKIE_NAME } from "@/lib/client-auth";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Never-fail intake: a lead must never be lost to a DB hiccup or shown a
+  // resubmit prompt. We attempt a durable DB write AND an admin notification;
+  // the submission only "fails" if it landed in neither place.
+  let data: Record<string, any> = {};
   try {
-    const data = await request.json();
-    const supabase = getSupabaseAdmin();
+    data = await request.json();
+  } catch (parseErr) {
+    console.error("Client request body parse error:", parseErr);
+  }
 
+  // Never trust a body-supplied client_id (attribution IDOR): a public caller
+  // could otherwise forge requests against any account. Attribute only to the
+  // caller's own session if they are logged in; otherwise leave unattributed.
+  let sessionClientId: string | null = null;
+  const clientToken = request.cookies.get(CLIENT_COOKIE_NAME)?.value;
+  if (clientToken) {
+    const session = await verifyClientSession(clientToken);
+    if (session) sessionClientId = session.clientId;
+  }
+
+  let captured = false;
+
+  // 1. Durable DB capture
+  try {
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase.from("client_requests").insert({
-      client_id: data.client_id || null,
+      client_id: sessionClientId,
       request_type: data.request_type || "general",
       summary: data.summary || null,
       raw_chat_json: data,
@@ -18,19 +40,27 @@ export async function POST(request: Request) {
       communication_pref: data.communication_pref || "email",
       status: "new",
     });
-
-    if (error) {
-      console.error("Client request insert error:", error);
-      return NextResponse.json({ error: "Failed to save" }, { status: 500 });
-    }
-
-    sendClientRequestNotification(data).catch((err) =>
-      console.error("Request notification error:", err)
-    );
-
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error("Request submit error:", error);
-    return NextResponse.json({ error: "Submit failed" }, { status: 500 });
+    if (error) console.error("Client request insert error:", error);
+    else captured = true;
+  } catch (dbErr) {
+    console.error("Client request insert threw:", dbErr);
   }
+
+  // 2. Notification to the monitored inbox — lands the lead even if the DB write failed
+  try {
+    await sendClientRequestNotification(data);
+    captured = true;
+  } catch (notifyErr) {
+    console.error("Request notification error:", notifyErr);
+  }
+
+  if (!captured) {
+    console.error("Client request captured NOWHERE:", JSON.stringify(data).slice(0, 500));
+    return NextResponse.json(
+      { error: "We could not record your request. Please email christian@thegatekeepers.club and we will pick it up right away." },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ ok: true });
 }

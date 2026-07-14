@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  serverExternalPackages: ['bcryptjs'],
   experimental: {
+    // Next 14.2 uses experimental.serverComponentsExternalPackages; the stable
+    // top-level `serverExternalPackages` key is Next 15+ and is ignored on 14.2.
+    serverComponentsExternalPackages: ['bcryptjs'],
     staleTimes: {
       dynamic: 0,
     },

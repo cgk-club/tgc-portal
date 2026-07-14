@@ -21,17 +21,17 @@ export function getSupabase(): SupabaseClient {
 export function getSupabaseAdmin(): SupabaseClient {
   if (!_supabaseAdmin) {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (serviceKey) {
-      _supabaseAdmin = createClient(getUrl(), serviceKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-      })
-    } else {
-      console.warn('[supabase] SUPABASE_SERVICE_ROLE_KEY not set, falling back to anon key')
-      _supabaseAdmin = getSupabase()
+    if (!serviceKey) {
+      // Never silently fall back to the anon key: service-role writes would then
+      // fail quietly under RLS. Fail loudly so the misconfiguration is visible.
+      throw new Error('[supabase] SUPABASE_SERVICE_ROLE_KEY is not set; refusing to fall back to the anon key for admin client')
     }
+    _supabaseAdmin = createClient(getUrl(), serviceKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    })
   }
   return _supabaseAdmin
 }
