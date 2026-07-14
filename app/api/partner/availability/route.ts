@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { partnerOwnsFiche } from "@/lib/partner-fiches";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { data, error } = await getSupabaseAdmin()
+  const sb = getSupabaseAdmin();
+
+  // Ensure the fiche belongs to this partner (prevents attaching availability to
+  // another partner's fiche).
+  if (!(await partnerOwnsFiche(sb, session.partnerId, body.fiche_id))) {
+    return NextResponse.json({ error: "Fiche not found" }, { status: 404 });
+  }
+
+  const { data, error } = await sb
     .from("partner_availability")
     .insert({
       partner_id: session.partnerId,

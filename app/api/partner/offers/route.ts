@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPartnerSession, PARTNER_COOKIE_NAME } from "@/lib/partner-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { partnerOwnsFiche } from "@/lib/partner-fiches";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
 
-  const { data, error } = await getSupabaseAdmin()
+  const sb = getSupabaseAdmin();
+
+  // If the offer is tied to a fiche, ensure it belongs to this partner.
+  if (body.fiche_id && !(await partnerOwnsFiche(sb, session.partnerId, body.fiche_id))) {
+    return NextResponse.json({ error: "Fiche not found" }, { status: 404 });
+  }
+
+  const { data, error } = await sb
     .from("partner_offers")
     .insert({
       partner_id: session.partnerId,
