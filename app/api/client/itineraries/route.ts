@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyClientSession, CLIENT_COOKIE_NAME } from '@/lib/client-auth'
 import { getSupabaseAdmin } from '@/lib/supabase'

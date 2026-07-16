@@ -3,6 +3,7 @@ import { verifyClientSession, CLIENT_COOKIE_NAME } from '@/lib/client-auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = "force-no-store";
 
 interface ClientVisibilitySettings {
   milestones: 'hidden' | 'view'
