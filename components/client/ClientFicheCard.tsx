@@ -16,12 +16,17 @@ interface ClientFicheCardProps {
 
 export default function ClientFicheCard({ item }: ClientFicheCardProps) {
   const fiche = item.fiche as (Fiche & { org?: AirtableOrg }) | undefined
-  const name = item.custom_title || fiche?.org?.name || fiche?.headline || 'Untitled'
+  const name = item.custom_title || fiche?.org?.name || fiche?.name || fiche?.headline || 'Untitled'
   const heroUrl = fiche?.hero_image_url
-  const description = fiche?.description
+  // The note written for THIS trip outranks the fiche's general description. Showing the
+  // description instead dropped the per-trip detail (times, what is booked, why it is here)
+  // from the client's view the moment an item was linked to a fiche.
+  const isTripNote = Boolean(item.custom_note)
+  const description = item.custom_note || fiche?.description
   const slug = fiche?.slug
   const org = fiche?.org
-  const location = org ? [org.city, org.country].filter(Boolean).join(', ') : ''
+  const location =
+    (org ? [org.city, org.country].filter(Boolean).join(', ') : '') || fiche?.location || ''
 
   const timeParts: string[] = []
   if (item.time_of_day) timeParts.push(TIME_LABELS[item.time_of_day] || item.time_of_day)
@@ -46,8 +51,10 @@ export default function ClientFicheCard({ item }: ClientFicheCardProps) {
           <p className="text-xs text-gray-400 font-body mb-2">{location}</p>
         )}
         {description && (
-          <p className="text-sm text-gray-600 font-body mb-3 line-clamp-3">
-            {description.slice(0, 200)}{description.length > 200 ? '...' : ''}
+          <p className="text-sm text-gray-600 font-body mb-3 leading-relaxed whitespace-pre-line">
+            {isTripNote
+              ? description
+              : `${description.slice(0, 200)}${description.length > 200 ? '…' : ''}`}
           </p>
         )}
         {slug && (

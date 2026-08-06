@@ -139,7 +139,8 @@ export async function getItineraryByToken(shareToken: string): Promise<Itinerary
           id, day_id, fiche_id, custom_title, custom_note,
           time_of_day, exact_time, sort_order, item_type,
           fiche:fiches(
-            id, airtable_record_id, slug, hero_image_url, headline,
+            id, airtable_record_id, slug, name, location,
+            hero_image_url, headline,
             description, highlights, gallery_urls, tags,
             latitude, longitude, geocoded_at,
             template_type, template_fields,

@@ -23,6 +23,10 @@ export interface Fiche {
   id: string
   airtable_record_id: string
   slug: string
+  // Client-facing name and location held on the fiche itself, so a fiche that has no
+  // matching Airtable Organization still renders with a real title instead of 'Unnamed'.
+  name: string | null
+  location: string | null
   hero_image_url: string | null
   headline: string | null
   description: string | null

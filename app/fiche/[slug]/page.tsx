@@ -52,9 +52,11 @@ export default async function FichePage({ params, searchParams }: PageProps) {
   }
 
   const org = await getOrgById(ficheData.airtable_record_id)
-  const name = org?.name || 'Unnamed'
+  // Airtable is the preferred source, but a fiche built outside Airtable carries its own
+  // name and location. Without this fallback those fiches render the title as 'Unnamed'.
+  const name = org?.name || ficheData.name || 'Unnamed'
   const locationParts = [org?.city, org?.country].filter(Boolean)
-  const location = locationParts.join(', ')
+  const location = locationParts.join(', ') || ficheData.location || ''
 
   // Auto-detect template if not set
   const templateType = ficheData.template_type || getTemplate(org?.categorySub)
@@ -68,9 +70,16 @@ export default async function FichePage({ params, searchParams }: PageProps) {
   }
 
   const rawHighlights = Array.isArray(ficheData.highlights) ? ficheData.highlights : []
-  const highlights: Highlight[] = rawHighlights.map((h: Highlight | string) =>
-    typeof h === 'string' ? { icon: '', label: h, value: h } : h
-  )
+  // A bare string highlight is a single statement, not a label/value pair. Mapping it to
+  // both fields printed the same sentence twice, once as the caption and again beneath it.
+  // "Label: value" still splits on the colon; anything else becomes a value with no caption.
+  const highlights: Highlight[] = rawHighlights.map((h: Highlight | string) => {
+    if (typeof h !== 'string') return h
+    const colon = h.indexOf(':')
+    return colon > 0
+      ? { icon: '', label: h.slice(0, colon).trim(), value: h.slice(colon + 1).trim() }
+      : { icon: '', label: '', value: h }
+  })
   const galleryUrls: string[] = Array.isArray(ficheData.gallery_urls) ? ficheData.gallery_urls : []
   const tags: string[] = Array.isArray(ficheData.tags) ? ficheData.tags : []
 

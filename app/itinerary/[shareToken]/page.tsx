@@ -104,7 +104,10 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
   const rawStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
   for (const day of days) {
     for (const item of day.items || []) {
-      if (item.item_type === 'fiche' && item.fiche?.latitude && item.fiche?.longitude) {
+      // Any item carrying a geocoded fiche is a place on the map. Keying this on the literal
+      // item_type 'fiche' silently dropped hotels, restaurants and transport, which are the
+      // stops a route is actually made of.
+      if (item.item_type !== 'note' && item.fiche?.latitude && item.fiche?.longitude) {
         rawStops.push({
           lat: item.fiche.latitude,
           lng: item.fiche.longitude,

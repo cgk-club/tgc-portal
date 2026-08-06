@@ -32,6 +32,8 @@ export async function PATCH(
 
   const allowedFields = [
     'slug',
+    'name',
+    'location',
     'hero_image_url',
     'headline',
     'description',

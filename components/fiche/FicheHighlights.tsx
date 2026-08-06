@@ -12,10 +12,12 @@ export default function FicheHighlights({ highlights }: FicheHighlightsProps) {
     <div className="bg-green-muted py-10 px-8 md:px-12 lg:px-16">
       <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-8">
         {highlights.map((h, i) => {
-          // Label may carry the value inline ("Bedrooms: 6") when value is empty
+          // Label may carry the value inline ("Bedrooms: 6") when value is empty.
+          // An empty label is deliberate: the highlight is one statement, so it renders as
+          // the value alone rather than printing the same sentence twice.
           const displayLabel = h.value ? h.label : h.label.replace(/:.*$/, '').trim()
           const displayValue = h.value || h.label.replace(/^[^:]+:\s*/, '').trim()
-          const iconSrc = h.value ? h.label : h.label
+          const iconSrc = h.label || h.value
 
           return (
             <div key={i} className="flex flex-col items-center text-center gap-2">
@@ -23,9 +25,11 @@ export default function FicheHighlights({ highlights }: FicheHighlightsProps) {
                 {getFeatureIcon(iconSrc)}
               </div>
               <div>
-                <div className="text-[11px] text-gray-400 uppercase tracking-widest font-body leading-tight">
-                  {displayLabel}
-                </div>
+                {displayLabel && (
+                  <div className="text-[11px] text-gray-400 uppercase tracking-widest font-body leading-tight">
+                    {displayLabel}
+                  </div>
+                )}
                 {displayValue && (
                   <div className="text-sm font-medium text-green font-body mt-0.5 leading-snug">
                     {displayValue}
