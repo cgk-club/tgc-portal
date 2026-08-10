@@ -6,7 +6,6 @@ import { getOrgById } from '@/lib/airtable'
 import ClientItineraryCover from '@/components/client/ClientItineraryCover'
 import ClientDaySection from '@/components/client/ClientDaySection'
 import ClientItineraryPDF from './ClientPDF'
-import ClientMap from './ClientMap'
 import ClientChoices from './ClientChoices'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { ChoiceGroup } from '@/types'
@@ -99,35 +98,6 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
     options: (choiceOptions || []).filter((o: { group_id: string }) => o.group_id === g.id),
   }))
 
-  // Collect map stops from geocoded fiche items, deduplicated by location
-  // Group nearby fiches (within ~0.05 degrees / ~5km) into a single stop using the day title
-  const rawStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
-  for (const day of days) {
-    for (const item of day.items || []) {
-      // Any item carrying a geocoded fiche is a place on the map. Keying this on the literal
-      // item_type 'fiche' silently dropped hotels, restaurants and transport, which are the
-      // stops a route is actually made of.
-      if (item.item_type !== 'note' && item.fiche?.latitude && item.fiche?.longitude) {
-        rawStops.push({
-          lat: item.fiche.latitude,
-          lng: item.fiche.longitude,
-          name: day.title || item.custom_title || item.fiche.headline || 'Untitled',
-          dayNumber: day.day_number,
-        })
-      }
-    }
-  }
-  // Deduplicate: keep one stop per location cluster per day group
-  const mapStops: { lat: number; lng: number; name: string; dayNumber: number }[] = []
-  for (const stop of rawStops) {
-    const isDuplicate = mapStops.some(
-      existing => Math.abs(existing.lat - stop.lat) < 0.05 && Math.abs(existing.lng - stop.lng) < 0.05
-    )
-    if (!isDuplicate) {
-      mapStops.push(stop)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-pearl">
       {/* Preview banner */}
@@ -166,9 +136,6 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
       {/* Cover */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {!itinerary.cover_image_url && <ClientItineraryCover itinerary={itinerary} />}
-
-        {/* Map */}
-        {mapStops.length > 0 && <ClientMap stops={mapStops} />}
 
         {/* Days with choice cards inserted after relevant days */}
         {days.map((day) => {
