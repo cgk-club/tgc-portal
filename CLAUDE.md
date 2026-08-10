@@ -212,7 +212,7 @@ git push
 - **Leaflet + SSR:** All map components use `dynamic(() => import(...), { ssr: false })` — never import Leaflet directly in server components
 - **Airtable write-back:** Generally read-only. Exception: outreach emails write a record to the Interactions table
 - **Admin auth:** Simple HTTP-only cookie session, no OAuth. Single operator tool.
-- **Client auth:** Magic link via Resend, 7-day token expiry, 30-day session cookie
+- **Client auth:** Magic link via Resend, **24-hour token expiry** (single use), 30-day session cookie. Ruled by Christian 10 Aug 2026: 24 hours is the default everywhere, for security. Admin-sent links (`/api/admin/clients/[id]/send-link`, `/api/admin/partners/[id]/send-link`) previously issued 7 days and now match.
 - **RLS:** Enabled on ALL 44 tables (security audit 28 Mar 2026). Admin tables use service-role-only access. Public read policies scoped to shared/live/published status. Client/partner INSERT policies enforce user_id = auth.uid().
 
 ---
@@ -252,7 +252,7 @@ Public lead magnet: `intelligence.thegatekeepers.club` should CNAME to `portal.t
 - 11 fiche templates, transport + events sub-layouts
 - Phase 5 webhook endpoint live
 - Airtable Organizations table ID: `tblRiQuIfeQ34aN5L`
-- Magic link auth: 7-day token expiry, 30-day session cookie
+- Magic link auth: 24-hour token expiry (single use), 30-day session cookie
 - Human-like typing effect on all chat modules (variable speed, typos, cursor)
 - One-question-at-a-time chat flow across all prompts
 - Client chat skips known details (email, name) for logged-in users
@@ -269,6 +269,13 @@ Public lead magnet: `intelligence.thegatekeepers.club` should CNAME to `portal.t
 - **Fiche publish flow (fixed 30 Jun 2026):** Approving a partner's fiche edit (`/api/admin/fiche-edits/[id]` action:approve) now promotes a still-`draft` fiche to `live` automatically (respecting the ≥4 gallery-image guard). Previously approval applied content but left status `draft`, so the public `/fiche/[slug]` link 404'd while `?preview=true` worked. To publish a fiche outside that flow, use the editor (`PATCH /api/admin/fiches/[id]` `{status:'live'}`, also enforces ≥4 images).
 - **Stale-cache 404 (fixed 30 Jun 2026):** The fiche page used to read a stale `draft` status from the Next.js Data Cache after publishing, 404ing until the next redeploy. `app/fiche/[slug]/page.tsx` now sets `fetchCache = 'force-no-store'` + `noStore()`, so a publish reflects immediately. `?preview=true` returning 200 while the bare URL 404s is the diagnostic that the status gate (not the data) is the issue.
 - `.claude/` added to .gitignore — worktree files must never be committed
+- **Client sign-in fixed (10 Aug 2026).** Four faults in one flow, all found while preparing a client email:
+  1. `/client/login` **opened in password mode by default**. Only 4 of 14 client accounts have a password, so 10 of them entered an email, got "Invalid email or password", and stopped. **Magic link is now the default**; password is opt in via `?mode=password`.
+  2. The page accepts **`?email=`** to prefill, so a link mailed to a client lands on one filled-in field and one button. This is the link to put in client emails: `/client/login?email=<their address>`.
+  3. `?error=invalid`, which `/api/client/verify` already redirected to when a token was expired or reused, **was never read by the page**. The client saw a blank login form and no explanation. It now shows a message and offers a fresh link.
+  4. The session cookie was `sameSite: 'strict'` on **both** verify routes. A magic link is clicked from a mail client, so the landing is a cross-site navigation and a strict cookie is withheld on the redirect that follows, bouncing the client back to login. Now `lax` on `/api/client/verify` and `/api/partner/verify`. Password login routes keep `strict` (same-site POST, genuine hardening).
+- **Email copy said 7 days on a 24-hour link** (`lib/email.ts`, client and partner). Copy corrected rather than the token, per the ruling above.
+- **`appUrl || request.url` removed from `/api/client/verify`.** That is deploy trap 4: behind the Railway proxy a route handler sees the internal address, so a missing `NEXT_PUBLIC_APP_URL` would redirect the client to `localhost:8080`. Now falls back to the literal domain like every other caller.
 
 ---
 

@@ -19,8 +19,8 @@ export async function GET(
     .single()
 
   if (!magicToken || !magicToken.client) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || ''
-    return NextResponse.redirect(new URL('/client/login?error=invalid', appUrl || request.url))
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'
+    return NextResponse.redirect(new URL('/client/login?error=invalid', appUrl))
   }
 
   // Mark token as used
@@ -34,12 +34,12 @@ export async function GET(
 
   // Redirect to password setup if no password set yet
   const needsPassword = !magicToken.client.password_hash
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || ''
-  const response = NextResponse.redirect(new URL(needsPassword ? '/client/setup-password' : '/client', appUrl || request.url))
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal.thegatekeepers.club'
+  const response = NextResponse.redirect(new URL(needsPassword ? '/client/setup-password' : '/client', appUrl))
   response.cookies.set(CLIENT_COOKIE_NAME, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 30 * 24 * 60 * 60,
     path: '/',
   })
