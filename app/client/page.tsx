@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Itinerary } from '@/types'
 import ClientNav from '@/components/client/ClientNav'
 import GuidedTour, { TOUR_STORAGE_KEY } from '@/components/client/GuidedTour'
@@ -236,7 +237,7 @@ export default function ClientDashboardPage() {
                 <Link key={fiche.slug} href={`/fiche/${fiche.slug}`} className="flex-none w-56 bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="h-32 bg-green-muted overflow-hidden">
                     {fiche.hero_image_url ? (
-                      <img src={fiche.hero_image_url} alt={fiche.headline} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={fiche.hero_image_url} alt={fiche.headline} width={448} height={256} sizes="224px" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="flex items-center justify-center h-full"><span className="text-green/20 text-xs font-body">Image</span></div>
                     )}
@@ -266,7 +267,7 @@ export default function ClientDashboardPage() {
                 <Link key={ev.id} href="/client/events" className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="h-24 bg-green-muted overflow-hidden relative">
                     {ev.image_url ? (
-                      <img src={ev.image_url} alt={ev.title} className="w-full h-full object-cover" />
+                      <Image src={ev.image_url} alt={ev.title} width={400} height={192} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex items-center justify-center h-full"><span className="text-green/15 text-[10px] font-body">{ev.category}</span></div>
                     )}
@@ -296,7 +297,7 @@ export default function ClientDashboardPage() {
                 <Link key={listing.id} href={`/client/marketplace/${listing.slug}`} className="bg-white border border-green/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="h-28 bg-green-muted overflow-hidden relative">
                     {listing.hero_image_url ? (
-                      <img src={listing.hero_image_url} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={listing.hero_image_url} alt={listing.title} width={400} height={224} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="flex items-center justify-center h-full"><span className="text-green/15 text-[10px] font-body">{MARKETPLACE_CATEGORY_LABELS[listing.category] || listing.category}</span></div>
                     )}
@@ -343,7 +344,7 @@ export default function ClientDashboardPage() {
                   className="bg-white rounded-lg border border-green/10 overflow-hidden hover:shadow-md transition-shadow group">
                   {it.cover_image_url && (
                     <div className="h-32 overflow-hidden">
-                      <img src={it.cover_image_url} alt={it.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={it.cover_image_url} alt={it.title} width={600} height={256} sizes="(max-width: 768px) 100vw, 50vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                   )}
                   <div className="p-4">

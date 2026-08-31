@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import Image from 'next/image'
 
 interface PortalHelpButtonProps {
   userType: 'client' | 'partner'
@@ -238,7 +239,14 @@ export default function PortalHelpButton({ userType }: PortalHelpButtonProps) {
                 </label>
                 {screenshotUrl ? (
                   <div className="relative rounded border border-green/10 overflow-hidden">
-                    <img src={screenshotUrl} alt="Screenshot" className="w-full h-24 object-cover" />
+                    <Image
+                      src={screenshotUrl}
+                      alt="Screenshot"
+                      width={400}
+                      height={96}
+                      sizes="360px"
+                      className="w-full h-24 object-cover"
+                    />
                     <button
                       onClick={() => setScreenshotUrl(null)}
                       className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors"

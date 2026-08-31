@@ -1,6 +1,7 @@
 'use client'
 
 import { ItineraryItem, TimeOfDay } from '@/types'
+import Image from 'next/image'
 
 const TIME_OPTIONS: { value: TimeOfDay | ''; label: string }[] = [
   { value: '', label: 'No time set' },
@@ -39,7 +40,13 @@ export default function ItineraryFicheCard({
     <div className="bg-white rounded-[8px] border border-gray-200 p-4 flex gap-4">
       {heroUrl && (
         <div className="w-20 h-20 rounded-[4px] overflow-hidden flex-shrink-0">
-          <img src={heroUrl} alt="" className="w-full h-full object-cover" />
+          <Image
+            src={heroUrl}
+            alt=""
+            width={80}
+            height={80}
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
 

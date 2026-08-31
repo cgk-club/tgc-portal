@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const LeadCaptureModal = dynamic(
   () => import("@/components/event-booking/LeadCaptureModal"),
@@ -370,11 +371,13 @@ function PavilionTerraceContent() {
                 className={`overflow-hidden rounded-lg ${i === 0 ? "sm:col-span-2 sm:row-span-2" : ""}`}
                 style={{ aspectRatio: i === 0 ? "16/9" : "4/3" }}
               >
-                <img
+                <Image
                   src={img.src}
                   alt={img.alt}
+                  width={1200}
+                  height={900}
+                  sizes="(max-width: 640px) 100vw, 50vw"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                 />
               </div>
             ))}

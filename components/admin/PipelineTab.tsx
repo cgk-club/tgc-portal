@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface Referral {
   id: string;
@@ -65,7 +65,7 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
   });
   const [adding, setAdding] = useState(false);
 
-  async function fetchPipeline() {
+  const fetchPipeline = useCallback(async () => {
     const res = await fetch(
       `/api/admin/event-referrals?project_id=${projectId}`
     );
@@ -75,11 +75,11 @@ export default function PipelineTab({ projectId }: { projectId: string }) {
       setStats(data.stats || { sent: 0, prospect: 0, lead: 0, client: 0, total: 0 });
     }
     setLoading(false);
-  }
+  }, [projectId]);
 
   useEffect(() => {
     fetchPipeline();
-  }, [projectId]);
+  }, [fetchPipeline]);
 
   async function handleStageChange(id: string, stage: string) {
     await fetch(`/api/admin/event-referrals/${id}`, {

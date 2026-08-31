@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface Props {
   images: string[]
@@ -23,11 +24,13 @@ export default function DisciplineCarousel({ images, name }: Props) {
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
           {images.map((src, i) => (
-            <div key={i} className="relative w-full flex-shrink-0">
-              <img
+            <div key={i} className="relative w-full flex-shrink-0 aspect-[16/10]">
+              <Image
                 src={src}
                 alt={`${name} — image ${i + 1}`}
-                className="w-full aspect-[16/10] object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                className="object-cover"
               />
             </div>
           ))}

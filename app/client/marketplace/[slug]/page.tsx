@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 
 interface ListingDetail {
@@ -292,9 +293,13 @@ export default function MarketplaceDetailPage() {
             {/* Main image */}
             <div className="rounded-lg overflow-hidden bg-green-muted mb-3 aspect-[4/3]">
               {allImages.length > 0 ? (
-                <img
+                <Image
                   src={allImages[galleryIndex]}
                   alt={listing.title}
+                  width={1200}
+                  height={900}
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 60vw"
                   className="w-full h-full object-cover cursor-pointer"
                   onClick={() => setSelectedImage(allImages[galleryIndex])}
                 />
@@ -318,9 +323,11 @@ export default function MarketplaceDetailPage() {
                         : "border-transparent hover:border-green/30"
                     }`}
                   >
-                    <img
+                    <Image
                       src={img}
                       alt={`${listing.title} ${idx + 1}`}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -496,9 +503,12 @@ export default function MarketplaceDetailPage() {
                 >
                   <div className="h-32 bg-green-muted overflow-hidden">
                     {item.hero_image_url ? (
-                      <img
+                      <Image
                         src={item.hero_image_url}
                         alt={item.title}
+                        width={400}
+                        height={256}
+                        sizes="(max-width: 768px) 50vw, 25vw"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
@@ -541,6 +551,7 @@ export default function MarketplaceDetailPage() {
           >
             &#10005;
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element -- full-size lightbox view: natural dimensions unknown, and a filled box would swallow the click-outside-to-close. */}
           <img
             src={selectedImage}
             alt={listing.title}

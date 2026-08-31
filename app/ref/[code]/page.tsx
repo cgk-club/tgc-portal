@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ReferralPartner {
   name: string;
@@ -94,9 +95,13 @@ export default function ReferralLandingPage() {
       <div className="relative">
         {partner.ficheHeroUrl ? (
           <div className="h-64 sm:h-80 overflow-hidden">
-            <img
+            <Image
               src={partner.ficheHeroUrl}
               alt={partner.name}
+              width={1600}
+              height={640}
+              priority
+              sizes="100vw"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

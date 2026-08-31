@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface FicheGalleryProps {
   images: string[]
@@ -18,10 +19,12 @@ export default function FicheGallery({ images, name }: FicheGalleryProps) {
       onClick={() => setLightboxIndex(idx)}
       className={`relative ${aspect} overflow-hidden rounded-[8px] group cursor-pointer ring-0 hover:ring-2 hover:ring-gold/40 transition-all`}
     >
-      <img
+      <Image
         src={url}
         alt={`${name} ${idx + 1}`}
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
       />
     </button>
   )
@@ -95,6 +98,7 @@ export default function FicheGallery({ images, name }: FicheGalleryProps) {
               &#8250;
             </button>
           )}
+          {/* eslint-disable-next-line @next/next/no-img-element -- full-size lightbox view: the natural dimensions are unknown, and next/image's filled box would swallow the click-outside-to-close on the letterboxed margins. */}
           <img
             src={images[lightboxIndex]}
             alt={`${name} ${lightboxIndex + 1}`}

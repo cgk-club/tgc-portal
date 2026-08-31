@@ -207,6 +207,7 @@ function SignaturePagePDF({
 
         <View style={styles.signatureSection}>
           {signatureDataUri && (
+            // eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer's Image, rendered into a PDF; it takes no alt prop.
             <Image src={signatureDataUri} style={styles.signatureImage} />
           )}
           <View style={styles.signatureLine} />

@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { getItineraryByToken } from '@/lib/itineraries'
 import { getOrgById } from '@/lib/airtable'
 import ClientItineraryCover from '@/components/client/ClientItineraryCover'
@@ -117,10 +118,13 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
       {/* Cover Image Hero */}
       {itinerary.cover_image_url && (
         <div className="relative w-full h-[40vh] sm:h-[50vh] min-h-[280px] overflow-hidden">
-          <img
+          <Image
             src={itinerary.cover_image_url}
             alt={itinerary.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 md:p-12">

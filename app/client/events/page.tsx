@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientChatModule from "@/components/client/ClientChatModule";
 import ClientNav from "@/components/client/ClientNav";
 
@@ -84,10 +85,12 @@ export default function ClientEventsPage() {
               >
                 {/* Image background */}
                 {ev.image_url ? (
-                  <img
+                  <Image
                     src={ev.image_url}
                     alt={ev.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="absolute inset-0 bg-green" />

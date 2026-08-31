@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 
 interface JourneyItem {
@@ -60,9 +61,12 @@ export default function JourneysPage() {
           {/* Cover image */}
           <div className="h-40 bg-green/5 overflow-hidden">
             {journey.cover_image_url ? (
-              <img
+              <Image
                 src={journey.cover_image_url}
                 alt={journey.title}
+                width={600}
+                height={320}
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (

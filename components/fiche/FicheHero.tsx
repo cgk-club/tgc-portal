@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Badge from '@/components/ui/Badge'
 
 interface FicheHeroProps {
@@ -70,10 +71,13 @@ export default function FicheHero({
   return (
     <div className="relative w-full h-[50vh] sm:h-[60vh] min-h-[300px] sm:min-h-[400px] overflow-hidden">
       {heroImageUrl ? (
-        <img
+        <Image
           src={heroImageUrl}
           alt={name}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
       ) : (
         <div className="absolute inset-0 bg-green" />

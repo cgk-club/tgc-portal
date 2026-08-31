@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ImageUpload from "@/components/partner/ImageUpload";
 
@@ -655,7 +656,7 @@ export default function PartnerEventsPage() {
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   {galleryImages.map((url, i) => (
                     <div key={i} className="relative rounded-md overflow-hidden aspect-square group">
-                      <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                      <Image src={url} alt={`Gallery ${i + 1}`} fill sizes="(max-width: 768px) 33vw, 160px" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => removeGalleryImage(i)}
@@ -798,9 +799,11 @@ export default function PartnerEventsPage() {
                 <div className="flex gap-4 p-5">
                   {event.image_url && (
                     <div className="hidden sm:block w-24 h-24 rounded-md overflow-hidden flex-none">
-                      <img
+                      <Image
                         src={event.image_url}
                         alt={event.title}
+                        width={96}
+                        height={96}
                         className="w-full h-full object-cover"
                       />
                     </div>

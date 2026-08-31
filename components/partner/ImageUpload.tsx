@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import NextImage from "next/image";
 
 interface ImageUploadProps {
   value: string | null;
@@ -146,9 +147,12 @@ export default function ImageUpload({ value, onChange, label }: ImageUploadProps
 
       {value ? (
         <div className="relative rounded-lg overflow-hidden border border-green/10 bg-white">
-          <img
+          <NextImage
             src={value}
             alt="Uploaded image"
+            width={800}
+            height={384}
+            sizes="(max-width: 768px) 100vw, 600px"
             className="w-full h-48 object-cover"
           />
           <div className="absolute top-2 right-2 flex gap-2">

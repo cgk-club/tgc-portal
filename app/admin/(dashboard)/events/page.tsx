@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 interface EventStats {
   duration?: string;
@@ -516,7 +517,7 @@ export default function AdminEventsPage() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-3">
                   {(form.gallery_images || []).map((url, i) => (
                     <div key={i} className="relative rounded-md overflow-hidden aspect-square group">
-                      <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                      <Image src={url} alt={`Gallery ${i + 1}`} fill sizes="(max-width: 768px) 33vw, 160px" className="object-cover" />
                       <button
                         type="button"
                         onClick={() => removeGalleryImage(i)}

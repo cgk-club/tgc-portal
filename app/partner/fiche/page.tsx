@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ImageUpload from "@/components/partner/ImageUpload";
 import { getGuidance } from "@/lib/ficheGuidance";
@@ -542,7 +543,7 @@ export default function PartnerFichePage() {
                     <div key={i} className="flex items-center gap-3 bg-green/[0.02] border border-green/10 rounded-md p-3">
                       <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100">
                         {galleryUrls[i] ? (
-                          <img src={galleryUrls[i]} alt={slot.label} className="w-full h-full object-cover" />
+                          <Image src={galleryUrls[i]} alt={slot.label} width={64} height={64} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-300">
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -573,7 +574,7 @@ export default function PartnerFichePage() {
                   {galleryUrls.slice(guidance.imageSlots.length).map((url, i) => (
                     <div key={`extra-${i}`} className="flex items-center gap-3 bg-green/[0.02] border border-green/10 rounded-md p-3">
                       <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100">
-                        <img src={url} alt={`Extra ${i + 1}`} className="w-full h-full object-cover" />
+                        <Image src={url} alt={`Extra ${i + 1}`} width={64} height={64} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-gray-700 font-body">
@@ -672,7 +673,7 @@ export default function PartnerFichePage() {
                           <div className="grid grid-cols-4 gap-2">
                             {(b.images || []).map((url, j) => (
                               <div key={j} className="relative group">
-                                <img src={url} alt="" className="w-full h-16 object-cover rounded-md" />
+                                <Image src={url} alt="" width={200} height={64} sizes="150px" className="w-full h-16 object-cover rounded-md" />
                                 <button
                                   type="button"
                                   onClick={() => removeDisciplineImage(i, j)}

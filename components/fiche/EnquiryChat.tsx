@@ -35,24 +35,7 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
 
   const displayedTyping = useTypingEffect(typingText, isTyping, handleTypingDone)
 
-  useEffect(() => {
-    if (isOpen && !started) {
-      startConversation()
-      setStarted(true)
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  useEffect(() => {
-    if (isOpen && !loading && !complete) {
-      inputRef.current?.focus()
-    }
-  }, [isOpen, loading, messages])
-
-  async function startConversation() {
+  const startConversation = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`${PROXY_URL}/chat`, {
@@ -78,7 +61,24 @@ export default function EnquiryChat({ propertyName, isOpen, onClose }: EnquiryCh
       console.error('Chat start failed:', err)
     }
     setLoading(false)
-  }
+  }, [propertyName])
+
+  useEffect(() => {
+    if (isOpen && !started) {
+      startConversation()
+      setStarted(true)
+    }
+  }, [isOpen, started, startConversation])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    if (isOpen && !loading && !complete) {
+      inputRef.current?.focus()
+    }
+  }, [isOpen, loading, complete, messages])
 
   async function sendMessage() {
     if (!input.trim() || loading || isTyping || complete) return

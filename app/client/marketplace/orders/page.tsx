@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 
 interface OrderListing {
@@ -122,9 +123,11 @@ export default function MarketplaceOrdersPage() {
                   {/* Listing image */}
                   <div className="flex-none w-20 h-20 rounded overflow-hidden bg-green-muted">
                     {order.listing?.hero_image_url ? (
-                      <img
+                      <Image
                         src={order.listing.hero_image_url}
                         alt={order.listing.title || "Order item"}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-cover"
                       />
                     ) : (

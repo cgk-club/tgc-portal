@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 
 interface MarketplaceListing {
@@ -285,9 +286,12 @@ export default function ClientMarketplacePage() {
                 {/* Hero image */}
                 <div className="h-48 bg-green-muted overflow-hidden relative">
                   {listing.hero_image_url ? (
-                    <img
+                    <Image
                       src={listing.hero_image_url}
                       alt={listing.title}
+                      width={600}
+                      height={384}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (

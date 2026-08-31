@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 
 interface ProjectListItem {
@@ -203,9 +204,12 @@ export default function ClientProjectsPage() {
                     {/* Cover image or type indicator */}
                     <div className="h-32 bg-green/5 overflow-hidden relative">
                       {heroImage ? (
-                        <img
+                        <Image
                           src={heroImage}
                           alt={project.title}
+                          width={600}
+                          height={256}
+                          sizes="(max-width: 768px) 100vw, 33vw"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (

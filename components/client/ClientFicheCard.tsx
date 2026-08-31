@@ -1,4 +1,5 @@
 import { ItineraryItem, Fiche, AirtableOrg } from '@/types'
+import Image from 'next/image'
 
 const TIME_LABELS: Record<string, string> = {
   breakfast: 'Breakfast',
@@ -37,7 +38,14 @@ export default function ClientFicheCard({ item }: ClientFicheCardProps) {
     <div className="bg-white rounded-[8px] shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row">
       {heroUrl && (
         <div className="md:w-2/5 h-48 md:h-auto flex-shrink-0">
-          <img src={heroUrl} alt={name} className="w-full h-full object-cover" />
+          <Image
+            src={heroUrl}
+            alt={name}
+            width={600}
+            height={450}
+            sizes="(max-width: 768px) 100vw, 40vw"
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
       <div className="p-4 sm:p-5 flex-1">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface EventStats {
@@ -174,7 +175,7 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
       {/* Hero */}
       <section className="relative w-full h-[70vh] min-h-[480px] max-h-[720px] overflow-hidden">
         {event.image_url ? (
-          <img src={event.image_url} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={event.image_url} alt={event.title} fill priority sizes="100vw" className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-green" />
         )}
@@ -266,7 +267,7 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
                   <div key={i} className="relative rounded-lg overflow-hidden h-48 sm:h-56 group">
                     {img ? (
                       <>
-                        <img src={img} alt={line} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <Image src={img} alt={line} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                         <div className="absolute inset-0 flex items-end p-5">
                           <p className="text-sm font-heading font-medium text-gold leading-snug">{line}</p>
@@ -425,8 +426,8 @@ export default function EventDetailView({ event }: { event: TGCEventDetail }) {
             <h2 className="font-heading text-lg sm:text-xl font-semibold text-green mb-6 text-center">Gallery</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {galleryImages.slice(highlightLines.length).map((url, i) => (
-                <div key={i} className="rounded-lg overflow-hidden aspect-[4/3]">
-                  <img src={url} alt={`${event.title} ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                <div key={i} className="relative rounded-lg overflow-hidden aspect-[4/3]">
+                  <Image src={url} alt={`${event.title} ${i + 1}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-500" />
                 </div>
               ))}
             </div>

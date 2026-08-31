@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 
 interface GalleryManagerProps {
   images: string[]
@@ -58,9 +59,12 @@ export default function GalleryManager({ images, onChange }: GalleryManagerProps
         <div className="grid grid-cols-3 gap-2 mb-3">
           {images.map((url, i) => (
             <div key={i} className="relative group">
-              <img
+              <Image
                 src={url}
                 alt={`Gallery ${i + 1}`}
+                width={300}
+                height={300}
+                sizes="(max-width: 768px) 33vw, 200px"
                 className="w-full aspect-square object-cover rounded-[4px]"
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-[4px] flex items-center justify-center gap-1">

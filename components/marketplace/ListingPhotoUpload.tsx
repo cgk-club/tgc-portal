@@ -2,6 +2,9 @@
 
 import { useState, useRef, useCallback } from "react";
 
+const MAX_FILES = 20;
+const MAX_SIZE = 20 * 1024 * 1024;
+
 interface ListingPhotoUploadProps {
   listingId: string;
   listingTitle: string;
@@ -22,9 +25,6 @@ export default function ListingPhotoUpload({
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const MAX_FILES = 20;
-  const MAX_SIZE = 20 * 1024 * 1024;
 
   const addFiles = useCallback(
     (newFiles: File[]) => {
@@ -172,6 +172,7 @@ export default function ListingPhotoUpload({
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
             {previews.map((src, i) => (
               <div key={i} className="relative group aspect-square">
+                {/* eslint-disable-next-line @next/next/no-img-element -- blob: object URL for a locally picked file; next/image cannot optimise it. */}
                 <img
                   src={src}
                   alt={`Preview ${i + 1}`}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ClientNav from "@/components/client/ClientNav";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 
@@ -401,7 +402,7 @@ export default function ProjectDetailPage() {
                       onClick={() => setSelectedImage(i)}
                       className="aspect-[4/3] rounded-md overflow-hidden bg-gray-100 hover:opacity-90 transition-opacity"
                     >
-                      <img src={url} alt={`Property ${i + 1}`} className="w-full h-full object-cover" />
+                      <Image src={url} alt={`Property ${i + 1}`} width={400} height={300} sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -890,6 +891,7 @@ export default function ProjectDetailPage() {
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- full-size lightbox view: the natural aspect ratio is unknown, so a declared box would letterbox it. */}
             <img
               src={images[selectedImage]}
               alt={`Property ${selectedImage + 1}`}

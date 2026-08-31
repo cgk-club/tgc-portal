@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import ClientNav from '@/components/client/ClientNav'
 
 interface WishlistItem {
@@ -90,7 +91,7 @@ export default function ClientWishlistPage() {
                 <Link href={`/client/marketplace/${item.slug}`}>
                   <div className="h-48 bg-green-muted overflow-hidden">
                     {item.hero_image_url ? (
-                      <img src={item.hero_image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={item.hero_image_url} alt={item.title} width={600} height={384} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="flex items-center justify-center h-full">
                         <span className="text-green/15 text-xs font-body">{CATEGORY_LABELS[item.category] || item.category}</span>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import ListingPhotoUpload from '@/components/marketplace/ListingPhotoUpload'
 
 // ── Types ──────────────────────────────────────────────────────
@@ -723,7 +724,7 @@ export default function AdminMarketplacePage() {
                   <label className="block text-xs text-gray-500 font-body mb-1">Hero image URL</label>
                   <input value={listingForm.hero_image_url || ''} onChange={(e) => setListingForm({ ...listingForm, hero_image_url: e.target.value || null })} className="w-full px-3 py-2 border border-green/20 rounded text-sm font-body" />
                   {editingListing?.hero_image_url && (
-                    <img src={editingListing.hero_image_url} alt="Current hero" className="mt-2 w-32 h-32 object-cover rounded border border-green/10" />
+                    <Image src={editingListing.hero_image_url} alt="Current hero" width={128} height={128} className="mt-2 w-32 h-32 object-cover rounded border border-green/10" />
                   )}
                 </div>
                 {!creatingListing && editingListing && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface HighlightCard {
   imageUrl: string
@@ -35,10 +36,12 @@ export default function FicheHighlightsEditorial({
                 onClick={() => setLightboxIndex(i)}
                 className="relative aspect-[4/3] rounded-[8px] overflow-hidden group cursor-pointer text-left"
               >
-                <img
+                <Image
                   src={card.imageUrl}
                   alt={card.heading}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {showLabels && (
                   <>
@@ -125,6 +128,7 @@ export default function FicheHighlightsEditorial({
           )}
 
           <div className="flex flex-col items-center max-w-5xl" onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- full-size lightbox view: natural dimensions unknown. */}
             <img
               src={cards[lightboxIndex].imageUrl}
               alt={cards[lightboxIndex].heading}

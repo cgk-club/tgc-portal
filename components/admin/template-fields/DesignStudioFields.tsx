@@ -3,6 +3,7 @@
 import { DesignStudioFields, DisciplineBlock } from '@/lib/ficheTemplates'
 import Input from '@/components/ui/Input'
 import ImageUploader from '@/components/admin/ImageUploader'
+import Image from 'next/image'
 
 interface Props {
   fields: DesignStudioFields
@@ -103,7 +104,14 @@ export default function DesignStudioFieldsEditor({ fields, onChange }: Props) {
                 <div className="grid grid-cols-4 gap-2 mb-2">
                   {(b.images || []).map((url, j) => (
                     <div key={j} className="relative group">
-                      <img src={url} alt="" className="w-full h-16 object-cover rounded-[4px]" />
+                      <Image
+                        src={url}
+                        alt=""
+                        width={200}
+                        height={64}
+                        sizes="150px"
+                        className="w-full h-16 object-cover rounded-[4px]"
+                      />
                       <button
                         type="button"
                         onClick={() => removeBlockImage(i, j)}

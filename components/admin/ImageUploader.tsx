@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 
 interface ImageUploaderProps {
   onUpload: (url: string) => void
@@ -66,9 +67,12 @@ export default function ImageUploader({ onUpload, currentUrl, label = 'Upload Im
         `}
       >
         {currentUrl ? (
-          <img
+          <Image
             src={currentUrl}
             alt="Current"
+            width={600}
+            height={320}
+            sizes="(max-width: 768px) 100vw, 400px"
             className="w-full h-40 object-cover rounded-[4px] mb-2"
           />
         ) : (

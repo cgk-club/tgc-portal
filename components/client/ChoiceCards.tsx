@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { ChoiceGroup, ChoiceOption } from "@/types";
 
 interface ChoiceCardsProps {
@@ -42,9 +43,12 @@ function OptionCard({
       {/* Image */}
       {option.image_url && (
         <div className="h-40 overflow-hidden">
-          <img
+          <Image
             src={option.image_url}
             alt={option.title}
+            width={600}
+            height={320}
+            sizes="(max-width: 768px) 100vw, 33vw"
             className="w-full h-full object-cover"
           />
         </div>

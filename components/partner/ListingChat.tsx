@@ -77,7 +77,7 @@ export default function ListingChat({
       setSending(false);
     }
     init();
-  }, [category, categoryLabel, partnerName]);
+  }, [category, categoryLabel, partnerName, chatEndpoint]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

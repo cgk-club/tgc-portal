@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import PartnerNav from "@/components/partner/PartnerNav";
 import ListingChat from "@/components/partner/ListingChat";
 import ListingPhotoUpload from "@/components/marketplace/ListingPhotoUpload";
@@ -521,9 +522,11 @@ export default function PartnerListingsPage() {
                     <div className="flex gap-4 p-5">
                       {listing.hero_image_url && (
                         <div className="hidden sm:block w-24 h-24 rounded-md overflow-hidden flex-none">
-                          <img
+                          <Image
                             src={listing.hero_image_url}
                             alt={listing.title}
+                            width={96}
+                            height={96}
                             className="w-full h-full object-cover"
                           />
                         </div>

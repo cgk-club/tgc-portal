@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import PartnerNav from "@/components/partner/PartnerNav";
 
 interface NetworkPartner {
@@ -120,9 +121,12 @@ export default function PartnerNetworkPage() {
               >
                 <div className="h-36 bg-green-muted overflow-hidden">
                   {partner.hero_image_url ? (
-                    <img
+                    <Image
                       src={partner.hero_image_url}
                       alt={partner.name}
+                      width={600}
+                      height={288}
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (

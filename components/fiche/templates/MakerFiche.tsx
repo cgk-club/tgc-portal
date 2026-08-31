@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Fiche } from '@/types'
 import { AirtableOrg } from '@/types'
 import { MakerFields } from '@/lib/ficheTemplates'
@@ -51,10 +52,13 @@ export default function MakerFiche({
       {/* Hero */}
       {fiche.hero_image_url && (
         <div className="relative w-full h-[60vh] min-h-[400px]">
-          <img
+          <Image
             src={fiche.hero_image_url}
             alt={name}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 lg:p-16">
@@ -93,19 +97,25 @@ export default function MakerFiche({
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="md:col-span-2">
-                <img
+                <Image
                   src={firstImage}
                   alt={`${name} 1`}
+                  width={1200}
+                  height={600}
+                  sizes="(max-width: 768px) 100vw, 66vw"
                   className="w-full h-[400px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => setLightboxIndex(0)}
                 />
               </div>
               <div className="flex flex-col gap-3">
                 {gridImages.map((url, i) => (
-                  <img
+                  <Image
                     key={i}
                     src={url}
                     alt={`${name} ${i + 2}`}
+                    width={600}
+                    height={190}
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="w-full h-[126px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => setLightboxIndex(i + 1)}
                   />
@@ -132,10 +142,13 @@ export default function MakerFiche({
         <div className="px-8 md:px-12 lg:px-16 pb-10">
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3">
             {remainingImages.map((url, i) => (
-              <img
+              <Image
                 key={i}
                 src={url}
                 alt={`${name} ${i + 5}`}
+                width={600}
+                height={400}
+                sizes="(max-width: 768px) 50vw, 33vw"
                 className="w-full h-[200px] object-cover rounded-[8px] cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => setLightboxIndex(i + 4)}
               />
@@ -174,6 +187,7 @@ export default function MakerFiche({
               &#8250;
             </button>
           )}
+          {/* eslint-disable-next-line @next/next/no-img-element -- full-size lightbox view: natural dimensions unknown, and a filled box would swallow the click-outside-to-close. */}
           <img
             src={galleryUrls[lightboxIndex]}
             alt={`${name} ${lightboxIndex + 1}`}

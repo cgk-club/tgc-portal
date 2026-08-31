@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface FeedbackItem {
   id: string
@@ -254,10 +255,12 @@ export default function AdminFeedbackPage() {
                       <div>
                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider font-body mb-1">Screenshot</label>
                         <a href={item.screenshot_url} target="_blank" rel="noopener noreferrer">
-                          <img
+                          <Image
                             src={item.screenshot_url}
                             alt="Screenshot"
-                            className="max-h-48 rounded border border-green/10 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                            width={800}
+                            height={600}
+                            className="max-h-48 w-auto rounded border border-green/10 object-contain cursor-pointer hover:opacity-90 transition-opacity"
                           />
                         </a>
                       </div>

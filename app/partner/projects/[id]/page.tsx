@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import PartnerNav from "@/components/partner/PartnerNav";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 import EventBudgetTracker from "@/components/partner/EventBudgetTracker";
@@ -231,6 +232,15 @@ export default function PartnerProjectDetailPage() {
 
   const feedEndRef = useRef<HTMLDivElement>(null);
 
+  const fetchProject = useCallback(async () => {
+    const res = await fetch(`/api/partner/projects/${projectId}`);
+    if (res.ok) {
+      setData(await res.json());
+    } else if (res.status === 404) {
+      router.push("/partner/projects");
+    }
+  }, [projectId, router]);
+
   useEffect(() => {
     async function load() {
       const sessionRes = await fetch("/api/partner/session");
@@ -242,16 +252,7 @@ export default function PartnerProjectDetailPage() {
       setLoading(false);
     }
     load();
-  }, [router, projectId]);
-
-  async function fetchProject() {
-    const res = await fetch(`/api/partner/projects/${projectId}`);
-    if (res.ok) {
-      setData(await res.json());
-    } else if (res.status === 404) {
-      router.push("/partner/projects");
-    }
-  }
+  }, [router, fetchProject]);
 
   async function handlePostUpdate(e: React.FormEvent) {
     e.preventDefault();
@@ -593,9 +594,11 @@ export default function PartnerProjectDetailPage() {
                   key={i}
                   className="w-32 h-24 rounded-lg overflow-hidden flex-none border border-green/10"
                 >
-                  <img
+                  <Image
                     src={url}
                     alt={`Property ${i + 1}`}
+                    width={128}
+                    height={96}
                     className="w-full h-full object-cover"
                   />
                 </div>

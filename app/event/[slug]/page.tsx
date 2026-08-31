@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const LeadCaptureModal = dynamic(
   () => import("@/components/event-booking/LeadCaptureModal"),
@@ -633,13 +634,13 @@ export default function EventPage() {
                 {s.website_url ? (
                   <a href={s.website_url} target="_blank" rel="noopener noreferrer">
                     {s.logo_url ? (
-                      <img src={s.logo_url} alt={s.name} className="h-10 sm:h-12 object-contain grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100" />
+                      <Image src={s.logo_url} alt={s.name} width={400} height={96} className="h-10 sm:h-12 w-auto object-contain grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100" />
                     ) : (
                       <span className="text-sm font-heading font-semibold text-green/50 hover:text-green transition-colors">{s.name}</span>
                     )}
                   </a>
                 ) : s.logo_url ? (
-                  <img src={s.logo_url} alt={s.name} className="h-10 sm:h-12 object-contain grayscale opacity-60" />
+                  <Image src={s.logo_url} alt={s.name} width={400} height={96} className="h-10 sm:h-12 w-auto object-contain grayscale opacity-60" />
                 ) : (
                   <span className="text-sm font-heading font-semibold text-green/50">{s.name}</span>
                 )}

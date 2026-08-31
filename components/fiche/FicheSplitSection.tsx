@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 interface FicheSplitSectionProps {
   imageUrl: string
   imageAlt: string
@@ -23,10 +25,12 @@ export default function FicheSplitSection({
           className={`lg:col-span-7 ${imagePosition === 'right' ? 'lg:order-2' : ''}`}
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] group">
-            <img
+            <Image
               src={imageUrl}
               alt={imageAlt}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              fill
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
           </div>
         </div>
