@@ -16,6 +16,22 @@ const nextConfig = {
         destination: '/event/pavilion-terrace',
         permanent: false,
       },
+      /* The Intelligence Suite moved to the main domain on 04/September/2026.
+         It was never gated behind the portal's auth, so it lived on a subdomain
+         only because that is the repo it was written in; on thegatekeepers.club
+         it sits under /resources where the site already advertises it, and
+         inherits the main domain's authority instead of splitting it.
+         Permanent, because these paths were live and linked. */
+      {
+        source: '/intelligence',
+        destination: 'https://www.thegatekeepers.club/resources/intelligence',
+        permanent: true,
+      },
+      {
+        source: '/intelligence/:path*',
+        destination: 'https://www.thegatekeepers.club/resources/intelligence/:path*',
+        permanent: true,
+      },
     ];
   },
   async headers() {
