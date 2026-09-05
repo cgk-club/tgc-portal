@@ -1,0 +1,22 @@
+# The Gatekeepers Club: client and partner portal.
+#
+# NOTHING HERE IS A PUBLIC MARKETING SURFACE, and several routes are the
+# opposite of one. A client itinerary lives at /itinerary/<shareToken>, a quote
+# at /quote/<quoteToken>, and a partner sign-in at /partner/auth/<token>. Those
+# URLs are the credential. They are not secret from a crawler that is handed one
+# by a referrer header, a pasted link or a browser extension, and until
+# 05/September/2026 this file did not exist, so nothing told a crawler to stay
+# away from any of it.
+#
+# robots.txt is only half of it, because a disallowed URL can still be indexed
+# by reference if something links to it. The other half is an
+# X-Robots-Tag: noindex, nofollow, noarchive header on every response, set in
+# next.config.mjs. That one is the control that actually removes a page.
+#
+# The public face of this business is thegatekeepers.club. The event and
+# pavilion pages here are booking screens reached from a link we send; the
+# marketing versions live on the main site, and two domains competing for the
+# same words only splits the authority between them.
+
+User-agent: *
+Disallow: /
