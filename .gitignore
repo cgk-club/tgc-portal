@@ -35,3 +35,10 @@ next-env.d.ts
 
 # Claude Code worktrees
 .claude/
+
+# Local scratch scripts. These carry a service role key in plaintext and must
+# never be committed; GitHub push protection caught them on 05/September/2026.
+# Give them their key from the environment before making any of them permanent.
+verify-pavilion.mjs
+scripts/upload-brochures.mjs
+scripts/upload-terrace-images.mjs
