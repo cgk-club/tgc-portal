@@ -21,6 +21,7 @@ export async function GET() {
     .from("event_packages")
     .select("id, name, name_fr, description, description_fr, price, currency, capacity, sold_count, included_services, included_services_fr, sort_order, price_options")
     .in("id", TERRACE_IDS)
+    .eq("status", "active")
     .order("sort_order", { ascending: true });
 
   const res = NextResponse.json({ packages: packages || [], brochures: BROCHURES });
