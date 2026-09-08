@@ -222,7 +222,7 @@ export async function POST(
           <p style="color: #333; font-size: 16px; line-height: 1.6;">${name},</p>
           <p style="color: #333; font-size: 16px; line-height: 1.6;">Thank you for your interest in The Pavilion at the Monaco Grand Prix, 5-8 June 2026.</p>
           ${package_interest ? `<p style="color: #333; font-size: 16px; line-height: 1.6;">You expressed interest in: <strong>${package_interest}</strong>${attending_as === "couple" ? " (couple)" : ""}.</p>` : ""}
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">Christian de Jabrun from The Gatekeepers Club will be in touch shortly with full details and next steps.</p>
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">Christian from The Gatekeepers Club will be in touch shortly with full details and next steps.</p>
           <p style="margin: 30px 0;"><a href="${appUrl}/event/the-pavilion" style="display: inline-block; background: #0e4f51; color: white; text-decoration: none; padding: 12px 24px; font-size: 14px; letter-spacing: 1px;">View The Pavilion</a></p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
           <p style="font-size: 10px; letter-spacing: 3px; color: #c8aa4a; text-transform: uppercase;">The Gatekeepers Club</p>

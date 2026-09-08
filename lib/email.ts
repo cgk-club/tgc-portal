@@ -193,7 +193,7 @@ export async function sendFicheEditSubmittedNotification(data: {
 
 export async function sendOutreachEmail(to: string, subject: string, body: string) {
   await sendEmail({
-    from: `Christian de Jabrun <${FROM_EMAIL}>`,
+    from: `Christian <${FROM_EMAIL}>`,
     to,
     subject,
     text: body,
