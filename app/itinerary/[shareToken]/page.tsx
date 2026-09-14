@@ -6,10 +6,12 @@ import { getItineraryByToken } from '@/lib/itineraries'
 import { getOrgById } from '@/lib/airtable'
 import ClientItineraryCover from '@/components/client/ClientItineraryCover'
 import ClientDaySection from '@/components/client/ClientDaySection'
+import ClientEventDay from '@/components/client/ClientEventDay'
 import ClientItineraryPDF from './ClientPDF'
 import ClientChoices from './ClientChoices'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { ChoiceGroup } from '@/types'
+import { ChoiceGroup, Itinerary } from '@/types'
+import { readSettings } from '@/lib/event-vocab'
 
 interface PageProps {
   params: Promise<{ shareToken: string }>
@@ -59,9 +61,26 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
     )
   }
 
+  // Team-only lines (events) never reach this page, the PDF or the cover. The
+  // query runs as the service role, so the filter has to happen here.
+  //
+  // In an event's SUMMARY view, places and notes are removed from the data itself,
+  // not just left unrendered: this object is also handed to the PDF button, a
+  // client component, so anything left in it is serialised into the page source.
+  const summaryOnly = itinerary.kind === 'event' && readSettings(itinerary.event_settings).client_view === 'summary'
+  const publicItinerary: Itinerary = {
+    ...itinerary,
+    days: (itinerary.days || []).map((day) => ({
+      ...day,
+      items: (day.items || [])
+        .filter((item) => (item as unknown as { visibility?: string }).visibility !== 'team')
+        .map((item) => (summaryOnly ? { ...item, custom_note: null, location: null } : item)),
+    })),
+  }
+
   // Enrich fiche items with org data
-  if (itinerary.days) {
-    for (const day of itinerary.days) {
+  if (publicItinerary.days) {
+    for (const day of publicItinerary.days) {
       if (day.items) {
         for (const item of day.items) {
           if (item.fiche?.airtable_record_id) {
@@ -75,7 +94,9 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
     }
   }
 
-  const days = itinerary.days || []
+  const days = publicItinerary.days || []
+  const kind = itinerary.kind || 'trip'
+  const eventView = readSettings(itinerary.event_settings).client_view
 
   // Fetch choice groups server-side (single query, no client-side waterfalls)
   const supabase = getSupabaseAdmin()
@@ -112,7 +133,7 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
         <span className="font-heading text-sm font-semibold tracking-wider text-gold">
           THE GATEKEEPERS CLUB
         </span>
-        <ClientItineraryPDF itinerary={itinerary} />
+        <ClientItineraryPDF itinerary={publicItinerary} />
       </header>
 
       {/* Cover Image Hero */}
@@ -139,14 +160,18 @@ export default async function ItineraryPage({ params, searchParams }: PageProps)
 
       {/* Cover */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        {!itinerary.cover_image_url && <ClientItineraryCover itinerary={itinerary} />}
+        {!itinerary.cover_image_url && <ClientItineraryCover itinerary={publicItinerary} />}
 
         {/* Days with choice cards inserted after relevant days */}
         {days.map((day) => {
           const dayChoices = allChoiceGroups.filter(g => g.position_after_day === day.day_number)
           return (
             <div key={day.id}>
-              <ClientDaySection day={day} />
+              {kind === 'event' ? (
+                <ClientEventDay day={day as unknown as Parameters<typeof ClientEventDay>[0]['day']} view={eventView} />
+              ) : (
+                <ClientDaySection day={day} showDayNumber={kind !== 'programme'} />
+              )}
               {dayChoices.length > 0 && (
                 <ClientChoices
                   shareToken={shareToken}

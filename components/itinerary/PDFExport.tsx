@@ -78,13 +78,21 @@ function ItineraryPDF({ itinerary }: { itinerary: Itinerary }) {
     }
   }
 
+  // Trips count days. Events are headed by their dates, and programmes by their
+  // block titles, because "Day 3" means nothing across eight months.
+  const kind = itinerary.kind || 'trip'
+  const fmtLong = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
   let dateRange = ''
-  if (itinerary.start_date) {
+  if (kind === 'trip' && itinerary.start_date) {
     const start = new Date(itinerary.start_date + 'T00:00:00')
     const end = new Date(start)
     end.setDate(end.getDate() + days.length - 1)
-    dateRange = `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} \u2013 ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    dateRange = `${fmtLong(start)} \u2013 ${fmtLong(end)}`
+  } else {
+    const dated = days.map((d) => d.date).filter((d): d is string => !!d).sort()
+    if (dated.length) dateRange = `${fmtLong(new Date(dated[0] + 'T00:00:00'))} to ${fmtLong(new Date(dated[dated.length - 1] + 'T00:00:00'))}`
   }
+  const countLabel = kind === 'programme' ? `${days.length} sections` : `${days.length} days`
 
   return (
     <Document>
@@ -96,7 +104,7 @@ function ItineraryPDF({ itinerary }: { itinerary: Itinerary }) {
         <Text style={styles.itineraryTitle}>{itinerary.title}</Text>
         {dateRange && <Text style={styles.dateRange}>{dateRange}</Text>}
         <Text style={styles.stats}>
-          {days.length} days {destinations.size > 0 ? `\u00B7 ${destinations.size} destinations` : ''}
+          {countLabel} {destinations.size > 0 ? `\u00B7 ${destinations.size} destinations` : ''}
         </Text>
         <Text style={styles.tagline}>Curated travel, crafted personally</Text>
       </Page>
@@ -106,7 +114,11 @@ function ItineraryPDF({ itinerary }: { itinerary: Itinerary }) {
         <Page key={day.id} size="A4" style={styles.page} wrap>
           <View style={styles.dayHeader}>
             <Text style={styles.dayHeaderText}>
-              Day {day.day_number}{day.title ? ` \u2014 ${day.title}` : ''}
+              {kind === 'trip'
+                ? `Day ${day.day_number}${day.title ? ` \u2014 ${day.title}` : ''}`
+                : kind === 'event'
+                  ? `${day.date ? formatDayDate(day.date) : `Day ${day.day_number}`}${day.title ? `, ${day.title}` : ''}`
+                  : day.title || (day.date ? formatDayDate(day.date) : '')}
             </Text>
             {day.date && (
               <Text style={styles.dayDate}>{formatDayDate(day.date)}</Text>

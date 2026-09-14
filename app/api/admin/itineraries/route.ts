@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json()
   const { client_name, client_email, client_account_id, title, start_date, num_days = 3 } = body
+  const kind = ['trip', 'event', 'programme'].includes(body.kind) ? body.kind : 'trip'
 
   if (!client_name || !title) {
     return NextResponse.json({ error: 'Client name and title are required' }, { status: 400 })
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       title,
       slug,
       start_date,
+      kind,
     })
 
     // Create the specified number of days

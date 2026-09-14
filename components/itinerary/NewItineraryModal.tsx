@@ -10,6 +10,14 @@ interface NewItineraryModalProps {
   onCreated: (id: string) => void
 }
 
+type Kind = 'trip' | 'event' | 'programme'
+
+const KINDS: { value: Kind; label: string; hint: string }[] = [
+  { value: 'trip', label: 'Trip', hint: 'Days with places, stays and experiences.' },
+  { value: 'event', label: 'Event', hint: 'Run of show, guests, the team on their phones, call sheets.' },
+  { value: 'programme', label: 'Programme', hint: 'Blocks over weeks or months, no day numbers.' },
+]
+
 export default function NewItineraryModal({ onClose, onCreated }: NewItineraryModalProps) {
   const [clientName, setClientName] = useState('')
   const [clientEmail, setClientEmail] = useState('')
@@ -17,6 +25,7 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
   const [title, setTitle] = useState('')
   const [startDate, setStartDate] = useState('')
   const [numDays, setNumDays] = useState(3)
+  const [kind, setKind] = useState<Kind>('trip')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,6 +46,7 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
         title,
         start_date: startDate || undefined,
         num_days: numDays,
+        kind,
       }),
     })
 
@@ -52,7 +62,7 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[8px] w-full max-w-md">
+      <div className="bg-white rounded-[8px] w-full max-w-md max-h-[92vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg font-semibold text-green">New Itinerary</h2>
@@ -63,6 +73,21 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <fieldset>
+            <legend className="block text-sm font-medium text-gray-700 mb-1">Type</legend>
+            <div className="grid grid-cols-3 gap-2">
+              {KINDS.map((k) => (
+                <label
+                  key={k.value}
+                  className={`cursor-pointer rounded-[4px] border px-2 py-2 text-center text-sm ${kind === k.value ? 'border-green bg-green-muted text-green font-medium' : 'border-gray-300 text-gray-600'}`}
+                >
+                  <input type="radio" name="kind" value={k.value} checked={kind === k.value} onChange={() => setKind(k.value)} className="sr-only" />
+                  {k.label}
+                </label>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-500">{KINDS.find((k) => k.value === kind)?.hint}</p>
+          </fieldset>
           <ClientSelect
             value={clientAccountId}
             onChange={(id, client) => {
@@ -89,19 +114,19 @@ export default function NewItineraryModal({ onClose, onCreated }: NewItineraryMo
           />
           <Input
             label="Itinerary title"
-            placeholder="e.g. Tuscany Week"
+            placeholder={kind === 'event' ? 'e.g. Paris Fashion Week SS27' : 'e.g. Tuscany Week'}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
           <Input
-            label="Start date (optional)"
+            label={kind === 'event' ? 'First day' : 'Start date (optional)'}
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
           <Input
-            label="Number of days"
+            label={kind === 'programme' ? 'Number of blocks' : 'Number of days'}
             type="number"
             min={1}
             max={30}

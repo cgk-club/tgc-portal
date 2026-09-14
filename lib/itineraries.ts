@@ -17,6 +17,7 @@ export async function createItinerary(data: {
   title: string
   slug: string
   start_date?: string
+  kind?: 'trip' | 'event' | 'programme'
 }): Promise<Itinerary> {
   // Auto-link: if email provided but no account ID, look up client account
   let accountId = data.client_account_id || null
@@ -39,6 +40,7 @@ export async function createItinerary(data: {
       slug: data.slug,
       start_date: data.start_date || null,
       status: 'draft',
+      kind: data.kind || 'trip',
     })
     .select()
     .single()
@@ -132,12 +134,13 @@ export async function getItineraryByToken(shareToken: string): Promise<Itinerary
     .select(`
       id, slug, client_name, title, cover_image_url, summary,
       status, share_token, start_date, is_member, currency,
-      quote_status, created_at, updated_at,
+      quote_status, created_at, updated_at, kind, event_settings,
       days:itinerary_days(
         id, itinerary_id, day_number, date, title, notes, sort_order,
         items:itinerary_items(
           id, day_id, fiche_id, custom_title, custom_note,
           time_of_day, exact_time, sort_order, item_type,
+          status, visibility, location, location_confirmed, end_time,
           fiche:fiches(
             id, airtable_record_id, slug, name, location,
             hero_image_url, headline,

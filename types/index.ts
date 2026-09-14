@@ -70,6 +70,8 @@ export interface Itinerary {
   quote_token: string | null
   created_at: string
   updated_at: string
+  kind?: 'trip' | 'event' | 'programme'
+  event_settings?: { guest_call_sheets: boolean; client_view: 'summary' | 'full' }
   days?: ItineraryDay[]
 }
 

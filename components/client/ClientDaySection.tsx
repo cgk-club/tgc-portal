@@ -4,9 +4,11 @@ import ClientNoteCard from './ClientNoteCard'
 
 interface ClientDaySectionProps {
   day: ItineraryDay
+  // Programmes run for months in blocks, so "Day 3" means nothing there.
+  showDayNumber?: boolean
 }
 
-export default function ClientDaySection({ day }: ClientDaySectionProps) {
+export default function ClientDaySection({ day, showDayNumber = true }: ClientDaySectionProps) {
   const dateLabel = day.date
     ? new Date(day.date + 'T00:00:00').toLocaleDateString('en-GB', {
         weekday: 'long',
@@ -21,11 +23,20 @@ export default function ClientDaySection({ day }: ClientDaySectionProps) {
     <section className="mb-12">
       <div className="border-b-2 border-green pb-2 mb-6">
         <h3 className="font-heading text-base sm:text-lg font-semibold text-green">
-          Day {day.day_number}
-          {day.title && <span className="block sm:inline"> {'\u2014'} {day.title}</span>}
+          {showDayNumber ? (
+            <>
+              Day {day.day_number}
+              {day.title && <span className="block sm:inline"> {'—'} {day.title}</span>}
+            </>
+          ) : (
+            day.title || dateLabel
+          )}
         </h3>
-        {dateLabel && (
+        {dateLabel && showDayNumber && (
           <p className="text-sm text-gray-400 font-body mt-1">{dateLabel}</p>
+        )}
+        {dateLabel && !showDayNumber && day.title && (
+          <p className="text-sm text-gray-400 font-body mt-1">Starts {dateLabel}</p>
         )}
       </div>
 

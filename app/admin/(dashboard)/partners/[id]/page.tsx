@@ -230,6 +230,27 @@ export default function PartnerDetailPage() {
             }`}>
               {partner.status}
             </span>
+            {/* Staff are partner accounts with a staff role (ruled 14/September/2026). */}
+            <button
+              type="button"
+              onClick={async () => {
+                const next = (partner as PartnerDetail & { account_type?: string }).account_type === 'staff' ? 'partner' : 'staff'
+                const res = await fetch(`/api/admin/partners/${id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ account_type: next }),
+                })
+                if (res.ok) fetchPartner()
+              }}
+              className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium border ${
+                (partner as PartnerDetail & { account_type?: string }).account_type === 'staff'
+                  ? 'bg-green text-white border-green'
+                  : 'border-gray-300 text-gray-500 hover:border-green hover:text-green'
+              }`}
+              title="Staff are TGC's own people working on events from their phones"
+            >
+              {(partner as PartnerDetail & { account_type?: string }).account_type === 'staff' ? 'TGC staff' : 'Mark as TGC staff'}
+            </button>
             <span className="text-xs text-gray-400 font-body">
               Created {new Date(partner.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>

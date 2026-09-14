@@ -103,6 +103,12 @@ export default function ItineraryBuilderPage() {
           </button>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <a
+            href={`/admin/itineraries/${id}/event`}
+            className="rounded-[4px] border border-green px-3 py-1.5 text-sm text-green hover:bg-green hover:text-white font-body"
+          >
+            {itinerary.kind === 'event' ? 'Run of show' : 'Event tools'}
+          </a>
           <Button
             variant="ghost"
             size="sm"

@@ -138,7 +138,12 @@ export async function PATCH(
   const body = await request.json()
 
   const updates: Record<string, unknown> = {}
-  const allowed = ['org_name', 'email', 'org_ids', 'status', 'primary_org_id', 'referral_code']
+  // account_type: 'staff' marks TGC's own people (ruled 14/September/2026: staff
+  // are partner accounts with a staff role, not a separate login).
+  if ('account_type' in body && !['partner', 'staff'].includes(body.account_type)) {
+    return NextResponse.json({ error: 'account_type must be partner or staff' }, { status: 400 })
+  }
+  const allowed = ['org_name', 'email', 'org_ids', 'status', 'primary_org_id', 'referral_code', 'account_type']
   for (const key of allowed) {
     if (key in body) {
       if (key === 'email') {
